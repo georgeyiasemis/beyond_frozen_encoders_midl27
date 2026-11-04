@@ -5,27 +5,27 @@
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.88\textwidth,height=0.66\textheight,keepaspectratio]{figures/fig_arms.pdf}
-\caption{Classification with SPECTRE and Pillar-0, drawn from the implementation (TAP-CT: Figure~\ref{fig:pipeline}). (a, b) How each backbone turns a volume into the tokens the heads read: SPECTRE encodes crops separately and summarizes them with its pretrained feature combiner; Pillar-0 encodes the whole head CT with a convolutional stem and a three-stage multi-scale transformer. (c) The encoder components each of the eleven methods trains, its head, its number of steps and the number of encoder parameters that receive a gradient; for Pillar-0 this excludes per-scale blocks that never run, and the note gives the logged counts that include them.}
+\includegraphics[width=\textwidth,height=0.71\textheight,keepaspectratio]{figures/fig_arms.pdf}
+\caption{Classification with SPECTRE and Pillar-0; TAP-CT is shown in Figure~\ref{fig:pipeline}. (a, b) How each backbone turns a volume into the tokens that the heads read. SPECTRE encodes crops separately and summarizes them with its pretrained feature combiner, whereas Pillar-0 encodes the whole head CT with a convolutional stem and a three-stage multi-scale transformer. (c) The encoder components that each of the eleven methods trains, its head, its number of steps and the number of encoder parameters that receive a gradient. For Pillar-0, this count excludes per-scale blocks that never run. The CVPR26 joint models were also trained for 26\,000 steps (13\,000 + 13\,000).}
 \label{fig:arms}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_arms_seg.pdf}
-\caption{Segmentation decoder and methods, drawn from the implementation. (a) Tensor shapes through the decoder for TAP-CT and SPECTRE, from the four encoder taps to the $C$ output maps (one per structure). (b) The encoder components each of the seven methods trains and the number of encoder parameters that receive a gradient; the SPECTRE counts exclude the feature combiner, which the adapters wrap but which does not enter the segmentation features.}
+\caption{Segmentation decoder and methods. (a) Tensor shapes through the decoder for TAP-CT and SPECTRE, from the four encoder taps to the $C$ output maps, one per structure. (b) The encoder components that each of the seven methods trains and the number of encoder parameters that receive a gradient. The decoder reads blocks 3, 6, 9 and 12 of TAP-CT or 6, 12, 18 and 24 of SPECTRE after the final normalization; each $3^3$ convolution is followed by instance normalization and a leaky ReLU, upsampling is trilinear along the axes whose stride is still above 1, and there are no skip connections from the input. The decoder has 2.45\,M (TAP-CT) and 2.62\,M (SPECTRE) parameters for $C=15$, and Lin, a $1\times1\times1$ convolution on the deepest tap followed by trilinear upsampling, has 769 and 1081 parameters per structure; $C$ is 1 per structure or the number of structures in joint training. The AMOS22 and TotalSegmentator joint models were trained for 24\,000 steps (12\,000 + 12\,000 for the two-stage method). On SPECTRE, LoRA, DoRA, Dec$\to$LoRA and Full FT also wrap or unfreeze the feature combiner, which never enters the segmentation features and receives no gradient; the counts exclude it, and including it gives 2.4\,M, 2.5\,M, 2.4\,M and 397\,M parameters, respectively.}
 \label{fig:armsseg}
 \end{figure}
 
-\paragraph{Input preprocessing.} Every volume is reoriented to the frame of the backbone's pretraining and resampled to its grid. TAP-CT: LPS, native slice spacing, in-plane trilinear resize to $224\times224$, depth padded with air to at least 12 slices and to a multiple of 4; HU clipped to $[-1008, 822]$ and standardized with the model's mean and standard deviation; windows of 12 slices with a stride of 3 slices plus a final window ending at the last slice (at most 32 windows per training step, all windows at evaluation). SPECTRE: RAS, $0.5\times0.5\times1$\,mm, centered $512\times512\times256$ field of view padded with the scan minimum, HU in $[-1000, 1000]$ scaled to $[0,1]$; a $4\times4\times4$ grid of 64 crops of $128\times128\times64$ voxels at evaluation and a random contiguous $2\times2\times2$ sub-grid of 8 crops at training; each crop is summarized by its CLS token concatenated with its mean patch token before the feature combiner. Pillar-0: LPI, $0.5\times0.5\times1.25$\,mm, centered $128\times256\times256$ volume, eleven input channels (ten fixed center/width windows and a per-volume min--max channel), one forward pass; the linear head reads the model's L2-normalized pooled embedding (three scales concatenated, 1152-d), the attentive head reads the tokens of the three scales, any scale with more than 4096 tokens being average-pooled on its grid. For segmentation, TAP-CT keeps the classification grid (in-plane 224, native depth) and crops of $12\times224\times224$ voxels; SPECTRE resamples to 1\,mm and uses crops of $64\times128\times128$ voxels. A training crop is centered on a random foreground voxel of the run's structures with probability 0.67 and placed uniformly otherwise; volumes smaller than the crop are padded with the image minimum. At evaluation the whole volume is covered by a sliding window with Gaussian weighting (overlap 0.5 for TAP-CT, 0.25 for SPECTRE) and Dice is computed on the backbone's working grid, without post-processing.
+\paragraph{Input Preprocessing} Every volume is reoriented to the frame of the backbone's pretraining and resampled to its grid. TAP-CT: LPS, native slice spacing, in-plane trilinear resize to $224\times224$, depth padded with air to at least 12 slices and to a multiple of 4; HU clipped to $[-1008, 822]$ and standardized with the model's mean and standard deviation; windows of 12 slices with a stride of 3 slices plus a final window ending at the last slice (at most 32 windows per training step, all windows at evaluation). SPECTRE: RAS, $0.5\times0.5\times1$\,mm, centered $512\times512\times256$ field of view padded with the scan minimum, HU in $[-1000, 1000]$ scaled to $[0,1]$; a $4\times4\times4$ grid of 64 crops of $128\times128\times64$ voxels at evaluation and a random contiguous $2\times2\times2$ sub-grid of 8 crops at training; each crop is summarized by its CLS token concatenated with its mean patch token before the feature combiner. Pillar-0: LPI, $0.5\times0.5\times1.25$\,mm, centered $128\times256\times256$ volume, eleven input channels (ten fixed center/width windows and a per-volume min--max channel), one forward pass; the linear head reads the model's L2-normalized pooled embedding (three scales concatenated, 1152-d), the attentive head reads the tokens of the three scales, any scale with more than 4096 tokens being average-pooled on its grid. For segmentation, TAP-CT keeps the classification grid (in-plane 224, native depth) and crops of $12\times224\times224$ voxels; SPECTRE resamples to 1\,mm and uses crops of $64\times128\times128$ voxels. A training crop is centered on a random foreground voxel of the run's structures with probability 0.67 and placed uniformly otherwise; volumes smaller than the crop are padded with the image minimum. At evaluation the whole volume is covered by a sliding window with Gaussian weighting (overlap 0.5 for TAP-CT, 0.25 for SPECTRE) and Dice is computed on the backbone's working grid, without post-processing.
 
-\paragraph{Heads.} The linear head is dropout (0.2) followed by one linear layer on the pooled feature: the mean of the window CLS tokens for TAP-CT (768-d), the feature combiner's CLS token for SPECTRE (1080-d) and the pooled image embedding for Pillar-0 (1152-d). The attentive probe prepends a learnable CLS token to the token set (the window CLS tokens for TAP-CT, the combiner tokens for SPECTRE and the multi-scale tokens for Pillar-0), applies two pre-norm transformer blocks with eight-head self-attention and a GELU feed-forward layer of ratio 4, normalises the CLS output and maps it through dropout (0.2) and a linear layer. LoRA+ABMIL pools the window or crop tokens by gated attention \citep{ilse2018abmil}, $a_i=\mathrm{softmax}_i\big(\bm{w}^\top(\tanh(\bm{V}\bm{x}_i)\odot\sigma(\bm{U}\bm{x}_i))\big)$ with hidden size 128, and feeds the pooled token to the attentive probe. The segmentation linear probe is a $1\times1\times1$ convolution on the deepest grid (TAP-CT block 12, SPECTRE block 24), upsampled trilinearly. The decoder projects each of the four grids to 128 channels with a $1\times1\times1$ convolution, resizes them to a common grid (the token grid), concatenates them (512 channels), fuses them with a $3^3$ convolution, instance normalization and leaky ReLU to 128 channels, then applies stages of trilinear $\times2$ upsampling followed by the same convolution block that halves the channels (to a minimum of 16) until the voxel grid is reached (three stages for TAP-CT, four for SPECTRE), and ends with a $1\times1\times1$ convolution to one logit per structure. It has 2.45\,M (TAP-CT) and 2.62\,M (SPECTRE) parameters plus $17C$ or $33C$ for $C$ structures, and no skip connections from the input.
+\paragraph{Heads} The linear head is dropout (0.2) followed by one linear layer on the pooled feature: the mean of the window CLS tokens for TAP-CT (768-d), the feature combiner's CLS token for SPECTRE (1080-d) and the pooled image embedding for Pillar-0 (1152-d). The attentive probe prepends a learnable CLS token to the token set (the window CLS tokens for TAP-CT, the combiner tokens for SPECTRE and the multi-scale tokens for Pillar-0), applies two pre-norm transformer blocks with eight-head self-attention and a GELU feed-forward layer of ratio 4, normalizes the CLS output and maps it through dropout (0.2) and a linear layer. For one label, the linear head has 769, 1081 and 1153 parameters and the attentive probe 14.2, 28.0 and 31.9\,M on TAP-CT, SPECTRE and Pillar-0, respectively. LoRA+ABMIL pools the window or crop tokens by gated attention \citep{ilse2018abmil}, $a_i=\mathrm{softmax}_i\big(\bm{w}^\top(\tanh(\bm{V}\bm{x}_i)\odot\sigma(\bm{U}\bm{x}_i))\big)$ with hidden size 128, and feeds the pooled token to the attentive probe. The segmentation linear probe is a $1\times1\times1$ convolution on the deepest grid (TAP-CT block 12, SPECTRE block 24), upsampled trilinearly. The decoder projects each of the four grids to 128 channels with a $1\times1\times1$ convolution, resizes them to a common grid (the token grid), concatenates them (512 channels), fuses them with a $3^3$ convolution, instance normalization and leaky ReLU to 128 channels, then applies stages of trilinear $\times2$ upsampling followed by the same convolution block that halves the channels (to a minimum of 16) until the voxel grid is reached (three stages for TAP-CT, four for SPECTRE), and ends with a $1\times1\times1$ convolution to one logit per structure. It has 2.45\,M (TAP-CT) and 2.62\,M (SPECTRE) parameters plus $17C$ or $33C$ for $C$ structures, and no skip connections from the input.
 
-\paragraph{Adapters.} LoRA \citep{hu2022lora} replaces a frozen projection $\bm{W}_0\bm{x}$ by $\bm{W}_0\bm{x}+\tfrac{\alpha}{r}\bm{B}\bm{A}\,\mathrm{drop}(\bm{x})$ with $r=16$, $\alpha=32$ and dropout 0.1; $\bm{A}$ is initialized Kaiming-uniform and $\bm{B}$ at zero, so training starts from the pretrained model. It is applied to the fused query/key/value projection of every TAP-CT block and to the separate query and key/value projections of every SPECTRE block, of SPECTRE's feature combiner, and of every Pillar-0 block. Late adapters cover TAP-CT blocks 9--12, SPECTRE blocks 17--24 and its feature combiner and the third stage of Pillar-0 (8 of 12 blocks). rsLoRA scales the update by $\alpha/\sqrt{r}$ instead of $\alpha/r$. DoRA \citep{liu2024dora} rescales each row of the adapted weight to a learned magnitude $\bm{m}$, $\bm{W}=\bm{m}\odot(\bm{W}_0+\tfrac{\alpha}{r}\bm{B}\bm{A})/\lVert\bm{W}_0+\tfrac{\alpha}{r}\bm{B}\bm{A}\rVert_{\text{row}}$, with $\bm{m}$ initialized to the row norms of $\bm{W}_0$; the magnitude is a two-dimensional parameter and receives weight decay like the adapter matrices. Attention-only fine-tuning unfreezes every parameter of the attention modules that LoRA would adapt (query, key, value and output projections with their biases). In segmentation the SPECTRE adapters and full fine-tuning also cover the feature combiner, which the segmentation path does not evaluate; those parameters receive no gradient.
+\paragraph{Adapters} LoRA \citep{hu2022lora} replaces a frozen projection $\bm{W}_0\bm{x}$ by $\bm{W}_0\bm{x}+\tfrac{\alpha}{r}\bm{B}\bm{A}\,\mathrm{drop}(\bm{x})$ with $r=16$, $\alpha=32$ and dropout 0.1; $\bm{A}$ is initialized Kaiming-uniform and $\bm{B}$ at zero, so training starts from the pretrained model. It is applied to the fused query/key/value projection of every TAP-CT block and to the separate query and key/value projections of every SPECTRE block, of SPECTRE's feature combiner, and of every Pillar-0 block. Late adapters cover TAP-CT blocks 9--12, SPECTRE blocks 17--24 and its feature combiner and the third stage of Pillar-0 (8 of 12 blocks). rsLoRA scales the update by $\alpha/\sqrt{r}$ instead of $\alpha/r$. DoRA \citep{liu2024dora} rescales each row of the adapted weight to a learned magnitude $\bm{m}$, $\bm{W}=\bm{m}\odot(\bm{W}_0+\tfrac{\alpha}{r}\bm{B}\bm{A})/\lVert\bm{W}_0+\tfrac{\alpha}{r}\bm{B}\bm{A}\rVert_{\text{row}}$, with $\bm{m}$ initialized to the row norms of $\bm{W}_0$; the magnitude is a two-dimensional parameter and receives weight decay like the adapter matrices. Attention-only fine-tuning unfreezes every parameter of the attention modules that LoRA would adapt (query, key, value and output projections with their biases). On Pillar-0, the per-scale blocks of scales that have already left the encoder and the text projection are also wrapped or unfrozen, but they never run and receive no gradient; counting them, LoRA updates 1.1\,M, LoRA$_{\text{late}}$ 0.74\,M, Attn-only FT 21\,M and Full FT 94\,M parameters (Figure~\ref{fig:arms}c excludes them). In segmentation the SPECTRE adapters and full fine-tuning also cover the feature combiner, which the segmentation path does not evaluate; those parameters receive no gradient.
 
-\paragraph{Two-stage methods.} Lin$\to$LoRA and Attn$\to$LoRA take the probe weights from the parent run's checkpoint at step 4000 of its 8000-step schedule, add late-block LoRA with $\bm{B}=0$, and train 4000 further steps with a fresh optimizer and schedule. Dec$\to$LoRA takes the decoder from the Dec run at the midpoint of its schedule (step 4000; step 12\,000 for the 24\,000-step joint models) and trains all-block LoRA with the decoder for the second half.
+\paragraph{Two-stage Methods} Lin$\to$LoRA and Attn$\to$LoRA take the probe weights from the parent run's checkpoint at step 4000 of its 8000-step schedule, add late-block LoRA with $\bm{B}=0$, and train 4000 further steps with a fresh optimizer and schedule. Dec$\to$LoRA takes the decoder from the Dec run at the midpoint of its schedule (step 4000; step 12\,000 for the 24\,000-step joint models) and trains all-block LoRA with the decoder for the second half.
 
-\paragraph{Optimization.} AdamW uses $\beta=(0.9, 0.999)$ and $\epsilon=10^{-8}$ (the framework defaults; no run overrides them). The learning rate rises linearly from 1\% of its peak over the first 10\% of the steps and then follows a cosine to $10^{-6}$. Weight decay is applied to parameters of dimension two or more, excluding biases and normalization weights. Gradients are not clipped. Classification trains at batch size 1, chosen empirically, without gradient accumulation; segmentation at a micro-batch of 2 crops with accumulation 2, so four crops per step. The classification loss for a case with logits $\bm{z}$, labels $\bm{y}$ and known-label mask $\bm{m}$ is
+\paragraph{Optimization} We used AdamW with the default $\beta=(0.9, 0.999)$ and $\epsilon=10^{-8}$ in all runs. The learning rate rises linearly from 1\% of its peak over the first 10\% of the steps and then follows a cosine to $10^{-6}$. Weight decay is applied to parameters of dimension two or more, excluding biases and normalization weights. Gradients are not clipped. Classification trains at batch size 1, chosen empirically, without gradient accumulation; segmentation at a micro-batch of 2 crops with accumulation 2, so four crops per step. The classification loss for a case with logits $\bm{z}$, labels $\bm{y}$ and known-label mask $\bm{m}$ is
 \begin{equation}
 \mathcal{L}_{\text{cls}}=\frac{1}{B}\sum_{b=1}^{B}\sum_{t} m_{bt}\,\mathrm{BCE}(z_{bt}, y_{bt}; w_t), \qquad w_t=\mathrm{clip}\Big(\frac{n^{-}_t}{n^{+}_t}, 0.05, 20\Big),
 \label{eq:lcls}
@@ -40,7 +40,7 @@ In the joint CVPR26 models the three sources are sampled in the ratio 10:8:8 (AM
 
 \begin{table}[H]
 \centering
-\caption{Classification settings per method. LoRA-type adapters have rank 16, $\alpha=32$ and dropout 0.1. Learning rate and weight decay apply to every trained parameter unless a backbone/head pair is given. All runs: AdamW, 8000 steps (two-stage: 4000 + 4000), batch size 1, warm-up 10\%, cosine to $10^{-6}$, bf16, head dropout 0.2.}
+\caption{Classification settings per method. LoRA-type adapters have rank 16, $\alpha=32$ and dropout 0.1. The learning rate and weight decay apply to every trained parameter unless separate values are given for the encoder and the head. All runs use AdamW for 8000 steps (two-stage methods: 4000 + 4000) at batch size 1, with a 10\% warm-up, cosine decay to $10^{-6}$, bf16 precision and a head dropout of 0.2.}
 \label{tab:optim}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\small
 \begin{tabular}{@{}llll@{}}
@@ -71,7 +71,7 @@ rsLoRA, matched LR & LoRA, scale $\alpha/\sqrt{r}$ & attentive & $2.5\times10^{-
 
 \begin{table}[H]
 \centering
-\caption{Segmentation settings per method. All runs: AdamW, 8000 steps (24\,000 for the AMOS22 and TotalSegmentator joint models; two-stage methods split the budget in halves), four crops per step, warm-up 10\%, cosine to $10^{-6}$, bf16. LoRA-type adapters as in Table~\ref{tab:optim}.}
+\caption{Segmentation settings per method. All runs use AdamW for 8000 steps (24\,000 for the AMOS22 and TotalSegmentator joint models; two-stage methods split the budget in halves) with four crops per step, a 10\% warm-up, cosine decay to $10^{-6}$ and bf16 precision. LoRA-type adapters are configured as in Table~\ref{tab:optim}.}
 \label{tab:optimseg}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\small
 \begin{tabular}{@{}llll@{}}
@@ -95,12 +95,12 @@ Compute-matched per-structure & Dec, LoRA, Full FT at 1600 steps per structure &
 
 \begin{table}[H]
 \centering
-\caption{Training cost per method. GiB: peak GPU memory of one training step (forward, backward and AdamW update in bf16, weights included) on one \numCostMemGpu{}, for the largest of 16 training inputs of FDG-PET/CT (TAP-CT, SPECTRE) or RSNA 2019 ICH (Pillar-0) at batch size 1, and for a micro-batch of two AMOS22 crops in segmentation. s: GPU time of that step, without data loading. min: wall-clock minutes per 1000 training steps of our runs, validation excluded and data loading included, converted to one \numCostRefGpu{} with a factor per GPU model estimated from configurations that ran on several models (typical deviation of a run from the fit: \numCostResidSdCls\% in classification, \numCostResidSdSeg\% in segmentation). Two-stage methods: second stage.}
+\caption{Training cost per method. GiB is the peak GPU memory of one training step (forward pass, backward pass and AdamW update in bf16, weights included) on one \numCostMemGpu{}, measured for the largest of 16 training inputs of FDG-PET/CT (TAP-CT, SPECTRE) or RSNA19 ICH (Pillar-0) at batch size 1, and for a micro-batch of two AMOS22 crops in segmentation. The column s gives the GPU time of that step without data loading. The column min gives the wall-clock minutes per 1000 training steps of our runs, excluding validation and including data loading, converted to one \numCostRefGpu{} with a factor per GPU model that was estimated from configurations that ran on several models (typical deviation of a run from the fit: \numCostResidSdCls\% in classification and \numCostResidSdSeg\% in segmentation). For two-stage methods, the second stage is reported.}
 \label{tab:cost}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\footnotesize\input{tables/tab_cost.tex}}
 \end{table}
 
-\paragraph{Model selection and per-case outputs.} Every 1000 steps the selection and held-out splits are evaluated and a checkpoint of the trained parameters is written; the checkpoint with the highest selection macro AUROC (mean over labels with both classes present) or mean Dice (mean over structures of the mean over cases in which the structure is present in the reference or the prediction) is kept, ties keeping the earlier checkpoint. For TotalSegmentator only the selection split is evaluated during training; the held-out split is evaluated afterwards with the selected checkpoint, and the recomputed selection Dice is required to match the recorded value within 0.005. Per case, the held-out probability of every known label (classification) and the Dice of every structure (segmentation) at the selected checkpoint are stored and are the input of every number in this paper. Dice thresholds the logits at 0; a structure enters a case's mean when the reference or the prediction contains it, so a false-positive structure scores 0 and an absent, unpredicted structure is skipped.
+\paragraph{Model Selection and Per-case Outputs} Every 1000 steps the selection and held-out splits are evaluated and a checkpoint of the trained parameters is written; the checkpoint with the highest selection macro AUROC (mean over labels with both classes present) or mean Dice (mean over structures of the mean over cases in which the structure is present in the reference or the prediction) is kept, ties keeping the earlier checkpoint. For TotalSegmentator only the selection split is evaluated during training; the held-out split is evaluated afterwards with the selected checkpoint, and the recomputed selection Dice is required to match the recorded value within 0.005. Per case, the held-out probability of every known label (classification) and the Dice of every structure (segmentation) at the selected checkpoint are stored and are the input of every number in this paper. Dice thresholds the logits at 0; a structure enters a case's mean when the reference or the prediction contains it, so a false-positive structure scores 0 and an absent, unpredicted structure is skipped.
 
 \clearpage
 \section{Statistical procedure}
@@ -114,41 +114,41 @@ Compute-matched per-structure & Dec, LoRA, Full FT at 1600 steps per structure &
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_key.pdf}
-\caption{Label-level mean difference in held-out AUROC (a) or Dice (b) for the comparisons of Table~\ref{tab:key}, per backbone, with the 95\% interval over cohorts, labels and held-out cases; 0 means no difference. A triangle at the axis edge marks an estimate beyond the axis, with its value printed. The SPECTRE Full FT $-$ Lin estimate includes runs that did not train.}
+\caption{Label-level mean difference in held-out AUROC (a) and Dice (b) for the comparisons of Table~\ref{tab:key}, per backbone, with the 95\% interval over cohorts, labels and held-out cases. The SPECTRE Full FT $-$ Lin estimate includes runs that did not train.}
 \label{fig:key}
 \end{figure}
 
 \begin{table}[H]
 \centering
-\caption{Classification headline: pooled held-out AUROC per backbone (mean over all label comparisons, $n$ = labels $\times$ \{per-task, joint\}), and per-label paired comparisons of LoRA against the linear probe and against full fine-tuning (DeLong, Benjamini--Hochberg; ``sig.'' = corrected $p<0.05$ in the stated direction). The mean gain of LoRA over the probe is similar for small and large held-out splits ($\numSigbysizeSmallMeandiff$ below 100 cases, $\numSigbysizeLargeMeandiff$ above 400) but significant in \numSigbysizeSmallSig\% and \numSigbysizeLargeSig\% of these comparisons; every comparison above 400 cases is from the hemorrhage cohort.}
+\caption{Classification headline results: pooled held-out AUROC per backbone (mean over all label comparisons, where $n$ = labels $\times$ \{per-task, joint\}) and per-label paired comparisons of LoRA against the linear probe and against full fine-tuning (DeLong test with Benjamini--Hochberg correction), where ``sig.'' denotes a corrected $p<0.05$ in the stated direction. The mean gain of LoRA over the probe is similar for small and large held-out splits ($\numSigbysizeSmallMeandiff$ below 100 cases and $\numSigbysizeLargeMeandiff$ above 400), but it is significant in \numSigbysizeSmallSig\% and \numSigbysizeLargeSig\% of these comparisons, respectively; every comparison above 400 cases is from RSNA19 ICH.}
 \label{tab:headline}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\footnotesize\input{tables/tab_headline.tex}}
 \end{table}
 
 \begin{table}[H]
 \centering
-\caption{Classification methods: trainable parameters of a single-label model as logged (head included; for Pillar-0 the count includes parameters of per-scale blocks that never run and receive no gradient, so the encoder parameters updated are about half, Figure~\ref{fig:arms}); mean rank within each of the \numRankSlotsN{} label--mode pairs ($\downarrow$; on SPECTRE among the ten methods that trained); share of pairs within 0.01 AUROC of the best method ($\uparrow$); mean AUROC deficit to the best method ($\downarrow$). \textbf{Bold}: best, \underline{underlined}: second best of each rank and score column. Full FT's pooled values exclude SPECTRE, where it did not train, so they are not comparable with the other methods' and are not marked. Choosing the method per label on the selection split finds the held-out best in \numSelectHit\% of pairs and lowers the mean deficit from $\numRegretAttnft$ (always attention-only fine-tuning) to $\numSelectRegret$, at eleven runs per label instead of one.}
+\caption{Classification methods compared by trainable parameters, rank and AUROC deficit. Trainable parameters are given for a single-label model, including the head; for Pillar-0, the count includes parameters of per-scale blocks that never run and receive no gradient, so the encoder parameters that are updated are about half of it (Figure~\ref{fig:arms}). The mean rank ($\downarrow$) is taken within each of the \numRankSlotsN{} label--mode pairs, on SPECTRE among the ten methods that trained. The table further gives the share of pairs within 0.01 AUROC of the best method ($\uparrow$) and the mean AUROC deficit to the best method ($\downarrow$). \textbf{Bold} marks the best and \underline{underlining} the second-best value of each rank and score column. The pooled values of Full FT exclude SPECTRE, where it did not train, so they are not comparable with those of the other methods and are not marked. Choosing the method per label on the selection split finds the held-out best in \numSelectHit\% of pairs and lowers the mean deficit from $\numRegretAttnft$ (always attention-only fine-tuning) to $\numSelectRegret$, at eleven runs per label instead of one.}
 \label{tab:methods}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\footnotesize\input{tables/tab_methods.tex}}
 \end{table}
 
 \begin{table}[H]
 \centering
-\caption{Label-level differences with 95\% intervals. Each label (or structure) counts once, with its per-task and joint differences averaged (except the two LoRA $-$ Dec sub-rows). Intervals are percentile bootstraps (4000 resamples) over cohort--backbone groups and labels within them, without and with a third stage that resamples the held-out cases of each drawn label (Appendix~\ref{app:stats}). Pillar-0 has one cohort, so its interval resamples labels and cases only. The last column counts the cohorts (datasets) with a positive mean difference.}
+\caption{Label-level differences with 95\% intervals. Each label (or structure) counts once, with its per-task and joint differences averaged, except in the two LoRA $-$ Dec sub-rows. The intervals are percentile bootstraps (4000 resamples) over cohort--backbone groups and labels within them, without and with a third stage that resamples the held-out cases of each drawn label (Appendix~\ref{app:stats}). As Pillar-0 has one cohort, its interval resamples labels and cases only. The last column counts the cohorts (datasets) with a positive mean difference.}
 \label{tab:cis}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\footnotesize\input{tables/tab_cis.tex}}
 \end{table}
 
 \begin{table}[H]
 \centering
-\caption{Per-label paired comparisons of held-out AUROC against the linear probe and against full fine-tuning, over the per-task and joint modes (DeLong test; Benjamini--Hochberg correction within each baseline over the comparisons of TAP-CT, SPECTRE and Pillar-0). ``Better'' is the share of label--mode pairs in which the method's AUROC exceeds the baseline's; ``Sig.'' the share in which, in addition, the corrected $p<0.05$. SPECTRE Full FT did not train.}
+\caption{Per-label paired comparisons of held-out AUROC against the linear probe and against full fine-tuning, over the per-task and joint modes. We used DeLong's test with Benjamini--Hochberg correction within each baseline over the comparisons of TAP-CT, SPECTRE and Pillar-0. ``Better'' is the share of label--mode pairs in which the method's AUROC exceeds that of the baseline, and ``Sig.'' the share in which, in addition, the corrected $p<0.05$. SPECTRE Full FT did not train.}
 \label{tab:paired}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\footnotesize\input{tables/tab_cls_paired.tex}}
 \end{table}
 
 \begin{table}[H]
 \centering
-\caption{Per-structure paired comparisons of held-out Dice over the per-structure and joint modes against the linear probe and the frozen decoder (paired bootstrap of the mean per-case difference, 4000 resamples; Benjamini--Hochberg correction within each baseline). Pairing keeps the cases on which a structure enters the Dice of both methods (present in the reference or in either prediction), so the mean differences here can differ from the differences of structure means in Table~\ref{tab:seg}.}
+\caption{Per-structure paired comparisons of held-out Dice against the linear probe and the frozen decoder, over the per-structure and joint modes, using a paired bootstrap of the mean per-case difference (4000 resamples) with Benjamini--Hochberg correction within each baseline. Pairing keeps the cases on which a structure enters the Dice of both methods, that is, where it is present in the reference or in either prediction, so the mean differences can differ from the differences of structure means in Table~\ref{tab:seg}.}
 \label{tab:segpaired}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\footnotesize\input{tables/tab_seg_paired.tex}}
 \end{table}
@@ -156,27 +156,27 @@ Compute-matched per-structure & Dec, LoRA, Full FT at 1600 steps per structure &
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_methods.pdf}
-\caption{Per-label change in held-out AUROC of each classification method relative to the linear probe of the same backbone, cohort and mode, one panel per method; rows are cohorts, color is the backbone, small markers are single label--mode comparisons and large markers the mean per cohort and backbone. Titles give the mean change and the share above zero over the pairs of all three backbones that trained. SPECTRE Full FT did not train; its cohort means are drawn open and left out of the title.}
+\caption{Per-label change in held-out AUROC of each classification method relative to the linear probe of the same backbone, cohort and training mode, with one panel per method. Rows are cohorts and colors denote backbones; small markers denote individual label--mode comparisons and large markers the mean per cohort and backbone. Panel titles give the mean change and the share above zero over the pairs of all three backbones that trained. SPECTRE Full FT did not train, so its cohort means are drawn open and excluded from the title.}
 \label{fig:methods}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_seg_methods.pdf}
-\caption{Per-structure change in held-out Dice of each segmentation method relative to the linear probe of the same backbone, dataset and mode, one panel per method; rows are datasets, color is the backbone, small markers are single structure--mode comparisons and large markers the mean per dataset and backbone.}
+\caption{Per-structure change in held-out Dice of each segmentation method relative to the linear probe of the same backbone, dataset and training mode, with one panel per method. Rows are datasets and colors denote backbones; small markers denote individual structure--mode comparisons and large markers the mean per dataset and backbone. Panel titles give the mean change and the share above zero, as in Figure~\ref{fig:methods}. The values for LoRA$_{\text{late}}$, DoRA and Dec$\to$LoRA exclude TotalSegmentator per-structure models, which were not trained for these methods.}
 \label{fig:segmethods}
 \end{figure}
 
 \begin{table}[H]
 \centering
-\caption{Encoder adaptation on top of the frozen decoder per dataset, backbone and mode: difference of structure-mean held-out Dice. Joint rows of AMOS22 and TotalSegmentator use the 24\,000-step schedule; the 8000-step rows show the same models under the shared budget.}
+\caption{Encoder adaptation on top of the frozen decoder, given as the difference of structure-mean held-out Dice per dataset, backbone and training mode. Joint rows of AMOS22 and TotalSegmentator use the 24\,000-step schedule, whereas the 8000-step rows show the same models under the shared budget.}
 \label{tab:segmodes}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\footnotesize\input{tables/tab_seg_modes.tex}}
 \end{table}
 
 \begin{table}[H]
 \centering
-\caption{The training budget of the 15-structure joint models (AMOS22, TotalSegmentator): held-out Dice, mean over structures, for one model per structure (8000 steps each), one joint model under the shared 8000 steps, and one joint model with three times the steps (Dec$\to$LoRA: 12\,000 + 12\,000).}
+\caption{Training budget of the 15-structure joint models (AMOS22, TotalSegmentator). The table gives held-out Dice, averaged over structures, for one model per structure (8000 steps each), one joint model under the shared 8000 steps and one joint model with three times the steps (Dec$\to$LoRA: 12\,000 + 12\,000).}
 \label{tab:segbudget}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\footnotesize\input{tables/tab_seg_budget.tex}}
 \end{table}
@@ -184,33 +184,33 @@ Compute-matched per-structure & Dec, LoRA, Full FT at 1600 steps per structure &
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.62\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_seg_budget.pdf}
-\caption{Validation Dice during training of the 15-structure AMOS22 joint model with the frozen decoder, LoRA and full fine-tuning, on TAP-CT (solid) and SPECTRE (dashed); thick lines stop at the shared 8000 steps, thin lines run 24\,000 steps.}
+\caption{Validation Dice during training of the 15-structure AMOS22 joint model with the frozen decoder, LoRA and full fine-tuning, on TAP-CT (solid) and SPECTRE (dashed). Thick lines stop at the shared 8000 steps, whereas thin lines run for 24\,000 steps.}
 \label{fig:segbudget}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_seg_convergence.pdf}
-\caption{Validation Dice at each evaluation minus that at the run's last evaluation, median over the runs of each schedule group, for Lin, Dec, LoRA and Full FT on TAP-CT (solid) and SPECTRE (dashed). Every curve ends at zero by construction; a curve still rising at the right edge had not converged.}
+\caption{Validation Dice at each evaluation minus that at the run's last evaluation, as the median over the runs of each schedule group, for Lin, Dec, LoRA and Full FT on TAP-CT (solid) and SPECTRE (dashed). Every curve ends at zero by construction, and a curve that is still rising at the right edge had not converged. Overall, \numConvSegAllLateBetter\% of segmentation runs selected one of their last two validations.}
 \label{fig:segconv}
 \end{figure}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_joint.pdf}
-\caption{Joint minus per-task held-out AUROC, mean over the labels of each cohort, for Lin, LoRA, LoRA+ABMIL, Attn-only FT and Full FT, per backbone (SPECTRE Full FT, which did not train, is not shown). Right of zero favors one joint model per cohort.}
+\caption{Joint minus per-task held-out AUROC, averaged over the labels of each cohort, for Lin, LoRA, LoRA+ABMIL, Attn-only FT and Full FT per backbone; SPECTRE Full FT, which did not train, is not shown. Values right of zero favor one joint model per cohort.}
 \label{fig:joint}
 \end{figure}
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_bbgap.pdf}
-\caption{Between-backbone difference per method: SPECTRE minus TAP-CT held-out AUROC per cohort (a) and held-out Dice per dataset (b), on the same labels or structures and modes. SPECTRE Full FT, which did not train in classification, is not shown in (a). Dice in (b) is computed on each backbone's own grid, so part of a difference can come from the grid.}
+\caption{Between-backbone difference per method, given as SPECTRE minus TAP-CT held-out AUROC per cohort (a) and held-out Dice per dataset (b), on the same labels or structures and modes. SPECTRE Full FT, which did not train in classification, is not shown in (a). Dice in (b) is computed on each backbone's own grid, so part of a difference can come from the grid and part from the pretraining overlap in Table~\ref{tab:overlap}.}
 \label{fig:bbgap}
 \end{figure}
 
 \begin{table}[H]
 \centering
-\caption{Median over label--mode pairs of the standard deviation of the held-out probabilities per backbone and method (the did-not-train rule flags values below \numSpreadMinValue{}; applied to TAP-CT, SPECTRE and Pillar-0 only).}
+\caption{Median over label--mode pairs of the standard deviation of the held-out probabilities, per backbone and method. The did-not-train rule flags values below \numSpreadMinValue{} and is applied to TAP-CT, SPECTRE and Pillar-0. The flagged value is shown in bold and marked with $^{\dagger}$, denoting a method that did not train (Section~\ref{sec:setup}).}
 \label{tab:spread}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\small\input{tables/tab_spread.tex}}
 \end{table}
@@ -221,21 +221,21 @@ Compute-matched per-structure & Dec, LoRA, Full FT at 1600 steps per structure &
 
 \begin{table}[H]
 \centering
-\caption{Held-out AUROC of the joint classification models across seeds 42, 43 and 44: mean over the cohort's labels, given as mean $\pm$ standard deviation over the seeds (their number in brackets), and the number of seeds in which the mean label difference between two methods is positive. SPECTRE Full FT, which did not train, has seed 42 only.}
+\caption{Held-out AUROC of the joint classification models across seeds 42, 43 and 44, averaged over the cohort's labels and given as mean $\pm$ standard deviation over the seeds (their number in brackets), together with the number of seeds in which the mean label difference between two methods is positive. SPECTRE Full FT, which did not train, has seed 42 only.}
 \label{tab:seedscls}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\scriptsize\input{tables/tab_seeds_cls.tex}}
 \end{table}
 
 \begin{table}[H]
 \centering
-\caption{Segmentation across seeds: held-out Dice of the joint models (AMOS22 and TotalSegmentator: 24\,000 steps), mean over structures, as in Table~\ref{tab:seedscls}.}
+\caption{Held-out Dice of the joint segmentation models across seeds, averaged over structures, as in Table~\ref{tab:seedscls}. The AMOS22 and TotalSegmentator joint models were trained for 24\,000 steps.}
 \label{tab:seedsseg}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\footnotesize\input{tables/tab_seeds_seg.tex}}
 \end{table}
 
 \begin{table}[H]
 \centering
-\caption{Held-out AUROC of the joint classification models under the default and three alternative full fine-tuning settings, mean over the cohort's labels, next to Lin and LoRA. \textbf{Bold}: the setting selected for the backbone, by the best mean selection-split AUROC over its cohorts; it need not have the best held-out value of its row. Grey: runs whose held-out predictions barely vary (median over labels of the standard deviation of the predicted probabilities below \numSpreadMinValue{}).}
+\caption{Held-out AUROC of the joint classification models under the default and three alternative full fine-tuning settings, averaged over the cohort's labels, next to Lin and LoRA. \textbf{Bold} marks the setting selected for each backbone by the best mean selection-split AUROC over its cohorts, which need not have the best held-out value of its row. Grey marks runs whose held-out predictions barely vary, that is, whose median over labels of the standard deviation of the predicted probabilities is below \numSpreadMinValue{}.}
 \label{tab:fullftfix}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\footnotesize\input{tables/tab_fullft_fix.tex}}
 \end{table}
@@ -243,27 +243,27 @@ Compute-matched per-structure & Dec, LoRA, Full FT at 1600 steps per structure &
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_fullft_spectre.pdf}
-\caption{Full fine-tuning on SPECTRE. (a) Median validation AUROC at each evaluation with the default settings, for TAP-CT and SPECTRE, over all runs of each method. (b) SPECTRE joint models on four cohorts, including Full FT with layer-wise learning-rate decay, the setting selected in Table~\ref{tab:fullftfix}, which gives the alternative settings on all three backbones; (b) shows SPECTRE, the one backbone on which Full FT failed.}
+\caption{Full fine-tuning on SPECTRE. (a) Median validation AUROC at each evaluation under the default settings, over all runs of each method on TAP-CT and SPECTRE. (b) SPECTRE joint models on the four cohorts, including Full FT rerun with layer-wise learning-rate decay, the setting selected in Table~\ref{tab:fullftfix}. Table~\ref{tab:fullftfix} gives all alternative settings on the three backbones.}
 \label{fig:fullftspectre}
 \end{figure}
 
 \begin{table}[H]
 \centering
-\caption{Controls for two confounds of the main comparison: rsLoRA at a quarter of the learning rate, which matches LoRA's update scale at initialization, and fine-tuning the MLP instead of the attention weights. Held-out AUROC of the joint models, mean over the cohort's labels.}
+\caption{Controls for two confounds of the main comparison: rsLoRA at a quarter of the learning rate, which matches the update scale of LoRA at initialization, and fine-tuning the MLP instead of the attention weights. The table gives the held-out AUROC of the joint models, averaged over the cohort's labels.}
 \label{tab:controls}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\footnotesize\input{tables/tab_controls.tex}}
 \end{table}
 
 \begin{table}[H]
 \centering
-\caption{Joint against compute-matched per-structure segmentation: held-out Dice, mean over the 15 structures, of per-structure models trained 1600 steps (matched) or 8000 steps, and of the 24\,000-step joint model on the same structures; the difference joint $-$ matched and the number of structures where it is positive.}
+\caption{Joint against compute-matched per-structure segmentation. The table gives held-out Dice, averaged over the 15 structures, of per-structure models trained for 1600 steps (matched) or 8000 steps and of the 24\,000-step joint model on the same structures, together with the difference joint $-$ matched and the number of structures in which it is positive.}
 \label{tab:segcm}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\footnotesize\input{tables/tab_seg_cm.tex}}
 \end{table}
 
 \begin{table}[H]
 \centering
-\caption{From-scratch control: TAP-CT architecture with a randomly initialized encoder, trained as the Full FT joint model, next to Full FT and Dec, per dataset (held-out Dice, mean over structures).}
+\caption{From-scratch control, in which the TAP-CT architecture with a randomly initialized encoder is trained as the Full FT joint model, next to Full FT and Dec per dataset (held-out Dice, averaged over structures).}
 \label{tab:scratch}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\footnotesize\input{tables/tab_scratch.tex}}
 \end{table}
@@ -286,7 +286,7 @@ Compute-matched per-structure & Dec, LoRA, Full FT at 1600 steps per structure &
 
 \begin{table}[H]
 \centering
-\caption{Held-out AUROC as in Table~\ref{tab:cls}, with the longer CVPR26 joint schedule (26\,000 steps) as an extra row. \textbf{Bold}: best, \underline{underlined}: second best of the row; \colorbox{modebest}{shaded}: the better of per-task and joint training (8000 steps).}
+\caption{Held-out AUROC as in Table~\ref{tab:cls}, with the longer CVPR26 joint schedule (26\,000 steps) as an extra row. Within each row, \textbf{bold} is the best and \underline{underlined} the second-best method. A \colorbox{modebest}{shaded} cell marks the better of per-task and joint training at 8000 steps.}
 \label{tab:ladder}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\footnotesize\input{tables/tab_cls_ladder.tex}}
 \end{table}
@@ -303,7 +303,7 @@ Compute-matched per-structure & Dec, LoRA, Full FT at 1600 steps per structure &
 
 \begin{table}[H]
 \centering
-\caption{Cohorts and datasets. Labels = binary labels (classification) or structures (segmentation); counts are cases in the training / selection / held-out splits as read from the manifests. Split rule: ``official val, halves'' = the official validation cases sorted by identifier and alternately assigned to the selection and held-out split; ``seeded'' = one fixed seeded division of the released labeled cases (80/10/10 of the released training data for the three RSNA and FDG cohorts, 70/15/15 for KiTS23 and MSD Pancreas, 91/20/20 volumes for LiTS); TotalSegmentator holds out its official test split and takes an equally large selection split from the official training split. FDG-PET/CT cases are studies (1014 studies of 900 patients; no patient spans splits); RSNA 2019 training cases are a stratified subset of the released training patients. Backbones: T = TAP-CT, S = SPECTRE, P = Pillar-0.}
+\caption{Cohorts and datasets. Labels are binary labels (classification) or structures (segmentation), and counts are cases in the training, selection and held-out splits. In the split rule, ``official val, halves'' denotes the official validation cases sorted by identifier and alternately assigned to the selection and held-out splits, and ``seeded'' one fixed seeded division of the released labeled cases (80/10/10 of the released training data for RSNA22 C-spine, RSNA23 trauma and FDG-PET/CT, 70/15/15 for KiTS23 and MSD Pancreas, and 91/20/20 volumes for LiTS). TotalSegmentator holds out its official test split and takes an equally large selection split from the official training split. FDG-PET/CT cases are studies (1014 studies of 900 patients, with no patient spanning splits), and the RSNA19 ICH training cases are a stratified subset of the released training patients. Backbones: T = TAP-CT, S = SPECTRE, P = Pillar-0.}
 \label{tab:cohorts}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\small
 \begin{tabular}{@{}llllrrr@{}}
@@ -315,9 +315,9 @@ CVPR26: AMOS & 15 disease labels & official val, halves & T S & 1463$^\dagger$ &
 CVPR26: COVID-CTset & COVID-19 & official val, halves & T S & 308 & \numCasesCvprCovidVal & \numCasesCvprCovidTest \\
 CVPR26: LUNA25 & nodule malignancy & official val, halves & T S & 1000 & \numCasesCvprLunaVal & \numCasesCvprLunaTest \\
 FDG-PET/CT & 4 diagnosis groups & seeded, patient level & T S & 776 & 116 & 122 \\
-RSNA 2022 C-spine & patient, C1--C7 (8) & seeded, per study & T S & 1615 & 202 & 202 \\
-RSNA 2023 trauma & any, kidney, liver, spleen (4) & seeded, one series per patient & T S & 2517 & 315 & 315 \\
-RSNA 2019 hemorrhage & any + 5 subtypes (6) & stratified, patient level & T S P & 5000 & 3269 & 3264 \\
+RSNA22 C-spine & patient, C1--C7 (8) & seeded, per study & T S & 1615 & 202 & 202 \\
+RSNA23 trauma & any, kidney, liver, spleen (4) & seeded, one series per patient & T S & 2517 & 315 & 315 \\
+RSNA19 ICH & any + 5 subtypes (6) & stratified, patient level & T S P & 5000 & 3269 & 3264 \\
 \addlinespace[2pt]
 \multicolumn{7}{@{}l}{\textit{Segmentation}} \\
 AMOS22 & 15 organs & official val, halves & T S & 200 & 50 & 50 \\
@@ -332,7 +332,7 @@ TotalSegmentator & 15 merged structures & official test held out & T S & 1721 & 
 
 \begin{table}[H]
 \centering
-\caption{TotalSegmentator: the 117 released structures merged into 15 within anatomical systems, as implemented. Where two source masks overlap, the voxel is assigned to the smaller structure.}
+\caption{The 117 released TotalSegmentator structures merged into 15 within anatomical systems. Where two source masks overlap, the voxel is assigned to the smaller structure.}
 \label{tab:totalseg}
 \small
 \begin{tabular}{@{}lp{0.72\textwidth}@{}}
@@ -360,7 +360,7 @@ muscles & gluteus maximus, medius and minimus, iliopsoas, autochthon (left and r
 
 \begin{table}[H]
 \centering
-\caption{Evaluation data that appear in a backbone's pretraining data, as listed in the backbones' papers (images only; no labels of our tasks were used in pretraining). TAP-CT was pretrained on in-house oncological CT \citep{veenboer2025tapct} and Pillar-0 on CT and breast MRI of one academic center \citep{agrawal2025pillar0}, neither listing a public dataset. SPECTRE lists, among others, AMOS, NLST, AbdomenAtlas~1.0 Mini (5,195 scans) and AbdomenCT-1K (1,062 scans) \citep{claessens2025spectre}, and removed only AMOS from its own evaluation. The last two aggregate public datasets: AbdomenCT-1K contains the 201 LiTS, 300 KiTS19 and 420 MSD Pancreas scans \citep{ma2022abdomenct1k}, and the 5,195 scans of AbdomenAtlas include 131 LiTS, 300 KiTS, 945 MSD CT, 200 AMOS22 and 2,200 FLARE'23 scans but no TotalSegmentator scans \citep{qu2023abdomenatlas}.}
+\caption{Evaluation data that appear in a backbone's pretraining data, as listed in the backbones' papers (images only; no labels of our tasks were used in pretraining). TAP-CT was pretrained on in-house oncological CT \citep{veenboer2025tapct} and Pillar-0 on CT and breast MRI of one academic center \citep{agrawal2025pillar0}, neither listing a public dataset. SPECTRE lists, among others, AMOS, NLST, AbdomenAtlas~1.0 Mini (5195 scans) and AbdomenCT-1K (1062 scans) \citep{claessens2025spectre}, and removed only AMOS from its own evaluation. The last two aggregate public datasets: AbdomenCT-1K contains the 201 LiTS, 300 KiTS19 and 420 MSD Pancreas scans \citep{ma2022abdomenct1k}, and the 5195 scans of AbdomenAtlas include 131 LiTS, 300 KiTS, 945 MSD CT, 200 AMOS22 and 2200 FLARE'23 scans but no TotalSegmentator scans \citep{qu2023abdomenatlas}.}
 \label{tab:overlap}
 {\footnotesize
 \begin{tabular}{@{}lccc@{}}
@@ -372,16 +372,16 @@ LUNA25 & no & yes$^{a}$ & no \\
 LiTS, MSD Pancreas & no & yes$^{b}$ & no \\
 KiTS23 & no & partly$^{c}$ & no \\
 TotalSegmentator, FDG-PET/CT & no & not confirmed$^{d}$ & no \\
-COVID-CTset, RSNA 2019/2022/2023 & no & not listed & no \\
+COVID-CTset, RSNA19 ICH, RSNA22 C-spine, RSNA23 trauma & no & not listed & no \\
 \bottomrule
 \end{tabular}}
-\\[2pt]{\footnotesize $^{a}$ through NLST, which is in the pretraining data; the public LUNA25 training and development scans are NLST scans \citep{peeters2025luna25data}. $^{b}$ every case of our splits, through AbdomenCT-1K and AbdomenAtlas. $^{c}$ the 300 KiTS19 cases (45 of our 73 held-out cases); the 189 cases added for KiTS23 are not included. $^{d}$ neither is a source of AbdomenCT-1K or AbdomenAtlas, but AbdomenAtlas includes 2,200 FLARE'23 scans whose sources we could not access, so we could not confirm that they are absent.}
+\\[2pt]{\footnotesize $^{a}$ through NLST, which is in the pretraining data; the public LUNA25 training and development scans are NLST scans \citep{peeters2025luna25data}. $^{b}$ every case of our splits, through AbdomenCT-1K and AbdomenAtlas. $^{c}$ the 300 KiTS19 cases (45 of our 73 held-out cases); the 189 cases added for KiTS23 are not included. $^{d}$ neither is a source of AbdomenCT-1K or AbdomenAtlas, but AbdomenAtlas includes 2200 FLARE'23 scans whose sources we could not access, so we could not confirm that they are absent.}
 \end{table}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_examples_cls.pdf}
-\caption{One held-out case per classification source: the case with the most positive labels, listed below it. Views are fixed per source and pass through the body's center of mass: coronal for AMOS, LUNA25 and RSNA 2023, sagittal for the cervical spine, and axial for COVID-CTset (thick slices), FDG-PET/CT (whole body) and head CT. Windows are soft tissue, lung (COVID-CTset, LUNA25), bone (cervical spine) and brain (hemorrhage).}
+\caption{One held-out case per classification source, namely the case with the most positive labels, which are listed below it. The slices show anatomy, not necessarily the findings. Views are fixed per source and pass through the body's center of mass: coronal for AMOS, LUNA25 and RSNA23 trauma, sagittal for RSNA22 C-spine, and axial for COVID-CTset (thick slices), FDG-PET/CT (whole body) and RSNA19 ICH. Windows are soft tissue, lung (COVID-CTset, LUNA25), bone (RSNA22 C-spine) and brain (RSNA19 ICH).}
 \label{fig:examples}
 \end{figure}
 
@@ -392,41 +392,41 @@ COVID-CTset, RSNA 2019/2022/2023 & no & not listed & no \\
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_cases_cls.pdf}
-\caption{Classification success (left) and failure (right) cases, one positive held-out case per source. Markers give the share of held-out negatives the case outranks for each method and backbone (1: ranked above every negative; dotted line: 0.5); the title gives the label and the case's mean over methods and backbones. Rows are the three CVPR26 sources, FDG-PET/CT, the RSNA 2022 cervical spine, RSNA 2023 trauma and RSNA 2019 hemorrhage.}
+\caption{Classification success (left) and weakest positive (right) cases, with one positive held-out case per source. Markers give the share of held-out negatives that the case outranks, for four methods and each backbone, where 1 means that the case is ranked above every negative and the dotted line marks 0.5; SPECTRE Full FT, which did not train, is drawn with open markers. The title gives the label and the case's mean over methods and backbones. Rows are the three CVPR26 sources, FDG-PET/CT, RSNA22 C-spine, RSNA23 trauma and RSNA19 ICH.}
 \label{fig:casescls}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth,height=0.66\textheight,keepaspectratio]{figures/fig_cases_seg_amos22.pdf}
-\caption{Segmentation success and failure cases on AMOS22 (15 structures), joint model. Rows: the success case (top two) and the failure case (bottom two), each on TAP-CT and SPECTRE; columns: the reference and the predictions of Lin, Dec, LoRA and Full FT on the axial slice with the most reference foreground, soft-tissue window, colors per structure. Panel titles give the method's Dice for the whole case, averaged over its structures, and how many of them score 0. These are the adrenal glands for most adapted methods and, for some, the esophagus or the gallbladder.}
+\includegraphics[width=\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_cases_seg_amos22.pdf}
+\caption{Segmentation success and failure cases on AMOS22 (15 structures) for the joint model. Rows show the success case (top two) and the failure case (bottom two), each on TAP-CT and SPECTRE, and columns the reference and the predictions of Lin, Dec, LoRA and Full FT on the axial slice with the most reference foreground, at the soft-tissue window. Panel titles give the method's Dice for the whole case, averaged over its structures, and how many structures score 0; these are the adrenal glands for most adapted methods and, for some, the esophagus or the gallbladder. For comparison, the dataset-mean Dice of the joint models is \numSegAmosBBTapctJointLin{}, \numSegAmosBBTapctJointDec{}, \numSegAmosBBTapctJointLora{} and \numSegAmosBBTapctJointFullft{} for Lin, Dec, LoRA and Full FT on TAP-CT, and \numSegAmosBBSpectreJointLin{}, \numSegAmosBBSpectreJointDec{}, \numSegAmosBBSpectreJointLora{} and \numSegAmosBBSpectreJointFullft{} on SPECTRE (Table~\ref{tab:seg}).}
 \label{fig:casesseg_amos22}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_cases_seg_totalseg.pdf}
-\caption{As Figure~\ref{fig:casesseg_amos22}, for TotalSegmentator (15 merged structures). Every adapted joint model scores 0 on the merged glands in both cases; in the failure case some models also score 0 on the arteries, the liver, the lungs and airway or the gastrointestinal tract.}
+\includegraphics[width=\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_cases_seg_totalseg.pdf}
+\caption{Segmentation success and failure cases on TotalSegmentator (15 merged structures), shown as in Figure~\ref{fig:casesseg_amos22}. Every model except the linear probe scores 0 on the merged glands in the success case, and every model except the TAP-CT linear probe does so in the failure case. In the failure case, some models also score 0 on the arteries, the liver, the lungs and airway or the gastrointestinal tract.}
 \label{fig:casesseg_totalseg}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_cases_seg_kits23.pdf}
-\caption{As Figure~\ref{fig:casesseg_amos22}, for KiTS23; panel titles give the Dice of each structure (kidney / tumor / cyst; \textendash: absent from both reference and prediction).}
+\includegraphics[width=\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_cases_seg_kits23.pdf}
+\caption{Segmentation success and failure cases on KiTS23, shown as in Figure~\ref{fig:casesseg_amos22}, except that panel titles give the Dice of each structure (kidney / tumor / cyst), where \textendash{} marks a structure absent from both reference and prediction. The prediction panels show the structure with the highest logit at each voxel, so a predicted tumor inside the kidney can appear as kidney; the panel titles give the Dice of every structure over the whole volume.}
 \label{fig:casesseg_kits23}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_cases_seg_lits.pdf}
-\caption{As Figure~\ref{fig:casesseg_amos22}, for LiTS, except that panel titles give the Dice of each structure (liver / tumor; \textendash: absent from both reference and prediction). Neither case has a tumor in the reference, so a method's tumor Dice is undefined when it predicts no tumor and 0 when it predicts any: in the success case only LoRA on TAP-CT predicts a tumor somewhere in the volume, and in the failure case every method does, while all segment the liver well. The failure is therefore a false-positive tumor, which the per-structure Dice counts as 0, and not a missed one; the overlay shows the structure with the highest logit at each voxel, which hides the predicted tumor under the liver in all but one run.}
+\includegraphics[width=\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_cases_seg_lits.pdf}
+\caption{Segmentation success and failure cases on LiTS, shown as in Figure~\ref{fig:casesseg_amos22}, except that panel titles give the Dice of each structure (liver / tumor), where \textendash{} marks a structure absent from both reference and prediction. Neither case has a tumor in the reference, so a method's tumor Dice is undefined when it predicts no tumor and 0 when it predicts any: in the success case only LoRA on TAP-CT predicts a tumor somewhere in the volume, and in the failure case every method does, while all segment the liver well. The failure is therefore a false-positive tumor, which the per-structure Dice counts as 0, and not a missed one; the overlay shows the structure with the highest logit at each voxel, which hides the predicted tumor under the liver in all but one run.}
 \label{fig:casesseg_lits}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.9\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_cases_seg_msd_pancreas.pdf}
-\caption{As Figure~\ref{fig:casesseg_amos22}, for MSD Pancreas; panel titles give the Dice of each structure (pancreas / tumor; \textendash: absent from both reference and prediction).}
+\includegraphics[width=\textwidth,height=0.74\textheight,keepaspectratio]{figures/fig_cases_seg_msd_pancreas.pdf}
+\caption{Segmentation success and failure cases on MSD Pancreas, shown as in Figure~\ref{fig:casesseg_amos22}, except that panel titles give the Dice of each structure (pancreas / tumor), where \textendash{} marks a structure absent from both reference and prediction. As in Figure~\ref{fig:casesseg_kits23}, the prediction panels show the structure with the highest logit at each voxel, so a predicted tumor inside the pancreas can appear as pancreas.}
 \label{fig:casesseg_msd_pancreas}
 \end{figure}

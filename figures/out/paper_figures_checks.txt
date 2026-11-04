@@ -1,4 +1,4 @@
-paper_figures.py number check: 637 comparisons, 537 equal, 0 different, 0 without a reference
+paper_figures.py number check: 649 comparisons, 537 equal, 0 different, 0 without a reference
 OK      fig_overview         (b) pooled AUROC pillar0 attn                           figure=    0.886  \pooledpillarZattn=0.886
 OK      fig_overview         (b) pooled AUROC pillar0 attn_then_lorag                figure=    0.900  \pooledpillarZattnthenlorag=0.900
 OK      fig_overview         (b) pooled AUROC pillar0 attnft                         figure=    0.922  \pooledpillarZattnft=0.922
@@ -268,28 +268,40 @@ INFO    fig_fullft_spectre   (a) spectre lin: median over 37 runs, first 0.605 l
 INFO    fig_fullft_spectre   (a) spectre lora: median over 37 runs, first 0.687 last 0.756
 INFO    fig_fullft_spectre   (a) spectre attnft: median over 37 runs, first 0.686 last 0.743
 INFO    fig_fullft_spectre   (a) spectre fullft: median over 37 runs, first 0.540 last 0.529
+INFO    fig_seg              (a) tapct lin: 0 pairs below -0.3, 3 above 0.3 (edge triangles)
 OK      fig_seg              (a) tapct lin - Dec mean                                figure=   -0.085  \numSegdeltaTapctDecLinMeandiff=-0.085
 OK      fig_seg              (a) tapct lin - Dec n                                   figure=       74  \numSegdeltaTapctDecLinN=74
+INFO    fig_seg              (a) tapct lora: 0 pairs below -0.3, 1 above 0.3 (edge triangles)
 OK      fig_seg              (a) tapct lora - Dec mean                               figure=   -0.005  \numSegdeltaTapctDecLoraMeandiff=-0.005
 OK      fig_seg              (a) tapct lora - Dec n                                  figure=       74  \numSegdeltaTapctDecLoraN=74
+INFO    fig_seg              (a) tapct lorag: 0 pairs below -0.3, 0 above 0.3 (edge triangles)
 OK      fig_seg              (a) tapct lorag - Dec mean                              figure=   -0.013  \numSegdeltaTapctDecLoragMeandiff=-0.013
 OK      fig_seg              (a) tapct lorag - Dec n                                 figure=       59  \numSegdeltaTapctDecLoragN=59
+INFO    fig_seg              (a) tapct dora: 0 pairs below -0.3, 0 above 0.3 (edge triangles)
 OK      fig_seg              (a) tapct dora - Dec mean                               figure=   -0.012  \numSegdeltaTapctDecDoraMeandiff=-0.012
 OK      fig_seg              (a) tapct dora - Dec n                                  figure=       59  \numSegdeltaTapctDecDoraN=59
+INFO    fig_seg              (a) tapct fullft: 1 pairs below -0.3, 0 above 0.3 (edge triangles)
 OK      fig_seg              (a) tapct fullft - Dec mean                             figure=    0.000  \numSegdeltaTapctDecFullftMeandiff=0.000
 OK      fig_seg              (a) tapct fullft - Dec n                                figure=       74  \numSegdeltaTapctDecFullftN=74
+INFO    fig_seg              (a) tapct dec_then_lora: 1 pairs below -0.3, 0 above 0.3 (edge triangles)
 OK      fig_seg              (a) tapct dec_then_lora - Dec mean                      figure=   -0.016  \numSegdeltaTapctDecDecThenLoraMeandiff=-0.016
 OK      fig_seg              (a) tapct dec_then_lora - Dec n                         figure=       59  \numSegdeltaTapctDecDecThenLoraN=59
+INFO    fig_seg              (b) spectre lin: 0 pairs below -0.3, 4 above 0.3 (edge triangles)
 OK      fig_seg              (b) spectre lin - Dec mean                              figure=   -0.061  \numSegdeltaSpectreDecLinMeandiff=-0.061
 OK      fig_seg              (b) spectre lin - Dec n                                 figure=       74  \numSegdeltaSpectreDecLinN=74
+INFO    fig_seg              (b) spectre lora: 0 pairs below -0.3, 3 above 0.3 (edge triangles)
 OK      fig_seg              (b) spectre lora - Dec mean                             figure=   +0.023  \numSegdeltaSpectreDecLoraMeandiff=+0.023
 OK      fig_seg              (b) spectre lora - Dec n                                figure=       74  \numSegdeltaSpectreDecLoraN=74
+INFO    fig_seg              (b) spectre lorag: 0 pairs below -0.3, 3 above 0.3 (edge triangles)
 OK      fig_seg              (b) spectre lorag - Dec mean                            figure=   +0.024  \numSegdeltaSpectreDecLoragMeandiff=+0.024
 OK      fig_seg              (b) spectre lorag - Dec n                               figure=       59  \numSegdeltaSpectreDecLoragN=59
+INFO    fig_seg              (b) spectre dora: 0 pairs below -0.3, 3 above 0.3 (edge triangles)
 OK      fig_seg              (b) spectre dora - Dec mean                             figure=   +0.028  \numSegdeltaSpectreDecDoraMeandiff=+0.028
 OK      fig_seg              (b) spectre dora - Dec n                                figure=       59  \numSegdeltaSpectreDecDoraN=59
+INFO    fig_seg              (b) spectre fullft: 0 pairs below -0.3, 0 above 0.3 (edge triangles)
 OK      fig_seg              (b) spectre fullft - Dec mean                           figure=   -0.003  \numSegdeltaSpectreDecFullftMeandiff=-0.003
 OK      fig_seg              (b) spectre fullft - Dec n                              figure=       74  \numSegdeltaSpectreDecFullftN=74
+INFO    fig_seg              (b) spectre dec_then_lora: 0 pairs below -0.3, 0 above 0.3 (edge triangles)
 OK      fig_seg              (b) spectre dec_then_lora - Dec mean                    figure=   +0.003  \numSegdeltaSpectreDecDecThenLoraMeandiff=+0.003
 OK      fig_seg              (b) spectre dec_then_lora - Dec n                       figure=       59  \numSegdeltaSpectreDecDecThenLoraN=59
 OK      fig_cls              attn tapct mean                                         figure=   +0.011  \numPairedTapctLinAttnMeandiff=+0.011

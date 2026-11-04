@@ -20,6 +20,7 @@ definition from those scripts are listed in tables/PAPER_TABLES.md.
 from __future__ import annotations
 
 import os
+import re
 from pathlib import Path
 
 import numpy as np
@@ -41,10 +42,11 @@ SEG_METHOD_TEX = {"lin": "Lin", "dec": "Dec", "lora": "LoRA", "lorag": "LoRA$_{\
                   "fullft": "Full FT", "dec_then_lora": "Dec$\\to$LoRA"}
 COHORTS = ["amos_covid_luna", "fdg", "rsna2022", "rsna2023", "rsna2019_ich"]
 DATASETS = ["amos22", "kits23", "lits", "msd_pancreas", "totalseg"]
-DATASET_TEX = {"amos_covid_luna": "CVPR26", "fdg": "FDG-PET/CT", "rsna2022": "RSNA 2022 C-spine", "rsna2023": "RSNA 2023 trauma",
-               "rsna2019_ich": "RSNA 2019 ICH", "amos22": "AMOS22", "kits23": "KiTS23", "lits": "LiTS", "msd_pancreas": "MSD Pancreas",
+DATASET_TEX = {"amos_covid_luna": "CVPR26", "fdg": "FDG-PET/CT", "rsna2022": "RSNA22 C-spine", "rsna2023": "RSNA23 trauma",
+               "rsna2019_ich": "RSNA19 ICH", "amos22": "AMOS22", "kits23": "KiTS23", "lits": "LiTS", "msd_pancreas": "MSD Pancreas",
                "totalseg": "TotalSegmentator"}
-SHORT_MAIN = {"amos_covid_luna": "CVPR26", "fdg": "FDG", "rsna2022": "RSNA22", "rsna2023": "RSNA23", "rsna2019_ich": "ICH"}
+SHORT_MAIN = {"amos_covid_luna": "CVPR26", "fdg": "FDG-PET/CT", "rsna2022": "RSNA22 C-spine", "rsna2023": "RSNA23 trauma",
+              "rsna2019_ich": "RSNA19 ICH"}  # cohort short names of Section 3 (E9)
 SHORT = {"amos_covid_luna": "CVPR26", "fdg": "FDG-PET/CT", "rsna2022": "RSNA22 C-spine", "rsna2023": "RSNA23 trauma",
          "rsna2019_ich": "RSNA19 ICH", "amos22": "AMOS22", "kits23": "KiTS23", "lits": "LiTS", "msd_pancreas": "MSD Pancreas",
          "totalseg": "TotalSegmentator"}
@@ -69,17 +71,21 @@ KEY_ROWS = [("cls_lora_lin", "cls", "LoRA $-$ Lin"), ("cls_lora_attn", "cls", "L
             ("seg_lora_dec", "seg", "LoRA $-$ Dec"), ("seg_lora_dec_pertask", "seg", "\\quad per-structure models"),
             ("seg_lora_dec_joint", "seg", "\\quad joint models"), ("seg_fullft_dec", "seg", "Full FT $-$ Dec"),
             ("seg_joint_pertask", "seg", "Joint $-$ per-task")]
+# extra classification rows of tab_cis only, so that every label-level estimate quoted in Section 4.1 has a table row
+CIS_EXTRA_ROWS = [("cls_attn_lin", "cls", "Attn $-$ Lin"), ("cls_attnft_lin", "cls", "Attn-only FT $-$ Lin"),
+                  ("cls_attnft_attn", "cls", "Attn-only FT $-$ Attn"),
+                  ("cls_lora_lin_nosc", "cls", "LoRA $-$ Lin, without FDG-PET/CT and COVID-CTset")]
 # Training-split sizes are not in the per-case files; they are the manifest counts of the v2 appendix table
 # "Cohorts and datasets" (paper/sections/appendix.tex) and report/code_map_classification.md section 1.
 # AMOS train = distinct case ids over the 15 per-label CSVs. Selection / held-out = manifest counts (same source).
 COHORT_SPLITS = {  # key: (name, labels, train, selection, held-out)
     "amos": ("AMOS (disease labels)", 15, 1463, 178, 178),
-    "covid": ("COVID-CT", 1, 308, 32, 32),
+    "covid": ("COVID-CTset", 1, 308, 32, 32),
     "luna": ("LUNA25 (nodule malignancy)", 1, 1000, 100, 100),
     "fdg": ("FDG-PET/CT (CT only)", 4, 776, 116, 122),
-    "rsna2022": ("RSNA 2022 cervical spine", 8, 1615, 202, 202),
-    "rsna2023": ("RSNA 2023 abdominal trauma", 4, 2517, 315, 315),
-    "ich": ("RSNA 2019 intracranial hemorrhage", 6, 5000, 3269, 3264),
+    "rsna2022": ("RSNA22 C-spine (cervical-spine fractures)", 8, 1615, 202, 202),
+    "rsna2023": ("RSNA23 trauma (abdominal trauma)", 4, 2517, 315, 315),
+    "ich": ("RSNA19 ICH (intracranial hemorrhage)", 6, 5000, 3269, 3264),
 }
 
 WRITTEN: list[str] = []
@@ -144,6 +150,7 @@ def _fmt_params(n: float) -> str:
 
 def _write(name: str, lines: list[str] | str) -> None:
     txt = lines if isinstance(lines, str) else "\n".join(lines) + "\n"
+    txt = re.sub(r"(?<![$\w\\{])-(?=\d*\.\d+(?!\d*pt))", "$-$", txt)  # true minus in text mode, as make_tables.true_minus
     (OUT_TEX / name).write_text(txt)
     WRITTEN.append(name)
 
@@ -226,7 +233,8 @@ def legacy_seg_ladder(D: dict) -> None:
                     cells.append(_mode_shade(_mark(v, list(full[mode].values())), v, full[other].get(mt, np.nan)))
                 lead = f"{DATASET_TEX[ds]} ({SEG_N_STRUCT[ds]}) & {BACKBONE_TEX[bb]}" if first else " & "
                 first = False
-                rows.append(f"{lead} & {MODE_TEX[mode]} & " + " & ".join(cells) + " \\\\")
+                mode_tex = "per-structure" if mode == "pertask" else MODE_TEX[mode]  # segmentation wording (E6)
+                rows.append(f"{lead} & {mode_tex} & " + " & ".join(cells) + " \\\\")
             rows.append("\\addlinespace[2pt]")
     _write("tab_seg_ladder.tex", ["\\begin{tabular}{lll" + "c" * len(SEG_METHODS) + "}", "\\toprule",
                                   "Dataset (structures) & Backbone & Mode & " + " & ".join(SEG_METHOD_TEX[mt] for mt in SEG_METHODS) + " \\\\",
@@ -262,14 +270,16 @@ def legacy_key(D: dict) -> None:
 def legacy_cis(D: dict) -> None:
     ll = D["label_level"]
     rows = []
-    for key, task, label in KEY_ROWS:
+    rows_def = [r for r in KEY_ROWS if r[1] == "cls"] + CIS_EXTRA_ROWS + [r for r in KEY_ROWS if r[1] == "seg"]
+    for key, task, label in rows_def:
         sub = ll[ll.key == key].set_index("backbone")
         for bb in ["all"] + PER_BB:
             if bb not in sub.index:
                 continue
             r = sub.loc[bb]
-            rows.append(f"{label} & {BACKBONE_TEX.get(bb, 'all')} & {int(r.n_labels)} & {_f3s(r['mean'])} & [{_f3s(r.lo2)}, {_f3s(r.hi2)}] & "
-                        f"[{_f3s(r.lo3)}, {_f3s(r.hi3)}] & {int(r.clusters_pos)}/{int(r.clusters_n)} \\\\")
+            m = lambda v: f"${_f3s(v)}$"  # math mode, so negative values print with a true minus (E2)
+            rows.append(f"{label} & {BACKBONE_TEX.get(bb, 'all')} & {int(r.n_labels)} & {m(r['mean'])} & [{m(r.lo2)}, {m(r.hi2)}] & "
+                        f"[{m(r.lo3)}, {m(r.hi3)}] & {int(r.clusters_pos)}/{int(r.clusters_n)} \\\\")
         rows.append("\\addlinespace[2pt]")
     _write("tab_cis.tex", ["\\begin{tabular}{llrrccc}", "\\toprule", " & & & & \\multicolumn{2}{c}{95\\% interval, resampling} & \\\\",
                            "\\cmidrule(lr){5-6}", "Comparison & Backbone & $n$ & Mean & cohorts, labels & + cases & Cohorts $>0$ \\\\", "\\midrule",

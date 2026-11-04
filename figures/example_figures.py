@@ -33,7 +33,7 @@ PAPER_FIG = style.PAPER_DIR / "figures"
 PAPER_TAB = style.PAPER_DIR / "tables"
 CHECK_DIR = OUT / "selection"
 INK, INK2 = style.INK, style.INK2
-FS = 6.0
+FS = 7.5   # 7.0 pt printed at the 0.94 text width the figure is included at
 CHECKS: list[str] = []
 
 SEG_BACKBONES = [("tapct", "TAP-CT"), ("spectre", "SPECTRE"), ("voco", "VoCo")]
@@ -52,7 +52,8 @@ SEG_BLOCKS = [
      "(b) AMOS22, one joint model for 15 structures"),
 ]
 REF_EDGE = "#ffd400"
-PRED_FILL = np.array([0.835, 0.369, 0.0, 0.55])  # Okabe-Ito vermillion, semi-transparent
+PRED_FILL = np.array([1.0, 0.180, 0.533, 0.45])  # pink, semi-transparent (orange is a backbone colour)
+FILL_ALPHA = 0.30                                  # multi-structure fill, plus a contour per structure
 
 
 def _seg_colors(n: int) -> np.ndarray:
@@ -89,20 +90,33 @@ def fig_examples_seg(out: Path) -> None:
     sel = json.loads((OUT_SEL / "seg_example_selection.json").read_text())
     old = json.loads((RES / "examples" / "seg" / "selection.json").read_text())
     seg_root = RES / "examples" / "seg"
-    fig = plt.figure(figsize=(style.TEXTWIDTH_IN, 5.75 if len(SEG_BACKBONES) == 3 else 4.0))
-    subs = fig.subfigures(2, 1, height_ratios=[1.0, 1.0], hspace=0.03)
+    from matplotlib.lines import Line2D
+    from matplotlib.patches import Patch
+    from select_cases import names_of
+    amos_names = names_of(run_row("seg", "amos22", "tapct", "joint", "lora"))
+    fig = plt.figure(figsize=(style.TEXTWIDTH_IN, 5.75 if len(SEG_BACKBONES) == 3 else 4.45))
+    subs = fig.subfigures(2, 1, height_ratios=[1.0, 1.1], hspace=0.03)
     diffs = []
+    shown_b = set()
     for sub, (key, sdir, ds, mode, struct, methods, title) in zip(subs, SEG_BLOCKS):
         case = sel[key]["case"]
         if not (seg_root / sdir / case).is_dir():
             CHECKS.append(f"fig_examples_seg {key}: selected case {case} has no saved predictions; drawing the draft's case {old[key]['case']}")
             case = old[key]["case"]
-        axes = sub.subplots(len(SEG_BACKBONES), len(methods) + 1, gridspec_kw={"wspace": 0.04, "hspace": 0.24, "top": 0.89, "bottom": 0.01,
-                                                                                "left": 0.0, "right": 1.0})
+        axes = sub.subplots(len(SEG_BACKBONES), len(methods) + 1, gridspec_kw={"wspace": 0.04, "hspace": 0.24, "top": 0.88,
+                                                                                "bottom": 0.01 if key == "lits" else 0.17, "left": 0.0, "right": 1.0})
         cid = case.replace("case_", "").replace("amos_", "").replace("liver_", "")
-        sub.suptitle(f"{title}; held-out case {cid}", fontsize=7.0, color=INK, x=0.0, ha="left", y=0.995)
+        sub.suptitle(f"{title}; held-out case {cid}", fontsize=FS, color=INK, x=0.0, ha="left", y=0.995)
         for r, (bb, bbl) in enumerate(SEG_BACKBONES):
             first = np.load(seg_root / sdir / case / f"{bb}-{methods[0][0]}.npz")
+            # TAP-CT resizes each whole slice to 224 x 224: its pixel aspect is the slice's physical height / width, read
+            # from SPECTRE's grid of the same case (equal in-plane spacing); SPECTRE and VoCo pixels are square
+            if bb == "tapct":
+                sh = np.load(seg_root / sdir / case / "spectre-lin.npz")["image"].shape
+                asp = sh[1] / sh[2]
+            else:
+                asp = 1.0
+            CHECKS.append(f"fig_examples_seg {key} {bb}: pixel aspect {asp:.3f}")
             img, ref = first["image"].astype(np.float32), first["reference"]
             labels = json.loads(str(first["meta"]))["labels"]
             single = len(labels) == 1
@@ -126,16 +140,19 @@ def fig_examples_seg(out: Path) -> None:
             cols = _seg_colors(15)
 
             def panel(ax, lab, ttl, is_ref=False):
-                ax.imshow(sl, cmap="gray", vmin=0, vmax=1, interpolation="nearest")
+                ax.imshow(sl, cmap="gray", vmin=0, vmax=1, interpolation="nearest", aspect=asp)
                 if single:
                     t = _display(np.isin(ref[z, y0:y1, x0:x1], labels), bb)
                     if not is_ref:
                         pr = _display(lab[z, y0:y1, x0:x1] > 0, bb)
-                        ax.imshow(np.where(pr[..., None], PRED_FILL, 0.0))
+                        ax.imshow(np.where(pr[..., None], PRED_FILL, 0.0), aspect=asp)
                     ax.contour(t, levels=[0.5], colors=[REF_EDGE], linewidths=0.8)
                 else:
                     lb = _display(lab[z, y0:y1, x0:x1], bb)
-                    ax.imshow(cols[lb], alpha=np.where(lb > 0, 0.55, 0.0), interpolation="nearest")
+                    ax.imshow(cols[lb], alpha=np.where(lb > 0, FILL_ALPHA, 0.0), interpolation="nearest", aspect=asp)
+                    for k in np.unique(lb[lb > 0]):
+                        ax.contour((lb == k).astype(float), levels=[0.5], colors=[cols[k]], linewidths=0.6)
+                        shown_b.add(int(k))
                 ax.set_title(ttl, fontsize=FS, color=INK, pad=1.5)
                 ax.set_xticks([]); ax.set_yticks([])
                 for sp in ax.spines.values():
@@ -146,7 +163,18 @@ def fig_examples_seg(out: Path) -> None:
                 d = np.load(seg_root / sdir / case / f"{bb}-{mt}.npz")
                 val, dif = check_seg_title("fig_examples_seg", ds, mode, struct, bb, mt, case, d)
                 diffs.append(dif)
-                panel(axes[r, c], d["prediction"], f"{mtl}: Dice {val:.2f}")
+                panel(axes[r, c], d["prediction"], f"{mtl}: {val:.2f}")
+        if key == "lits":
+            sub.legend(handles=[Line2D([], [], color=REF_EDGE, lw=1.2, label="reference"),
+                                Patch(facecolor=PRED_FILL[:3], alpha=PRED_FILL[3], label="prediction")],
+                       loc="upper right", bbox_to_anchor=(1.0, 1.045), ncol=2, frameon=False, fontsize=FS, handlelength=1.2, borderaxespad=0.0)
+    cols = _seg_colors(15)
+    hs = [Patch(facecolor=cols[k], edgecolor=cols[k], label=amos_names[k - 1].replace("_", " ")) for k in sorted(shown_b)]
+    nc = min(len(hs), 6); nr = -(-len(hs) // nc)
+    hs = [hs[r_ * nc + c_] for c_ in range(nc) for r_ in range(nr) if r_ * nc + c_ < len(hs)]   # legend reads row by row
+    subs[1].legend(handles=hs, loc="lower center", ncol=nc, frameon=False, fontsize=FS, bbox_to_anchor=(0.5, -0.01),
+                   handlelength=1.0, handletextpad=0.4, columnspacing=1.0)
+    CHECKS.append("fig_examples_seg (b) structures shown: " + ", ".join(amos_names[k - 1] for k in sorted(shown_b)))
     style.save(fig, out, "fig_examples_seg")
     CHECKS.append(f"fig_examples_seg: titles print the per-case-file Dice; max |saved prediction - per-case file| = {max(diffs):.2e} over {len(diffs)} panels")
 

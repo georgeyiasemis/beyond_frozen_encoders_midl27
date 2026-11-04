@@ -64,8 +64,8 @@ REV_STACK = {
 }
 COHORTS = ["amos_covid_luna", "fdg", "rsna2022", "rsna2023", "rsna2019_ich"]
 COHORT_TEX = {
-    "amos_covid_luna": "CVPR26", "fdg": "FDG-PET/CT", "rsna2022": "RSNA 2022 C-spine", "rsna2023": "RSNA 2023 trauma",
-    "rsna2019_ich": "RSNA 2019 hemorrhage",
+    "amos_covid_luna": "CVPR26", "fdg": "FDG-PET/CT", "rsna2022": "RSNA22 C-spine", "rsna2023": "RSNA23 trauma",
+    "rsna2019_ich": "RSNA19 ICH",
 }
 DATASETS = ["amos22", "kits23", "lits", "msd_pancreas", "totalseg"]
 DATASET_TEX = {"amos22": "AMOS22", "kits23": "KiTS23", "lits": "LiTS", "msd_pancreas": "MSD Pancreas", "totalseg": "TotalSegmentator"}
@@ -144,7 +144,7 @@ def label_tex(label: str) -> str:
     if txt.isupper() and len(txt) > 2:
         txt = txt.lower()
     if src:
-        txt += " (" + {"amos": "AMOS", "covid_ct": "COVID-CT", "luna25": "LUNA25"}.get(src, src) + ")"
+        txt += " (" + {"amos": "AMOS", "covid_ct": "COVID-CTset", "luna25": "LUNA25"}.get(src, src) + ")"
     return esc(txt)
 
 
@@ -189,8 +189,18 @@ def tabular(colspec: str, header: str | list[str], rows: list[str], pre: str = "
                       "\\bottomrule", "\\end{tabular}"]) + "\n"
 
 
+# a hyphen-minus before a decimal number in text mode (not after $, a letter, a digit, a backslash or a brace, and not a
+# length such as -1.5pt) is printed as a true minus sign
+TEXT_MINUS = re.compile(r"(?<![$\w\\{])-(?=\d*\.\d+(?!\d*pt))")
+
+
+def true_minus(tex: str) -> str:
+    return TEXT_MINUS.sub("$-$", tex)
+
+
 def write(name: str, tex: str) -> None:
     p = OUT_TEX / name
+    tex = true_minus(tex)
     p.write_text(tex)
     WRITTEN.append((name, tex.count("\\\\")))
 

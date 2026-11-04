@@ -50,27 +50,32 @@ PAPER_FIG = style.PAPER_DIR / "figures"
 PAPER_TAB = style.PAPER_DIR / "tables"
 NO_VOCO = style.NO_VOCO                                    # fig_arms / fig_arms_seg without VoCo unless WITH_VOCO=1
 
-# ------------------------------------------------------------------ palette (the previous draft's diagram colours)
-BLUE, ORANGE = "#2a78d6", "#eb6834"
+# ------------------------------------------------------------------ palette. Blue, orange and green are reserved for the backbones
+# in every figure (style.BACKBONE_COL), so the diagrams use the method family colours of style.METHOD_COL: trained in full =
+# pink (Attn-only FT / Full FT), low-rank adapter = purple (LoRA). BLUE / ORANGE keep their names as the trained / adapter edges.
+BLUE, ORANGE = "#B0558F", "#5E3C99"
 INK, INK2, MUTED = "#0b0b0b", "#52514e", "#7a7976"
 FROZEN_FC, FROZEN_EC = "#eceef1", "#a4abb4"               # frozen pretrained weights
-TRAIN_FC, TRAIN_EC = "#d6e6fb", BLUE                      # trained in full
-ADP_FC = "#fde3d6"                                        # low-rank adapter (edge ORANGE)
+TRAIN_FC, TRAIN_EC = "#f7e8f1", BLUE                      # trained in full
+ADP_FC = "#e8e3f2"                                        # low-rank adapter (edge ORANGE)
 DATA_EC = "#b9b4a8"
 CARD_FC, CARD_EC = "#ffffff", "#d9d7d2"
 CLS_C = "#7b5ea7"      # class token
 REG_C = "#c9c6bf"      # register tokens
-PATCH_C = "#b9cff0"    # patch tokens
-GEO_C = "#1baf7a"      # data geometry (windows, crops)
+PATCH_C = "#d3d3df"    # patch tokens
+PATCH2_C = "#a9a9bf"   # pooled / combined tokens
+GEO_C = "#ffffff"      # data geometry (crop grids), drawn on the CT thumbnails
+WIN_C = "#8C510A"      # slices of one window / crop in a slice stack (brown: not a backbone or method colour)
 HEAD_C = TRAIN_FC
 
 # ------------------------------------------------------------------ fonts. Figures are drawn 7.0 in wide and placed at
-# the 6.0 in text width (scale 6/7); FS_MIN = 7.0 pt drawn is 6.0 pt printed.
+# the 6.0 in text width (scale 6/7); FS_MIN = 8.2 pt drawn is 7.0 pt printed (include them at \textwidth).
 DRAW_W = 7.0
 FS = 5.4
 FSCALE = 1.28
-FS_MIN = 7.0
-assert abs(TEXTWIDTH_IN - 6.0) < 1e-6 and FS_MIN * TEXTWIDTH_IN / DRAW_W >= 6.0 - 1e-9
+FS_MIN = 8.2
+PRINT_MIN = 7.0
+assert abs(TEXTWIDTH_IN - 6.0) < 1e-6 and FS_MIN * TEXTWIDTH_IN / DRAW_W >= PRINT_MIN - 0.01
 plt.rcParams.update({"font.size": 7, "pdf.fonttype": 42, "font.family": "DejaVu Sans", "mathtext.fontset": "dejavusans"})
 
 LATE = r"LoRA$_\mathrm{late}$"
@@ -253,7 +258,7 @@ def head(ax, x, y, title):
 
 
 def token(ax, x, y, s, kind, z=4):
-    fc = {"cls": CLS_C, "reg": REG_C, "patch": PATCH_C, "patch2": "#8cb0e4"}[kind]
+    fc = {"cls": CLS_C, "reg": REG_C, "patch": PATCH_C, "patch2": PATCH2_C}[kind]
     ax.add_patch(Rectangle((x, y), s, s, fc=fc, ec="white", lw=0.4, zorder=z))
 
 
@@ -303,7 +308,7 @@ def thumb(fig, ax, x, y, s_in, img, overlay=None, alpha=0.55, grid=None):
     return iax
 
 
-def stack(fig, ax, x, y, s_in, slices, overlays=None, alpha=0.5, mark=None, mark_c=GEO_C, step_in=0.035):
+def stack(fig, ax, x, y, s_in, slices, overlays=None, alpha=0.5, mark=None, mark_c=WIN_C, step_in=0.035):
     """Real axial slices drawn back to front; mark=(i0, i1) outlines a run of slices (a window)."""
     n = len(slices)
     for k in range(n):
@@ -316,6 +321,21 @@ def stack(fig, ax, x, y, s_in, slices, overlays=None, alpha=0.5, mark=None, mark
     return data_units(fig, ax, s_in + step_in * (n - 1))
 
 
+def patch_slabs(fig, ax, x, y, s_in, fronts, n_slab=3, depth=4, grid=(7, 7), step_in=0.012, gap_in=0.07,
+                mark_c=WIN_C):
+    """One window cut into n_slab depth slabs of `depth` slices each, drawn back to front; each slab's front slice
+    carries the in-plane patch grid, so a patch spans `depth` slices in depth and one grid cell in-plane."""
+    n = n_slab * depth
+    off = lambda i: (n_slab - 1 - i // depth) * gap_in + (n - 1 - i) * step_in
+    for i in range(n):
+        dxu, dyu = data_units(fig, ax, off(i))
+        img = fronts[i // depth] * (0.6 + 0.4 * (i + 1) / n)
+        iax = thumb(fig, ax, x + dxu, y + dyu, s_in, img, grid=grid if i % depth == depth - 1 else None)
+        for sp in iax.spines.values():
+            sp.set_edgecolor(mark_c); sp.set_linewidth(0.8)
+    return data_units(fig, ax, s_in + off(0))
+
+
 def mini_block(ax, x, ytop, w, qkv="frozen", proj="frozen", mlp="frozen", norm="frozen", lora=False, title=None):
     """One pre-norm transformer block, read bottom to top: LN, W_qkv, attention, W_proj, residual add, LN, MLP,
     residual add. lora=True draws the rank-16 side branch A, B next to W_qkv. The block hangs from ytop; every
@@ -323,8 +343,8 @@ def mini_block(ax, x, ytop, w, qkv="frozen", proj="frozen", mlp="frozen", norm="
     bottom of the block."""
     col = {"frozen": (FROZEN_FC, FROZEN_EC), "train": (TRAIN_FC, TRAIN_EC)}
     CH, GAP, ADD, ATT = 2.0, 0.55, 1.75, 1.7      # sub-box height, gap, gap holding a residual add, attention row
-    bx, bw = x + 1.15, 6.85                     # same sub-box width in every card; a LoRA card is wider for A, B
-    cx, sx = bx + bw / 2, x + 0.6
+    bx, bw = x + 1.25, 7.6                      # same sub-box width in every card; a LoRA card is wider for A, B
+    cx, sx = bx + bw / 2, x + 0.45
     # rows bottom to top: (name, state, height, gap above)
     rows = [("LN", norm, CH, GAP), ("$W_{qkv}$", qkv, CH, 0.3), ("attention", None, ATT, 0.3), ("$W_{proj}$", proj, CH, ADD),
             ("LN", norm, CH, GAP), ("MLP", mlp, CH, ADD)]
@@ -374,7 +394,7 @@ def canvas(H: float, ylo: float = 0.0):
 def save(fig, name: str) -> None:
     sizes = [t.get_fontsize() for t in fig.findobj(matplotlib.text.Text) if t.get_text().strip()]
     printed = min(sizes) * TEXTWIDTH_IN / fig.get_size_inches()[0]
-    assert printed >= 6.0 - 1e-9, (name, printed)
+    assert printed >= PRINT_MIN - 0.01, (name, printed)
     print(f"{name}: {fig.get_size_inches()[0]:.1f} x {fig.get_size_inches()[1]:.2f} in drawn, smallest text {min(sizes):.2f} pt"
           f" -> {printed:.2f} pt at {TEXTWIDTH_IN} in")
     OUT.mkdir(parents=True, exist_ok=True)
@@ -384,8 +404,8 @@ def save(fig, name: str) -> None:
 
 # ================================================================== Figure: pipeline (TAP-CT)
 def fig_pipeline(vol, vpred, seg) -> None:
-    H = 5.52
-    top = 100 * 5.35 / DRAW_W - 1.0
+    H = 6.17                                   # 7.0 pt printed text needs more room than the 6.0 pt layout (H 5.52)
+    top = 100 * 5.35 / DRAW_W - 1.0 + 7.9
     fig, ax = canvas(H, top - 100 * H / DRAW_W)
     s_in, ar = 0.5, 2.4
 
@@ -394,7 +414,7 @@ def fig_pipeline(vol, vpred, seg) -> None:
         return x + 1.0 + ar
 
     # ---------------- (a) classification, TAP-CT (tapct_cls.py; code map CLS 1.5, 2.1, 2.5)
-    y0 = 61.9
+    y0 = 68.4
     dx, dy = stack(fig, ax, 1.0, y0, s_in, vol)
     head(ax, 0.8, y0 + dy + 2.6, "(a) Classification")
     ym, lab_y = y0 + dy / 2, y0 - 1.3
@@ -403,8 +423,7 @@ def fig_pipeline(vol, vpred, seg) -> None:
     stack(fig, ax, x, y0, s_in, vol, mark=(2, 4))
     txt(ax, x + dx / 2, lab_y, "K windows,\n12 slices,\nstride 3", va="top")
     x = go(x + dx, ym)
-    ps = data_units(fig, ax, s_in)[0]
-    thumb(fig, ax, x, ym - ps / 2, s_in, vol[-1], grid=(7, 7))
+    ps = patch_slabs(fig, ax, x, y0, s_in, vol[2:5])[0]
     txt(ax, x + ps / 2, lab_y, "4×8×8\npatches,\n3×28² grid", va="top")
     x = go(x + ps, ym)
     ts = 1.45
@@ -418,7 +437,7 @@ def fig_pipeline(vol, vpred, seg) -> None:
     token(ax, x + 10 * ts, ty, ts, "patch")
     txt(ax, x + ts / 2, ty + ts + 1.0, "CLS", fs=4.6, c=CLS_C)
     txt(ax, x + 3.0 * ts, ty - 1.0, "4 registers", fs=4.4, c=INK2)
-    txt(ax, x + 8.0 * ts, ty + ts + 1.0, "2352 patch tokens", fs=4.4, c=INK2)
+    txt(ax, x + 7.5 * ts, ty + ts + 1.9, "2352 patch\ntokens", fs=4.4, c=INK2)
     txt(ax, x + 5.5 * ts, lab_y, "tokens of one\nwindow:\n2357 × 768", va="top")
     x = go(x + 11 * ts, ym)
     ew = 8.5
@@ -439,18 +458,18 @@ def fig_pipeline(vol, vpred, seg) -> None:
     box(ax, hx, y0 + dy * 0.70, hw, dy * 0.26, HEAD_C, BLUE, lw=0.9, r=0.8)
     txt(ax, hx + hw / 2, y0 + dy * 0.83, "Lin: mean → linear", fs=4.8, c=INK)
     box(ax, hx, y0 + dy * 0.02, hw, dy * 0.62, HEAD_C, BLUE, lw=0.9, r=0.8)
-    txt(ax, hx + hw / 2, y0 + dy * 0.33, "Attn: learned CLS + K tokens,\n2 self-attention blocks;\nCLS → linear", fs=4.6, c=INK)
+    txt(ax, hx + hw / 2, y0 + dy * 0.33, "Attn: learned CLS + K\ntokens, two attention\nblocks; CLS → linear", fs=4.6, c=INK)
     txt(ax, hx + hw / 2, lab_y, "head: one logit\nper label", va="top")
     for yy in (0.83, 0.33):
         arrow(ax, hx + hw + 0.2, y0 + dy * yy, hx + hw + 1.4, y0 + dy * yy)
         txt(ax, hx + hw + 1.7, y0 + dy * yy, "z", fs=5.6, c=INK, ha="left", style="italic")
 
     # ---------------- (b) segmentation, TAP-CT (backbones.py TapCTDenseBackbone, heads.py MultiTapSegDecoder)
-    y1 = 38.7
+    y1 = 42.6
     head(ax, 0.8, y1 + dy + 4.6, "(b) Segmentation")
     ym, lab_y = y1 + dy / 2, y1 - 1.3
-    stack(fig, ax, 1.0, y1, s_in, vol, mark=(2, 4), mark_c=ORANGE)
-    txt(ax, 0.8, lab_y, "crop: 12 whole\nslices, centered on\nforeground with\nprobability 0.67", va="top", ha="left")
+    stack(fig, ax, 1.0, y1, s_in, vol, mark=(2, 4))
+    txt(ax, 0.8, lab_y, "crop: 12 whole\nslices, centered\non foreground\nwith prob. 0.67", va="top", ha="left")
     x = go(1.0 + dx, ym)
     ew2 = 20.0
     by, bh = y1 + 0.8, dy - 1.6
@@ -462,7 +481,7 @@ def fig_pipeline(vol, vpred, seg) -> None:
         if k in (2, 5, 8, 11):                      # TAPCT_DEFAULT_TAPS = (2, 5, 8, 11)
             tap_x.append(bx + bw / 2)
             txt(ax, bx + bw / 2, by + bh / 2, str(k + 1), fs=4.6, c=BLUE, bold=True)
-    txt(ax, x + ew2 / 2, lab_y, "tokens of blocks 3, 6, 9, 12\nafter the final norm, as\n768×3×28² grids (Lin: block 12)", va="top")
+    txt(ax, x + ew2 / 2 + 0.8, lab_y, "tokens of blocks\n3, 6, 9, 12 after\nthe final norm,\n768×3×28² grids\n(Lin: block 12)", va="top")
     dx0 = x + ew2 + 4.0
     ytop = by + bh + 2.0
     for tx_ in tap_x:
@@ -474,7 +493,7 @@ def fig_pipeline(vol, vpred, seg) -> None:
         yy = by + 0.4 + i * (bh - 0.8) / 4
         ax.plot([dx0 - 0.8, dx0], [yy + 0.8, yy + 0.8], color=BLUE, lw=0.6, zorder=2)
         box(ax, dx0, yy, 2.6, 1.6, HEAD_C, BLUE, lw=0.6, r=0.2)
-    txt(ax, dx0 + 0.9, lab_y + 0.4, "1×1×1\nconv,\n4×128", va="top")
+    txt(ax, dx0 + 0.3, lab_y + 0.4, "1×1×1\nconv,\n4×128", va="top")
     # TAP-CT stride (4, 8, 8): 3 stages with scales (2,2,2), (2,2,2), (1,2,2); channels 128 -> 64 -> 32 -> 16
     stages = [("128", "3×28²", 128, 28, 3), ("64", "6×56²", 64, 56, 6), ("32", "12×112²", 32, 112, 12), ("16", "12×224²", 16, 224, 12)]
     fx = dx0 + 2.6 + 0.6
@@ -487,11 +506,11 @@ def fig_pipeline(vol, vpred, seg) -> None:
         nx = fx + w_ + ddx + 0.4
         if k < len(stages) - 1:
             arrow(ax, nx + 0.3, ym, nx + 2.5, ym)
-        fx = nx + 3.0
+        fx = nx + 4.0
     dec_tap = seg.loc[("tapct", "dec")]
     dec_n = int(dec_tap["trainable"])           # logged, joint AMOS22 model (15 structures)
-    txt(ax, 38.5, y1 + dy + 3.6, f"decoder ({dec_n / 1e6:.2f} M parameters for {int(dec_tap['classes'])} structures): concatenate, 3³ conv to 128 channels;\n"
-        "×2 trilinear upsampling (last: in-plane only) with 3³ conv; 1×1×1 conv out", fs=4.5, ha="left", va="center")
+    txt(ax, 38.5, y1 + dy + 4.4, f"decoder ({dec_n / 1e6:.2f} M parameters for {int(dec_tap['classes'])} structures):\n"
+        "concatenate, 3³ conv to 128 channels; ×2 trilinear\nupsampling (last: in-plane only) with 3³ conv; 1×1×1 conv out", fs=4.5, ha="left", va="center")
     arrow(ax, fx - 2.4, ym, fx + 1.2, ym)
     fx += 1.6
     stack(fig, ax, fx, y1, s_in, vol, overlays=vpred, alpha=0.55)
@@ -500,11 +519,11 @@ def fig_pipeline(vol, vpred, seg) -> None:
     # ---------------- (c) what is trained inside one block (lora.py, dora.py, unfreeze_attention_modules)
     y2 = 4.0
     head(ax, 0.8, 29.4, "(c) What each method trains in every block")
-    specs = [("frozen", dict(), 8.6, "Lin, Attn, Dec"),
-             ("LoRA", dict(lora=True), 15.3, "LoRA, rsLoRA (α/√r), DoRA (+m),\nLoRA+ABMIL, Dec→LoRA;\n"
-              + LATE + ", Lin→LoRA,\nAttn→LoRA: blocks 9–12"),
-             ("Attn-only FT", dict(qkv="train", proj="train"), 8.6, "the attention\nmodule: projec-\ntions and biases"),
-             ("Full FT", dict(qkv="train", proj="train", mlp="train", norm="train"), 8.6, "all, incl. patch\nembedding")]
+    specs = [("frozen", dict(), 9.4, "Lin, Attn,\nDec"),
+             ("LoRA", dict(lora=True), 16.1, "LoRA, rsLoRA (α/√r),\nDoRA (+m), LoRA+ABMIL,\nDec→LoRA; " + LATE + ",\n"
+              "Lin→LoRA, Attn→LoRA:\nblocks 9–12"),
+             ("Attn-only FT", dict(qkv="train", proj="train"), 9.4, "attention\nmodule:\nprojections\nand biases"),
+             ("Full FT", dict(qkv="train", proj="train", mlp="train", norm="train"), 9.4, "all, incl. patch\nembedding")]
     bx = 1.0
     for t, kw, w_, sub in specs:
         yb = mini_block(ax, bx, 25.9, w_, title=t, **kw)
@@ -513,15 +532,15 @@ def fig_pipeline(vol, vpred, seg) -> None:
     items = [(FROZEN_FC, FROZEN_EC, "frozen"), (TRAIN_FC, TRAIN_EC, "trained"),
              (ADP_FC, ORANGE, "low-rank adapter: $W_0x + \\frac{\\alpha}{r}BAx$, $\\alpha$ = 32")]
     for k, (fc, ec, t) in enumerate(items):
-        xx = 1.0 + [0, 8.5, 18.0][k]
-        box(ax, xx, -2.0, 1.8, 1.3, fc, ec, lw=0.7, r=0.2)
-        txt(ax, xx + 2.4, -1.35, t, fs=4.6, ha="left")
+        xx = 1.0 + [0, 10.0, 21.0][k]
+        box(ax, xx, -3.65, 1.8, 1.3, fc, ec, lw=0.7, r=0.2)
+        txt(ax, xx + 2.4, -3.0, t, fs=4.6, ha="left")
 
     # ---------------- (d) per-task vs joint (code map CLS 4, SEG 5)
     x3 = 64.5
     head(ax, x3, 29.4, "(d) Two training modes")
     card(ax, x3, 2.5, 34.5, 25.3)
-    labs = [BLUE, ORANGE, GEO_C]
+    labs = ["#000000", "#999999", "#CC79A7"]   # three labels (not backbone colours)
 
     def model(xm, ym_, outs, w=5.4, h=2.4):
         box(ax, xm, ym_, w, h, FROZEN_FC, FROZEN_EC, lw=0.6, r=0.3)
@@ -536,11 +555,11 @@ def fig_pipeline(vol, vpred, seg) -> None:
     for q, c in enumerate(labs):
         model(x3 + 1.5, 21.8 - q * 2.7, [c])
     txt(ax, x3 + 13.4, 19.4, "K runs; each sees\nits own label only", fs=4.6, ha="left")
-    ax.plot([x3 + 1.0, x3 + 33.5], [15.2, 15.2], color=CARD_EC, lw=0.6)
-    txt(ax, x3 + 1.2, 13.8, "joint: one model per cohort", fs=4.9, c=INK, ha="left", bold=True)
-    model(x3 + 1.5, 9.0, labs)
-    txt(ax, x3 + 13.4, 9.7, "1 run; encoder, adapters\nand head shared; K outputs;\nloss over the labels known\nfor a case", fs=4.6, ha="left")
-    txt(ax, x3 + 1.2, 4.3, "Seg.: label = structure, cohort = dataset;\n15-structure joint models: 3 × the steps", fs=4.4, c=MUTED, ha="left")
+    ax.plot([x3 + 1.0, x3 + 33.5], [15.7, 15.7], color=CARD_EC, lw=0.6)
+    txt(ax, x3 + 1.2, 14.2, "joint: one model per cohort", fs=4.9, c=INK, ha="left", bold=True)
+    model(x3 + 1.5, 7.6, labs)
+    txt(ax, x3 + 13.4, 8.0, "1 run; encoder,\nadapters and head\nshared; K outputs;\nloss over the labels\nknown for a case", fs=4.6, ha="left")
+    # in the caption: "Segmentation: label = structure, cohort = dataset; 15-structure joint models train for 3 × the steps."
     save(fig, "fig_pipeline")
 
 
@@ -563,10 +582,13 @@ def matrix(ax, x0, ytop, rows, cols, row_h=2.25, name_w=17.0, groups=()):
         pos[key] = (x, w, kind)
         txt(ax, x + w / 2, ytop + 1.2, lab, fs=4.5, c=INK, va="bottom")
         x += w + 0.5
-    for g_lab, k0, k1 in groups:
+    for g_lab, k0, k1, *al in groups:   # optional 4th item "right": label right-aligned to the group (longer than the group)
         xa = pos[k0][0]; xb = pos[k1][0] + pos[k1][1]
         ax.plot([xa, xb], [ytop + 5.0, ytop + 5.0], color=INK2, lw=0.5)
-        txt(ax, (xa + xb) / 2, ytop + 5.9, g_lab, fs=4.8, c=INK, bold=True, va="bottom")
+        if al and al[0] == "right":
+            txt(ax, xb, ytop + 5.9, g_lab, fs=4.8, c=INK, bold=True, va="bottom", ha="right")
+        else:
+            txt(ax, (xa + xb) / 2, ytop + 5.9, g_lab, fs=4.8, c=INK, bold=True, va="bottom")
     ax.plot([x0, x], [ytop + 0.6, ytop + 0.6], color=INK2, lw=0.5)
     for i, (name, sub, vals) in enumerate(rows):
         y = ytop - (i + 1) * row_h
@@ -574,7 +596,7 @@ def matrix(ax, x0, ytop, rows, cols, row_h=2.25, name_w=17.0, groups=()):
             ax.add_patch(Rectangle((x0, y - 0.15), x - x0, row_h, fc="#f7f6f3", ec="none", zorder=0))
         txt(ax, x0 + 0.4, y + row_h / 2 + 0.05, name, fs=5.0, c=INK, ha="left", bold=True)
         if sub:
-            txt(ax, x0 + 10.6, y + row_h / 2, sub, fs=4.1, c=MUTED, ha="left")
+            txt(ax, x0 + 9.0, y + row_h / 2, sub, fs=4.1, c=MUTED, ha="left")
         for key, (cx, w, kind) in pos.items():
             v = vals.get(key, "-" if kind == "cell" else "")
             if kind == "cell":
@@ -592,9 +614,9 @@ def legend_row(ax, x, y, items, fs=4.6):
         x += 2.3 + 0.105 * max(fs * FSCALE, FS_MIN) * len(t) + 2.0
 
 
-ENC_COLS = [("pe", "patch\nemb.", 4.0, "cell"),
-            ("eq", "$W_{qkv}$", 4.0, "cell"), ("ep", "$W_{proj}$", 4.0, "cell"), ("em", "MLP,\nnorms", 4.0, "cell"),
-            ("lq", "$W_{qkv}$", 4.0, "cell"), ("lp", "$W_{proj}$", 4.0, "cell"), ("lm", "MLP,\nnorms", 4.0, "cell")]
+ENC_COLS = [("pe", "patch\nemb.", 4.6, "cell"),
+            ("eq", "$W_{qkv}$", 4.6, "cell"), ("ep", "$W_{proj}$", 4.6, "cell"), ("em", "MLP,\nnorms", 4.6, "cell"),
+            ("lq", "$W_{qkv}$", 4.6, "cell"), ("lp", "$W_{proj}$", 4.6, "cell"), ("lm", "MLP,\nnorms", 4.6, "cell")]
 CELLS = {  # which encoder components each method trains (code map CLS 3.1-3.4, SEG 4)
     "lin": {}, "attn": {}, "dec": {},
     "lora": {"eq": "a", "lq": "a"}, "lorag": {"lq": "a"}, "babmil": {"eq": "a", "lq": "a"},
@@ -619,8 +641,8 @@ def _cells(m):
 # ================================================================== Figure: classification backbones + method matrix
 def fig_arms(vol, head_ct, cls) -> None:
     sh = 27.5 if NO_VOCO else 0.0       # NO_VOCO: panel (c) VoCo is dropped; (a), (b) move down onto the matrix
-    H = 9.3 - sh * DRAW_W / 100
-    yb = 100 * 0.45 / DRAW_W
+    yb = -3.4 if NO_VOCO else 100 * 0.45 / DRAW_W   # NO_VOCO: the notes are in the caption, the canvas ends below the legend
+    H = 9.3 - sh * DRAW_W / 100 - (100 * 0.45 / DRAW_W - yb) * DRAW_W / 100
     fig, ax = canvas(H, -yb)
     s_in, ar = 0.5, 2.6
 
@@ -648,7 +670,7 @@ def fig_arms(vol, head_ct, cls) -> None:
         token(ax, x + (k + 1) * ts, ym - ts / 2, ts, "patch")
     txt(ax, x + 5.5 * ts, ym, "…", fs=6)
     token(ax, x + 6 * ts, ym - ts / 2, ts, "patch")
-    txt(ax, x + 3.5 * ts, lab_y, "per 128²×64 crop:\n16×16×8 patches,\n512 + CLS tokens", va="top", fs=4.6)
+    txt(ax, x + 3.9 * ts, lab_y, "128²×64 crop:\n16×16×8\npatches,\n512 + CLS", va="top", fs=4.6)
     x = go(x + 7 * ts, ym)
     ew = 8.0
     box(ax, x, y0 + 0.6, ew, dy - 1.2, FROZEN_FC, FROZEN_EC, lw=0.7, r=0.5)
@@ -668,51 +690,51 @@ def fig_arms(vol, head_ct, cls) -> None:
     token(ax, x, ym - ts / 2 + 2.2, ts, "cls")
     for k in range(3):
         token(ax, x, ym - ts / 2 - k * ts + 0.4, ts, "patch2")
-    txt(ax, x + ts / 2 + 0.9, lab_y, "scan CLS\n+ N crop\ntokens", va="top", fs=4.6)
+    txt(ax, x + ts / 2 + 2.4, lab_y, "scan CLS\n+ N crop\ntokens", va="top", fs=4.6)
     x += ts + 0.6
     hx = x + 2.8
     hw = 99.0 - hx
     for t, yy in [("Lin: scan CLS → linear", 0.82), ("Attn: scan CLS + N crop tokens", 0.5),
-                  ("LoRA+ABMIL: N crop tokens → ABMIL → Attn", 0.18)]:
+                  ("LoRA+ABMIL: crop tokens → ABMIL → Attn", 0.18)]:
         arrow(ax, x + 0.2, ym, hx - 0.2, y0 + dy * yy)
         box(ax, hx, y0 + dy * yy - 1.15, hw, 2.3, HEAD_C, BLUE, lw=0.8, r=0.6)
         txt(ax, hx + hw / 2, y0 + dy * yy, t, fs=4.5, c=INK)
 
     # ---------------- (b) Pillar-0 (pillar0_cls.py; remote multimodal_atlas.py / multimodal_msa.py; CLS 2.3)
-    y1 = 91.5 - sh
+    y1 = 90.5 - sh
     head(ax, 0.8, y1 + dy + 2.4, "(b) Pillar-0 (head CT): multi-window input, conv stem, three-stage multi-scale encoder")
     ym, lab_y = y1 + dy / 2, y1 - 1.2
     chans = [np.clip((head_ct - 0.5) * g + 0.5, 0, 1) for g in (0.6, 0.8, 1.0, 1.3, 1.7, 2.2)]
     stack(fig, ax, 1.0, y1, s_in, chans)
-    txt(ax, 1.0, lab_y, "128×256×256,\n0.5×0.5×1.25 mm;\n11 channels: 10\nHU windows +\nmin–max", va="top", fs=4.6, ha="left")
-    x = go(1.0 + dx + 0.5, ym)
+    txt(ax, 1.0, lab_y, "128×256×256,\n0.5×0.5×1.25 mm;\n11 channels (10 HU\nwindows, min–max)", va="top", fs=4.6, ha="left")
+    x = go(1.0 + dx + 3.5, ym)
     box(ax, x, y1 + 1.5, 6.0, dy - 3.0, FROZEN_FC, FROZEN_EC, lw=0.7, r=0.5)
     txt(ax, x + 3.0, ym, "conv\nstem", fs=4.8, c=INK)
     txt(ax, x + 3.6, lab_y, "8×8×4\npatches,\n32³ grid", va="top", fs=4.6)
     x = go(x + 6.0, ym)
     gx = x + 0.3
     for k, sz in enumerate([6.6, 4.2, 2.2]):   # sizes are schematic: scale k = stem grid max-pooled by 4^k per axis
-        ddx, _ = cuboid(ax, gx, ym - sz / 2, sz, sz, d=sz * 0.5, fc=PATCH_C if k == 0 else "#8cb0e4", ec=BLUE, lw=0.5)
+        ddx, _ = cuboid(ax, gx, ym - sz / 2, sz, sz, d=sz * 0.5, fc=PATCH_C if k == 0 else PATCH2_C, ec=INK2, lw=0.5)
         txt(ax, gx + sz / 2, ym - 4.6, ["32³", "8³", "2³"][k], fs=4.6, c=INK)
-        gx += sz + ddx + 1.6
-    txt(ax, x + 9.0, lab_y - 0.6, "tokens at 3 scales\n(max-pool by 4 per axis),\nattention within\nand across scales", va="top", fs=4.6)
-    x = go(x + 22.0, ym)
-    ew = 14.0
+        gx += sz + ddx + 0.8
+    txt(ax, x + 9.0, lab_y - 0.6, "tokens at 3 scales\n(max-pool by 4\nper axis), attention\nwithin and across", va="top", fs=4.6)
+    x = go(x + 20.0, ym)
+    ew = 13.0
     box(ax, x, y1 + 0.6, ew, dy - 1.2, FROZEN_FC, FROZEN_EC, lw=0.7, r=0.5)
-    for k, (nb, w_, sc) in enumerate([(2, 2.6, "32³ 8³ 2³"), (2, 2.6, "8³ 2³"), (8, 6.4, "2³")]):
-        sx = x + 0.6 + [0, 3.2, 6.4][k]
+    for k, (nb, w_, sc) in enumerate([(2, 2.4, "32³ 8³ 2³"), (2, 2.4, "8³ 2³"), (8, 6.0, "2³")]):
+        sx = x + 0.6 + [0, 3.0, 6.0][k]
         box(ax, sx, y1 + 1.4, w_, dy - 3.6, "white", FROZEN_EC, lw=0.5, r=0.3, z=4)
         txt(ax, sx + w_ / 2, ym - 0.2, f"{nb}", fs=5.0, c=INK)
     txt(ax, x + ew / 2, y1 + dy - 1.3, "384-d", fs=4.6, c=INK)
-    txt(ax, x + ew / 2, lab_y, "3 stages of 2, 2, 8 blocks;\nscales 32³, 8³, 2³ leave\nafter stages 1, 2, 3;\nno CLS token", va="top", fs=4.6)
+    txt(ax, x + ew / 2, lab_y, "3 stages of 2, 2, 8\nblocks; scales 32³,\n8³, 2³ leave after\nstages 1, 2, 3", va="top", fs=4.6)
     x = go(x + ew, ym)
     hx = x
     hw = 99.0 - hx
-    for t, yy, hh in [("Lin: max-pool per scale, 3 × 384\n= 1152-d, L2-normalized → linear", 0.87, 3.0),
-                      ("Attn: tokens of all scales\n(32³ avg-pooled to 16³)", 0.51, 3.0),
-                      ("LoRA+ABMIL: same tokens → ABMIL → Attn", 0.14, 2.3)]:
-        box(ax, hx, y1 + dy * yy - hh / 2, hw, hh, HEAD_C, BLUE, lw=0.8, r=0.6)
-        txt(ax, hx + hw / 2, y1 + dy * yy, t, fs=4.5, c=INK)
+    for t, dyc in [("Lin: per-scale max-pool,\nL2-normalized, 1152-d → linear", 4.25),
+                   ("Attn: tokens of all scales\n(32³ avg-pooled to 16³)", 0.0),
+                   ("LoRA+ABMIL: same tokens\n→ ABMIL → Attn", -4.25)]:
+        box(ax, hx, ym + dyc - 1.95, hw, 3.9, HEAD_C, BLUE, lw=0.8, r=0.6)
+        txt(ax, hx + hw / 2, ym + dyc, t, fs=4.5, c=INK)
 
     if not NO_VOCO:
         # ---------------- (c) VoCo (voco_cls.py: SwinUNETR(use_v2).swinViT, feature_size 96, depths 2/2/2/2; CLS 2.4)
@@ -755,8 +777,8 @@ def fig_arms(vol, head_ct, cls) -> None:
     head(ax, 0.8, 52.0, "(c) What each classification method trains" if NO_VOCO else "(d) What each classification method trains")
     bbs = ("tapct", "spectre", "pillar0") if NO_VOCO else ("tapct", "spectre", "pillar0", "voco")
     pkeys = ("p1", "p2", "p3", "p4")[:len(bbs)]
-    cols = ENC_COLS + [("hd", "head", 12.0, "text"), ("sc", "steps", 9.0, "text"),
-                       ("p1", "TAP-CT", 5.6, "text"), ("p2", "SPECTRE", 5.8, "text"), ("p3", "Pillar-0", 6.6, "text"), ("p4", "VoCo", 6.4, "text")]
+    cols = ENC_COLS + [("hd", "head", 14.0, "text"), ("sc", "steps", 10.0, "text"),
+                       ("p1", "TAP-CT", 6.6, "text"), ("p2", "SPECTRE", 7.4, "text"), ("p3", "Pillar-0", 7.0, "text"), ("p4", "VoCo", 6.4, "text")]
     cols = cols[:len(cols) - 4 + len(bbs)]
     hd = {"lin": "pooled → linear", "babmil": "ABMIL → Attn", "lin_then_lorag": "linear"}
     order = ["lin", "attn", "lora", "lorag", "babmil", "dora", "rslora", "lin_then_lorag", "attn_then_lorag", "attnft", "fullft"]
@@ -770,24 +792,23 @@ def fig_arms(vol, head_ct, cls) -> None:
             ng = int(cls.loc[(bb, CLS_SAME_AS.get(m, m)) if (bb, m) not in cls.index else (bb, m), "no_grad_backbone"])
             vals[key] = fmt_m(n) + ("*" if ng else "") + ("†" if derived else "")
         rows.append((NAME[m], SUB.get(m, ""), vals))
-    matrix(ax, 0.8, 41.5, rows, cols, row_h=2.95, name_w=17.5,
-           groups=[("early blocks", "eq", "em"), ("late blocks", "lq", "lm"), ("encoder parameters updated", "p1", pkeys[-1])])
+    matrix(ax, 0.8, 41.5, rows, cols, row_h=2.95, name_w=15.0,
+           groups=[("early blocks", "eq", "em"), ("late blocks", "lq", "lm"), ("encoder parameters updated", "p1", pkeys[-1], "right")])
     legend_row(ax, 1.0, 5.2, [(FROZEN_FC, FROZEN_EC, "frozen"),
                               (ADP_FC, ORANGE, "rank-16 adapter (m: DoRA magnitude; 2: added in stage 2)"),
                               (TRAIN_FC, TRAIN_EC, "trained in full")])
     lin = {bb: int(cls.loc[(bb, "lin"), "trainable"]) for bb in bbs}
     att = {bb: int(cls.loc[(bb, "attn"), "trainable"]) for bb in bbs}
     pl = {m: fmt_m(cls_bb(cls, "pillar0", m, grad_only=False)[0]) for m in ("lora", "lorag", "attnft", "fullft")}
-    if NO_VOCO:
-        txt(ax, 1.0, 3.3,
-            "$W_{qkv}$: fused qkv (TAP-CT) or q and kv (SPECTRE, Pillar-0); Attn-only FT trains the whole attention module (with biases).\n"
-            "Late blocks: TAP-CT 9–12, SPECTRE 17–24 and its combiner, the last stage of Pillar-0 (8 of 12 blocks). CVPR26 joint models\n"
-            "also ran 26 000 steps (13 000 + 13 000). Head parameters for one label (TAP-CT / SPECTRE / Pillar-0): linear "
-            f"{' / '.join(str(lin[b]) for b in lin)};\nattentive probe {' / '.join(f'{att[b] / 1e6:.1f}' for b in att)} M. "
-            "*Pillar-0: the per-scale blocks of scales that have already left the encoder, and the text\nprojection, are also wrapped or "
-            f"unfrozen but never run and receive no gradient; counting them: LoRA {pl['lora']}, {LATE} {pl['lorag']},\n"
-            f"Attn-only FT {pl['attnft']}, Full FT {pl['fullft']}.",
-            fs=4.3, c=MUTED, ha="left", va="top")
+    if NO_VOCO:   # the note is part of the caption (printed here for the main text, not drawn)
+        print("CAPTION NOTE fig_arms:",
+              "W_qkv: fused qkv (TAP-CT) or q and kv (SPECTRE, Pillar-0); Attn-only FT trains the whole attention module (with biases). "
+              "Late blocks: TAP-CT 9-12, SPECTRE 17-24 and its combiner, the last stage of Pillar-0 (8 of 12 blocks). CVPR26 joint models "
+              "also ran 26 000 steps (13 000 + 13 000). Head parameters for one label (TAP-CT / SPECTRE / Pillar-0): linear "
+              f"{' / '.join(str(lin[b]) for b in lin)}; attentive probe {' / '.join(f'{att[b] / 1e6:.1f}' for b in att)} M. "
+              "*Pillar-0: the per-scale blocks of scales that have already left the encoder, and the text projection, are also wrapped or "
+              f"unfrozen but never run and receive no gradient; counting them: LoRA {pl['lora']}, LoRA_late {pl['lorag']}, "
+              f"Attn-only FT {pl['attnft']}, Full FT {pl['fullft']}.")
         save(fig, "fig_arms")
         return
     txt(ax, 1.0, 3.3,
@@ -804,9 +825,10 @@ def fig_arms(vol, head_ct, cls) -> None:
 
 # ================================================================== Figure: segmentation decoder + method matrix
 def fig_arms_seg(seg) -> None:
-    sh = 8.2 if NO_VOCO else 0.0        # NO_VOCO: no VoCo shape row and shorter notes; panel (a) moves down
-    H = 5.42 - sh * DRAW_W / 100
-    fig, ax = canvas(H, -5.4)
+    sh = 15.5 if NO_VOCO else 0.0       # NO_VOCO: no VoCo shape row, notes in the caption; panel (a) moves down
+    ylo = -1.4 if NO_VOCO else -5.4
+    H = 5.42 - sh * DRAW_W / 100 - (ylo + 5.4) * DRAW_W / 100
+    fig, ax = canvas(H, ylo)
     head(ax, 0.8, 70.3 - sh, "(a) Segmentation decoder: tensor shapes (channels × depth × height × width)")
     y = 58.8 - sh
     # TAP-CT stride (4,8,8) on a 12x224x224 crop; SPECTRE (8,16,16) on 64x128x128; VoCo taps at strides 4-32 on 96^3,
@@ -820,7 +842,7 @@ def fig_arms_seg(seg) -> None:
               ("upsample,\n3³ conv", "–", "16×64×128²", "–", 16, 224, 4),
               ("1×1×1 conv", "C×12×224²", "C×64×128²", "C×96³", 8, 224, 4)]
     sbbs = ("tapct", "spectre") if NO_VOCO else ("tapct", "spectre", "voco")
-    for name, yy in (("TAP-CT", y - 7.6), ("SPECTRE", y - 10.0), ("VoCo", y - 12.6))[:len(sbbs)]:
+    for name, yy in (("TAP-CT", y - 8.6), ("SPECTRE", y - 11.0), ("VoCo", y - 13.4))[:len(sbbs)]:
         txt(ax, 1.0, yy, name, fs=4.7, c=INK, ha="left", bold=True)
     xs = 13.0
     for k, (nm, t1, t2, t3, ch, hw_, dd) in enumerate(stages):
@@ -830,27 +852,26 @@ def fig_arms_seg(seg) -> None:
         ddx, _ = cuboid(ax, xs, y - h_ / 2 + 2.6, w_, h_, d=1.0 + dd * 0.8, fc=fc, ec=BLUE if k else FROZEN_EC, lw=0.6)
         cx = xs + (w_ + ddx) / 2
         txt(ax, cx, y - 4.0, nm, fs=4.4, c=INK, va="top")
-        txt(ax, cx, y - 7.6, t1, fs=4.1)
-        txt(ax, cx, y - 10.0, t2, fs=4.1)
+        txt(ax, cx, y - 8.6, t1, fs=4.1)
+        txt(ax, cx, y - 11.0, t2, fs=4.1)
         if not NO_VOCO:
-            txt(ax, cx, y - 12.6, t3, fs=4.1)
+            txt(ax, cx, y - 13.4, t3, fs=4.1)
         if k < len(stages) - 1:
-            arrow(ax, xs + w_ + ddx + 0.6, y + 2.6, xs + 10.85 - 0.6, y + 2.6)
-        xs += 10.85
+            arrow(ax, xs + w_ + ddx + 0.6, y + 2.6, xs + 11.2 - 0.6, y + 2.6)
+        xs += 11.2
     dec = {bb: seg.loc[(bb, "dec")] for bb in sbbs}
     linp = {bb: int(seg.loc[(bb, "lin"), "trainable"]) // int(seg.loc[(bb, "lin"), "classes"]) for bb in sbbs}
     C = {int(d["classes"]) for d in dec.values()}
     assert len(C) == 1
     dec_txt = " / ".join(f"{d['trainable'] / 1e6:.2f}" for d in dec.values()) + \
         f" M ({' / '.join(BACKBONE_TEX[b] for b in sbbs)}, C = {C.pop()})"
-    if NO_VOCO:
-        txt(ax, 1.0, y - 12.6,
-            "Taps: blocks 3, 6, 9, 12 (TAP-CT) or 6, 12, 18, 24 (SPECTRE) after the final norm. Each 3³ conv is followed by instance norm\n"
-            "and LeakyReLU; trilinear upsampling along the axes whose stride is still above 1; no skips from the input. SPECTRE: per-crop\n"
-            f"ViT-L only. Decoder parameters: {dec_txt}. Lin: a 1×1×1 conv on the deepest tap (block 12 or\n"
-            f"block 24) with trilinear upsampling; {' / '.join(str(linp[b]) for b in linp)} parameters per structure. "
-            "C = 1 per structure, or the number of structures (joint).",
-            fs=4.3, c=MUTED, ha="left", va="top")
+    if NO_VOCO:   # the note is part of the caption (printed here for the main text, not drawn)
+        print("CAPTION NOTE fig_arms_seg (a):",
+              "Taps: blocks 3, 6, 9, 12 (TAP-CT) or 6, 12, 18, 24 (SPECTRE) after the final norm. Each 3³ conv is followed by instance norm "
+              "and LeakyReLU; trilinear upsampling along the axes whose stride is still above 1; no skips from the input. SPECTRE: per-crop "
+              f"ViT-L only. Decoder parameters: {dec_txt}. Lin: a 1×1×1 conv on the deepest tap (block 12 or "
+              f"block 24) with trilinear upsampling; {' / '.join(str(linp[b]) for b in linp)} parameters per structure. "
+              "C = 1 per structure, or the number of structures (joint).")
     else:
         txt(ax, 1.0, y - 15.0,
             "Taps: blocks 3, 6, 9, 12 (TAP-CT) or 6, 12, 18, 24 (SPECTRE) after the final norm; for VoCo the four stage outputs\n"
@@ -863,8 +884,8 @@ def fig_arms_seg(seg) -> None:
             fs=4.3, c=MUTED, ha="left", va="top")
     # ---------------- (b) the seven methods
     head(ax, 0.8, 29.0, "(b) What each segmentation method trains")
-    cols = ENC_COLS + [("hd", "head", 11.5, "text"), ("sc", "steps", 9.0, "text"),
-                       ("p1", "TAP-CT", 6.0, "text"), ("p2", "SPECTRE", 6.0, "text"), ("p3", "VoCo", 6.0, "text")]
+    cols = ENC_COLS + [("hd", "head", 13.0, "text"), ("sc", "steps", 10.5, "text"),
+                       ("p1", "TAP-CT", 7.0, "text"), ("p2", "SPECTRE", 7.6, "text"), ("p3", "VoCo", 6.0, "text")]
     cols = cols[:len(cols) - 3 + len(sbbs)]
     order = ["lin", "dec", "lora", "lorag", "dora", "dec_then_lora", "fullft"]
     rows = []
@@ -877,16 +898,17 @@ def fig_arms_seg(seg) -> None:
             n = int(r["backbone_trainable"]) - int(r["no_grad_backbone"])
             vals[key] = fmt_m(n) + ("*" if int(r["no_grad_backbone"]) else "")
         rows.append((NAME[m], SUB.get(m, ""), vals))
-    matrix(ax, 0.8, 19.8, rows, cols, row_h=2.45, name_w=17.5,
-           groups=[("early blocks", "eq", "em"), ("late blocks", "lq", "lm"), ("encoder parameters updated", "p1", ("p1", "p2", "p3")[len(sbbs) - 1])])
+    matrix(ax, 0.8, 19.8, rows, cols, row_h=2.45, name_w=15.0,
+           groups=[("early blocks", "eq", "em"), ("late blocks", "lq", "lm"), ("encoder parameters updated", "p1", ("p1", "p2", "p3")[len(sbbs) - 1], "right")])
     legend_row(ax, 1.0, 0.4, [(FROZEN_FC, FROZEN_EC, "frozen"), (ADP_FC, ORANGE, "rank-16 adapter (m: DoRA magnitude; 2: added in stage 2)"),
                                (TRAIN_FC, TRAIN_EC, "trained in full")])
-    sp = {m: seg.loc[("spectre", m)] for m in ("lora", "dora", "fullft")}
-    txt(ax, 1.0, -1.2,
-        "AMOS22 and TotalSegmentator joint models: 24 000 steps (12 000 + 12 000). *SPECTRE: LoRA, DoRA and Full FT also wrap or unfreeze\n"
-        "the feature combiner, which never enters the segmentation features and receives no gradient; counting it, "
-        f"{fmt_m(sp['lora']['backbone_trainable'])} / {fmt_m(sp['dora']['backbone_trainable'])} / {fmt_m(sp['fullft']['backbone_trainable'])}.",
-        fs=4.3, c=MUTED, ha="left", va="top")
+    sp = {m: seg.loc[("spectre", m)] for m in ("lora", "dora", "dec_then_lora", "fullft")}
+    starred = [m for m in sp if int(sp[m]["no_grad_backbone"])]
+    print("CAPTION NOTE fig_arms_seg (b):",
+          "AMOS22 and TotalSegmentator joint models: 24 000 steps (12 000 + 12 000). *SPECTRE: "
+          f"{', '.join(NAME[m] for m in starred[:-1])} and {NAME[starred[-1]]} also wrap or unfreeze "
+          "the feature combiner, which never enters the segmentation features and receives no gradient; counting it, "
+          f"{' / '.join(fmt_m(sp[m]['backbone_trainable']) for m in starred)}.")
     save(fig, "fig_arms_seg")
 
 

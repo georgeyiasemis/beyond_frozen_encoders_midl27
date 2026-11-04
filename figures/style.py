@@ -42,13 +42,17 @@ METHOD_TEX = {"lin": "Lin", "attn": "Attn", "lora": "LoRA", "lorag": r"LoRA$_{\m
 METHOD_FAMILY = {"lin": "frozen", "attn": "frozen", "dec": "frozen", "lora": "lowrank", "lorag": "lowrank", "babmil": "lowrank",
                  "dora": "lowrank", "rslora": "lowrank", "lin_then_lorag": "lowrank", "attn_then_lorag": "lowrank",
                  "dec_then_lora": "lowrank", "attnft": "fullrank", "fullft": "fullrank"}
-# per-method colours when methods are distinguished on one axis (families stay recognisable by hue)
-METHOD_COL = {"lin": "#7f7f7f", "attn": "#bdbdbd", "dec": "#7f7f7f",
-              "lora": OI["blue"], "lorag": OI["skyblue"], "babmil": "#1f5fa0", "dora": OI["purple"], "rslora": "#8b5fa8",
-              "lin_then_lorag": OI["green"], "attn_then_lorag": "#66c2a4", "dec_then_lora": OI["green"],
-              "attnft": OI["yellow"], "fullft": OI["orange"]}
-COHORT_TEX = {"amos_covid_luna": "CVPR26", "fdg": "FDG-PET/CT", "rsna2022": "RSNA 2022 C-spine", "rsna2023": "RSNA 2023 trauma",
-              "rsna2019_ich": "RSNA 2019 hemorrhage", "amos22": "AMOS22", "kits23": "KiTS23", "lits": "LiTS",
+# per-method colours where a figure colours methods: greys and purples only, so that blue, orange/vermillion and green
+# always mean a backbone, and no yellow (poor contrast on white). Methods that share a figure also differ in marker
+# (METHOD_MARK). LoRA+ABMIL (classification) and DoRA (segmentation) never share a figure and share a colour.
+METHOD_COL = {"lin": "#999999", "attn": "#c8c8c8", "dec": "#000000",
+              "lora": "#5E3C99", "lorag": "#9E9AC8", "babmil": "#B2ABD2", "dora": "#B2ABD2", "rslora": "#9E9AC8",
+              "lin_then_lorag": "#9E9AC8", "attn_then_lorag": "#9E9AC8", "dec_then_lora": "#9E9AC8",
+              "attnft": "#CC79A7", "fullft": "#882255"}
+METHOD_MARK = {"lin": "o", "attn": "o", "dec": "s", "lora": "o", "babmil": "D", "dora": "v", "attnft": "P", "fullft": "^"}
+CONTROL_COL = "#8C510A"   # brown: negative-control lines (not a backbone or method colour)
+COHORT_TEX = {"amos_covid_luna": "CVPR26", "fdg": "FDG-PET/CT", "rsna2022": "RSNA22 C-spine", "rsna2023": "RSNA23 trauma",
+              "rsna2019_ich": "RSNA19 ICH", "amos22": "AMOS22", "kits23": "KiTS23", "lits": "LiTS",
               "msd_pancreas": "MSD Pancreas", "totalseg": "TotalSegmentator"}
 INK, INK2, GRID = "#222222", "#555555", "#e6e6e6"
 

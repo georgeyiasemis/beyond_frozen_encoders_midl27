@@ -23,6 +23,7 @@ from pathlib import Path
 
 import nibabel as nib
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
@@ -35,7 +36,7 @@ OUT = style.FIG_OUT
 PAPER_FIG = style.PAPER_DIR / "figures"
 CHECK_DIR = OUT / "selection"
 INK, INK2, GRID = style.INK, style.INK2, style.GRID
-FS = 6.0
+FS = 7.0   # printed size: the figures are included at the text width
 BB_COL, BB_MARK, BB_TEX = style.BACKBONE_COL, style.BACKBONE_MARK, style.BACKBONE_TEX
 BB_ORDER = ["tapct", "spectre", "pillar0", "voco"]
 SEG_BACKBONES = ["tapct", "spectre", "voco"]
@@ -44,14 +45,14 @@ if style.NO_VOCO:
     SEG_BACKBONES = [b for b in SEG_BACKBONES if b != "voco"]
 CVPR = "/projects/cvpr2026_challenge_fomo4ct/CVPR26-3DCTFMCompetition"
 DP = "/mnt/kronos/data_public"
-SOURCES = {  # key: (title, cohort, view, window)
+SOURCES = {  # key: (title, cohort, view, window); cohort names as style.COHORT_TEX
     "amos": ("CVPR26: AMOS", "amos_covid_luna", "coronal", (-160, 240)),
-    "covid": ("CVPR26: COVID-CT", "amos_covid_luna", "axial", (-1350, 150)),
+    "covid": ("CVPR26: COVID-CTset", "amos_covid_luna", "axial", (-1350, 150)),
     "luna": ("CVPR26: LUNA25", "amos_covid_luna", "coronal", (-1350, 150)),
     "fdg": ("FDG-PET/CT (CT)", "fdg", "axial", (-160, 240)),
-    "rsna2022": ("RSNA 2022 C-spine", "rsna2022", "sagittal", (-300, 1200)),
-    "rsna2023": ("RSNA 2023 trauma", "rsna2023", "coronal", (-160, 240)),
-    "ich": ("RSNA 2019 hemorrhage", "rsna2019_ich", "axial", (0, 80)),
+    "rsna2022": ("RSNA22 C-spine", "rsna2022", "sagittal", (-300, 1200)),
+    "rsna2023": ("RSNA23 trauma", "rsna2023", "coronal", (-160, 240)),
+    "ich": ("RSNA19 ICH", "rsna2019_ich", "axial", (0, 80)),
 }
 METHODS = [("lin", "Lin"), ("lora", "LoRA"), ("attnft", "Attn-only FT"), ("fullft", "Full FT")]
 CHECKS: list[str] = []
@@ -143,21 +144,21 @@ def pretty(lab: str) -> str:
 
 # ------------------------------------------------------------------ one held-out case per classification source
 def fig_cohorts(out: Path) -> None:
-    fig, axes = plt.subplots(1, 7, figsize=(style.TEXTWIDTH_IN, 1.95))
+    fig, axes = plt.subplots(1, 7, figsize=(style.TEXTWIDTH_IN, 2.2))
     for ax, src in zip(axes, SOURCES):
         title, ds, _, _ = SOURCES[src]
         pos = case_labels(ds, src)
         case = sorted(pos, key=lambda c: (-len(pos[c]), c))[0]  # held-out case with the most positive labels
         CHECKS.append(f"fig_examples_cls {src}: case {case}, positive labels {pos[case]}")
         show(ax, image_path(src, case), src)
-        t = title.replace("CVPR26: ", "CVPR26\n").replace(" (CT)", "\n(CT)").replace("RSNA 20", "RSNA 20").replace(" C-spine", "\nC-spine") \
-                 .replace(" trauma", "\ntrauma").replace(" hemorrhage", "\nhemorrhage")
+        t = title.replace("CVPR26: ", "CVPR26\n").replace(" (CT)", "\n(CT)").replace(" C-spine", "\nC-spine") \
+                 .replace(" trauma", "\ntrauma").replace(" ICH", "\nICH")
         ax.set_title(t, fontsize=FS, color=INK, pad=2, linespacing=1.0)
         labs = [pretty(x) for x in pos[case]]
         lines, cur = [], ""
         for l in labs:
             nxt = (cur + ", " + l) if cur else l
-            if len(nxt) > 16 and cur:
+            if len(nxt) > 14 and cur:
                 lines.append(cur + ","); cur = l
             else:
                 cur = nxt
@@ -166,18 +167,22 @@ def fig_cohorts(out: Path) -> None:
             rest = len(labs) - sum(len(x.rstrip(",").split(", ")) for x in lines[:3])
             lines = lines[:3] + [f"+ {rest} more"]
         ax.set_xlabel("\n".join(lines), fontsize=FS, color=INK2, labelpad=2, linespacing=1.0)
-    fig.subplots_adjust(left=0.005, right=0.995, top=0.80, bottom=0.30, wspace=0.10)
+    fig.subplots_adjust(left=0.005, right=0.995, top=0.80, bottom=0.31, wspace=0.12)
     style.save(fig, out, "fig_examples_cls")
 
 
 # ------------------------------------------------------------------ classification success / failure
 def fig_cls_cases(sel: dict, out: Path) -> None:
+    """Per source, the positive at the 90th percentile of the case score ("success") and the lowest-scoring positive
+    ("weakest positive"); no image (the label has no location to point at). A backbone-method pair that did not train
+    (spread.csv: SPECTRE Full FT) is drawn open."""
     cs = sel["cls"]
     srcs = list(SOURCES)
-    fig = plt.figure(figsize=(style.TEXTWIDTH_IN, 1.05 * len(srcs) + 0.45))
-    # columns: image, gap for the method names, dots, gap, image, gap, dots
-    gs = fig.add_gridspec(len(srcs), 7, width_ratios=[0.85, 0.56, 1.2, 0.22, 0.85, 0.56, 1.2], left=0.06, right=0.985, top=0.965,
-                          bottom=0.07, hspace=0.5, wspace=0.04)
+    sp = pd.read_csv(V2 / "metrics" / "out" / "spread.csv")
+    dnt = {(r.backbone, r.method) for r in sp.itertuples() if getattr(r, "did_not_train", False)}
+    fig = plt.figure(figsize=(style.TEXTWIDTH_IN, 0.92 * len(srcs) + 0.5))
+    gs = fig.add_gridspec(len(srcs), 3, width_ratios=[1.0, 0.12, 1.0], left=0.215, right=0.985, top=0.965,
+                          bottom=0.085, hspace=0.75, wspace=0.12)
     for i, src in enumerate(srcs):
         e = cs[src]
         bbs = sorted({k.split("/")[0] for k in e["runs"]} & set(BB_ORDER), key=BB_ORDER.index)
@@ -192,30 +197,32 @@ def fig_cls_cases(sel: dict, out: Path) -> None:
                 cmean[c] = float(np.mean(v))
                 CHECKS.append(f"fig_cases_cls {src} {c}: mean over {', '.join(bbs)} = {cmean[c]:.4f} "
                               f"(selection mean with VoCo {e['case_mean'][c]:.4f})")
-        for j, role in enumerate(["success", "failure"]):
+        for j, (role, rtxt) in enumerate([("success", "success"), ("failure", "weakest positive")]):
             case = e["cases"][role]
-            axi = fig.add_subplot(gs[i, 0 if j == 0 else 4])
-            show(axi, image_path(src, case), src)
-            if j == 0:
-                axi.set_ylabel(SOURCES[src][0].replace("CVPR26: ", "CVPR26\n").replace(" (CT)", "").replace("RSNA 20", "RSNA\n20"),
-                               fontsize=FS, color=INK, linespacing=1.0)
-            axd = fig.add_subplot(gs[i, 2 if j == 0 else 6])
+            axd = fig.add_subplot(gs[i, 0 if j == 0 else 2])
             for k, (mt, mlab) in enumerate(METHODS):
                 y = len(METHODS) - 1 - k
                 for b, bb in enumerate(bbs):
                     v = e["case_score"][f"{bb}/{mt}"][case]
-                    axd.scatter([v], [y + (b - (len(bbs) - 1) / 2) * 0.28], s=12, color=BB_COL[bb], marker=BB_MARK[bb], zorder=3,
-                                edgecolor="white", linewidths=0.4)
+                    off = (bb, mt) in dnt
+                    axd.scatter([v], [y + (b - (len(bbs) - 1) / 2) * 0.28], s=14, color="white" if off else BB_COL[bb], marker=BB_MARK[bb],
+                                zorder=3, edgecolor=BB_COL[bb] if off else "white", linewidths=0.8 if off else 0.4)
             axd.axvline(0.5, color=INK2, lw=0.6, ls=":", zorder=1)
             axd.set_xlim(-0.03, 1.03); axd.set_ylim(-0.6, len(METHODS) - 0.4)
-            axd.set_yticks(range(len(METHODS))); axd.set_yticklabels([m[1] for m in METHODS[::-1]], fontsize=FS)
+            axd.set_yticks(range(len(METHODS)))
+            axd.set_yticklabels([m[1] for m in METHODS[::-1]] if j == 0 else [], fontsize=FS)
             axd.set_xticks([0, 0.5, 1]); axd.set_xticklabels(["0", "0.5", "1"]); axd.tick_params(length=1.5, labelsize=FS, pad=1)
             axd.grid(axis="x", color=GRID, lw=0.5, zorder=0)
             if i == len(srcs) - 1:
                 axd.set_xlabel("negatives outranked by the case", fontsize=FS, labelpad=1)
-            axd.set_title(f"{role}: {pretty(e['label'].split(':')[-1])} (mean {cmean[case]:.2f})", fontsize=FS, color=INK, loc="left", pad=2)
+            axd.set_title(f"{rtxt}: {pretty(e['label'].split(':')[-1])} (mean {cmean[case]:.2f})", fontsize=FS, color=INK, loc="left", pad=2)
+            if j == 0:
+                axd.text(-0.33, 0.5, SOURCES[src][0].replace("CVPR26: ", "CVPR26\n").replace(" (CT)", "").replace(" C-spine", "\nC-spine")
+                         .replace(" trauma", "\ntrauma").replace(" ICH", "\nICH"),
+                         transform=axd.transAxes, ha="right", va="center", fontsize=FS, color=INK, linespacing=1.0)
     handles = [Line2D([], [], marker=BB_MARK[b], ls="", color=BB_COL[b], markersize=4, label=BB_TEX[b]) for b in BB_ORDER]
-    fig.legend(handles=handles, loc="lower center", ncol=len(BB_ORDER), frameon=False, fontsize=FS, bbox_to_anchor=(0.5, 0.0))
+    handles.append(Line2D([], [], marker=BB_MARK["spectre"], ls="", color=BB_COL["spectre"], mfc="white", markersize=4, label="did not train"))
+    fig.legend(handles=handles, loc="lower center", ncol=len(handles), frameon=False, fontsize=FS, bbox_to_anchor=(0.5, 0.0))
     style.save(fig, out, "fig_cases_cls")
 
 
@@ -256,14 +263,45 @@ def file_dice(ds: str, bb: str, mt: str, case: str) -> np.ndarray:
     return out
 
 
+# few-structure datasets: one clearly distinct hue per structure (organ violet, tumor pink, cyst yellow); the 15-structure
+# datasets keep tab20 (15 hues cannot avoid every backbone hue)
+FEW_COL = {"kits23": {"kidney": "#9E8FE6", "tumor": "#FF2E88", "cyst": "#FFD92F"},
+           "lits": {"liver": "#9E8FE6", "tumor": "#FF2E88"},
+           "msd_pancreas": {"pancreas": "#9E8FE6", "tumor": "#FF2E88"}}
+FILL_ALPHA = 0.28   # light fill plus a contour, so the anatomy under a structure stays visible
+
+
+def _struct_cols(ds: str, names: list[str]) -> np.ndarray:
+    """RGBA per label value (0 = background, k = names[k - 1])."""
+    if ds in FEW_COL:
+        from matplotlib.colors import to_rgba
+        cols = np.zeros((256, 4))
+        for k, n in enumerate(names, start=1):
+            cols[k] = to_rgba(FEW_COL[ds][n])
+        return cols
+    return _label_cols()
+
+
+def _tapct_aspect(ds: str, case: str) -> float:
+    """TAP-CT resizes each whole slice to 224 x 224, so its pixels are not square when the slice is not; the physical
+    height / width of the slice is taken from SPECTRE's grid of the same case, which keeps equal in-plane spacing."""
+    sh = np.load(RES / "examples" / "seg_cases" / ds / case / "spectre-lora.npz")["image"].shape
+    return sh[0] / sh[1]
+
+
 def fig_seg_cases(sel: dict, out: Path, ds: str) -> None:
+    from matplotlib.patches import Patch
     root = RES / "examples" / "seg_cases"
-    cols = _label_cols()
+    names = names_of(run_row("seg", ds, "tapct", "joint", "lora"))
+    cols = _struct_cols(ds, names)
     rows = [(role, bb) for role in ("success", "failure") for bb in SEG_BACKBONES]
-    fig, axes = plt.subplots(len(rows), 5, figsize=(style.TEXTWIDTH_IN, 1.13 * len(rows) + 0.1))
+    fig, axes = plt.subplots(len(rows), 5, figsize=(style.TEXTWIDTH_IN, 1.32 * len(rows) + 0.55))
     maxd = 0.0
+    shown = set()
     for r, (role, bb) in enumerate(rows):
         case = sel["seg"][ds]["cases"][role]
+        asp = _tapct_aspect(ds, case) if bb == "tapct" else 1.0
+        CHECKS.append(f"fig_cases_seg_{ds} {role} {case} {bb}: pixel aspect {asp:.3f}")
         for c, (mt, mlab) in enumerate([("ref", "reference")] + SEG_METHODS):
             ax = axes[r, c]
             ax.set_xticks([]); ax.set_yticks([])
@@ -276,10 +314,13 @@ def fig_seg_cases(sel: dict, out: Path, ds: str) -> None:
             lab = d["reference"] if mt == "ref" else d["prediction"]
             if bb != "tapct":
                 lab = lab[::-1, ::-1]
-            ax.imshow(im, cmap="gray", vmin=0, vmax=1, interpolation="bilinear")
-            ax.imshow(cols[lab], alpha=np.where(lab > 0, 0.5, 0.0), interpolation="nearest")
+            ax.imshow(im, cmap="gray", vmin=0, vmax=1, interpolation="bilinear", aspect=asp)
+            ax.imshow(cols[lab], alpha=np.where(lab > 0, FILL_ALPHA, 0.0), interpolation="nearest", aspect=asp)
+            for k in np.unique(lab[lab > 0]):
+                ax.contour((lab == k).astype(float), levels=[0.5], colors=[cols[k]], linewidths=0.6)
+                shown.add(int(k))
             if mt == "ref":
-                ax.set_title(f"{BB_TEX[bb]}: reference", fontsize=FS, color=INK, pad=1.5)
+                ax.set_title(f"{BB_TEX[bb]}\nreference", fontsize=FS, color=INK, pad=1.5, linespacing=1.0)
                 if bb == "tapct":
                     ax.set_ylabel(f"{SEG_TEX[ds]}\n{role}, case {case.split('_')[-1] if ds != 'totalseg' else case}", fontsize=FS, color=INK)
                 continue
@@ -288,23 +329,31 @@ def fig_seg_cases(sel: dict, out: Path, ds: str) -> None:
             dd = float(np.nanmax(np.abs(fd - nd))) if same_nan else float("nan")
             maxd = max(maxd, dd) if not np.isnan(dd) else maxd
             if len(fd) <= 3:  # few structures: one Dice each (–: absent from reference and prediction)
-                per = " / ".join("–" if np.isnan(x) else f"{x:.2f}" for x in fd)
-                per_n = " / ".join("–" if np.isnan(x) else f"{x:.2f}" for x in nd)
-                ttl = f"{mlab}: {per}"
+                per = ", ".join("–" if np.isnan(x) else f"{x:.2f}" for x in fd)
+                per_n = ", ".join("–" if np.isnan(x) else f"{x:.2f}" for x in nd)
+                ttl = f"{mlab}\n{per}"
                 changed = per != per_n
             else:  # many structures: the case mean and how many structures it averages in at Dice 0
                 dice, nz = float(np.nanmean(fd)), int((fd == 0).sum())
-                ttl = f"{mlab}: Dice {dice:.2f}" + (f", {nz} at 0" if nz else "")
-                old_t = f"{mlab}: Dice {float(np.nanmean(nd)):.2f}" + (f", {int((nd == 0).sum())} at 0" if (nd == 0).sum() else "")
+                ttl = f"{mlab}\nDice {dice:.2f}" + (f", {nz} at 0" if nz else "")
+                old_t = f"{mlab}\nDice {float(np.nanmean(nd)):.2f}" + (f", {int((nd == 0).sum())} at 0" if (nd == 0).sum() else "")
                 changed = ttl != old_t
             zero_names = [names_of(run_row('seg', ds, bb, 'joint', mt))[k] for k in np.where(fd == 0)[0]]
-            CHECKS.append(f"fig_cases_seg_{ds} {role} {case} {bb}/{mt}: title '{ttl}'; max |saved prediction - per-case file| "
+            CHECKS.append(f"fig_cases_seg_{ds} {role} {case} {bb}/{mt}: title '{ttl.replace(chr(10), ' ')}'; max |saved prediction - per-case file| "
                           f"{'n/a (valid sets differ)' if not same_nan else f'{dd:.1e}'}" + ("  (2-decimal title differs from the saved prediction's)" if changed else "")
                           + (f"; Dice 0: {', '.join(zero_names)}" if zero_names else ""))
-            ax.set_title(ttl, fontsize=FS, color=INK, pad=1.5)
-    fig.subplots_adjust(left=0.065, right=0.985, top=0.965, bottom=0.005, hspace=0.2, wspace=0.12)
+            ax.set_title(ttl, fontsize=FS, color=INK, pad=1.5, linespacing=1.0)
+    # legend: the structures that appear in any shown slice (reference or prediction)
+    hs = [Patch(facecolor=cols[k], edgecolor=cols[k], label=names[k - 1].replace("_", " ")) for k in sorted(shown)]
+    nc = min(len(hs), 6); nr = -(-len(hs) // nc)
+    hs = [hs[r * nc + c] for c in range(nc) for r in range(nr) if r * nc + c < len(hs)]   # legend reads row by row
+    fig.legend(handles=hs, loc="lower center", ncol=nc, frameon=False, fontsize=FS, bbox_to_anchor=(0.5, 0.0),
+               handlelength=1.0, handletextpad=0.4, columnspacing=1.0)
+    nleg = (len(hs) + 5) // 6
+    fig.subplots_adjust(left=0.065, right=0.985, top=0.955, bottom=0.03 + 0.045 * nleg, hspace=0.32, wspace=0.12)
     style.save(fig, out, f"fig_cases_seg_{ds}")
-    CHECKS.append(f"fig_cases_seg_{ds}: max |saved prediction - per-case file| over shown Dice = {maxd:.2e}")
+    CHECKS.append(f"fig_cases_seg_{ds}: max |saved prediction - per-case file| over shown Dice = {maxd:.2e}; structures shown: "
+                  + ", ".join(names[k - 1] for k in sorted(shown)))
 
 
 def main() -> None:

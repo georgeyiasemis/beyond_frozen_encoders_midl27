@@ -14,6 +14,9 @@
 \sisetup{detect-all}
 \definecolor{modebest}{HTML}{E8F1FA}
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+% \magn{\numX}: magnitude of a signed number macro (+0.034 or -0.050 -> 0.034, 0.050), for prose where the verb gives the direction
+\def\stripsign#1#2\relax{\ifx+#1#2\else\ifx-#1#2\else#1#2\fi\fi}
+\newcommand{\magn}[1]{\expandafter\stripsign#1\relax}
 \newcommand{\mci}[3]{\begin{tabular}[c]{@{}c@{}}#1\\[-1.5pt]{\scriptsize[#2, #3]}\end{tabular}}
 \input{tables/numbers.tex}
 \input{tables/design_numbers.tex}
@@ -28,7 +31,7 @@
 \jmlrworkshop{Full Paper -- MIDL 2027 submission}
 \editors{Under Review for MIDL 2027}
 
-\title[Beyond frozen encoders]{Beyond Frozen Encoders: Adapting 3-D CT Foundation Models to Multi-Label Classification and Segmentation}
+\title[Beyond frozen encoders]{Beyond Frozen Encoders: Adapting 3D CT Foundation Models to Multi-Label Classification and Segmentation}
 
 \midlauthor{\Name{George Yiasemis} \Email{g.yiasemis@nki.nl}\\
 \Name{Jonas Teuwen} \Email{j.teuwen@nki.nl}\\
@@ -69,7 +72,7 @@ Foundation models, computed tomography, parameter-efficient fine-tuning, low-ran
 \label{sec:results}
 \input{sections/results.tex}
 
-\section{A practical guide and discussion}
+\section{Discussion and Conclusion}
 \label{sec:discussion}\label{sec:guide}
 \input{sections/discussion.tex}
 

@@ -21,7 +21,7 @@ liver lesion (AMOS) & 0.569 & 0.639 & \textbf{0.706} & 0.691 & 0.608 & 0.661 & 0
 lymphadenopathy (AMOS) & 0.600 & 0.733 & 0.643 & 0.669 & \textbf{0.765} & 0.733 & 0.657 & 0.693 & 0.695 & \underline{0.760} & 0.543 \\
 renal cyst (AMOS) & 0.659 & 0.637 & 0.671 & \textbf{0.691} & 0.654 & 0.643 & \underline{0.686} & 0.641 & 0.639 & 0.659 & 0.666 \\
 splenomegaly (AMOS) & 0.684 & \textbf{0.751} & 0.707 & 0.724 & 0.714 & 0.708 & \underline{0.733} & 0.702 & 0.714 & 0.718 & 0.709 \\
-covid (COVID-CT) & 0.814 & 0.758 & 0.971 & 0.750 & \underline{0.992} & 0.988 & 0.980 & 0.840 & 0.770 & \textbf{0.996} & 0.916 \\
+covid (COVID-CTset) & 0.814 & 0.758 & 0.971 & 0.750 & \underline{0.992} & 0.988 & 0.980 & 0.840 & 0.770 & \textbf{0.996} & 0.916 \\
 lung nodule malignancy (LUNA25) & 0.527 & 0.572 & \textbf{0.593} & 0.563 & 0.565 & 0.550 & 0.574 & 0.558 & 0.505 & \underline{0.590} & 0.546 \\
 \addlinespace
 \multicolumn{12}{@{}l}{\textit{joint}} \\
@@ -40,7 +40,7 @@ liver lesion (AMOS) & 0.631 & \textbf{0.714} & 0.696 & 0.689 & \underline{0.703}
 lymphadenopathy (AMOS) & 0.727 & 0.766 & \textbf{0.781} & 0.735 & 0.708 & 0.747 & \underline{0.777} & 0.733 & 0.680 & 0.735 & \underline{0.777} \\
 renal cyst (AMOS) & 0.597 & 0.637 & 0.665 & 0.660 & \underline{0.684} & \underline{0.684} & 0.657 & 0.614 & 0.647 & \textbf{0.699} & 0.671 \\
 splenomegaly (AMOS) & 0.715 & 0.784 & 0.860 & 0.815 & 0.798 & \textbf{0.909} & \underline{0.872} & 0.683 & 0.784 & 0.862 & 0.836 \\
-covid (COVID-CT) & 0.828 & 0.738 & 0.832 & 0.820 & 0.844 & 0.820 & 0.855 & 0.824 & 0.842 & \underline{0.895} & \textbf{0.934} \\
+covid (COVID-CTset) & 0.828 & 0.738 & 0.832 & 0.820 & 0.844 & 0.820 & 0.855 & 0.824 & 0.842 & \underline{0.895} & \textbf{0.934} \\
 lung nodule malignancy (LUNA25) & 0.514 & 0.667 & 0.645 & \underline{0.672} & 0.640 & 0.646 & 0.654 & 0.479 & \textbf{0.682} & 0.655 & 0.620 \\
 \addlinespace
 \multicolumn{12}{@{}l}{\textit{joint (26\,000 steps)}} \\
@@ -59,7 +59,7 @@ liver lesion (AMOS) & 0.540 & \textbf{0.714} & 0.702 & 0.659 & 0.701 & 0.701 & 0
 lymphadenopathy (AMOS) & 0.688 & 0.726 & 0.632 & 0.741 & \textbf{0.778} & \underline{0.776} & 0.683 & 0.693 & 0.737 & 0.770 & 0.670 \\
 renal cyst (AMOS) & 0.611 & 0.664 & 0.633 & \underline{0.686} & \textbf{0.721} & 0.658 & 0.682 & 0.622 & 0.655 & 0.684 & 0.576 \\
 splenomegaly (AMOS) & 0.733 & 0.826 & \underline{0.871} & 0.807 & 0.805 & \textbf{0.879} & 0.750 & 0.727 & 0.791 & 0.817 & 0.760 \\
-covid (COVID-CT) & 0.781 & 0.762 & 0.809 & 0.801 & \underline{0.938} & 0.777 & 0.852 & 0.809 & 0.822 & \textbf{0.992} & 0.795 \\
+covid (COVID-CTset) & 0.781 & 0.762 & 0.809 & 0.801 & \underline{0.938} & 0.777 & 0.852 & 0.809 & 0.822 & \textbf{0.992} & 0.795 \\
 lung nodule malignancy (LUNA25) & 0.516 & 0.641 & 0.630 & \underline{0.680} & 0.647 & 0.529 & 0.583 & 0.526 & 0.649 & \textbf{0.784} & 0.564 \\
 \bottomrule
 \end{tabular}
@@ -87,7 +87,7 @@ lymphoma & 0.937 & 0.925 & 0.919 & 0.951 & 0.925 & 0.931 & 0.907 & 0.933 & \text
 \end{tabular}
 }\end{minipage}
 \par\bigskip
-\noindent\begin{minipage}{\textwidth}\centering\footnotesize\textit{RSNA 2022 C-spine, TAP-CT: held-out AUROC per label}\\[2pt]
+\noindent\begin{minipage}{\textwidth}\centering\footnotesize\textit{RSNA22 C-spine, TAP-CT: held-out AUROC per label}\\[2pt]
 \adjustbox{max width=\textwidth}{%
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}lccccccccccc@{}}
@@ -117,7 +117,7 @@ C7 & 0.635 & 0.658 & 0.713 & 0.697 & 0.698 & 0.679 & 0.582 & 0.649 & 0.641 & \un
 \end{tabular}
 }\end{minipage}
 \par\bigskip
-\noindent\begin{minipage}{\textwidth}\centering\footnotesize\textit{RSNA 2023 trauma, TAP-CT: held-out AUROC per label}\\[2pt]
+\noindent\begin{minipage}{\textwidth}\centering\footnotesize\textit{RSNA23 trauma, TAP-CT: held-out AUROC per label}\\[2pt]
 \adjustbox{max width=\textwidth}{%
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}lccccccccccc@{}}
@@ -139,7 +139,7 @@ spleen injury & 0.685 & 0.711 & 0.706 & 0.707 & 0.681 & 0.740 & 0.616 & 0.719 & 
 \end{tabular}
 }\end{minipage}
 \par\bigskip
-\noindent\begin{minipage}{\textwidth}\centering\footnotesize\textit{RSNA 2019 hemorrhage, TAP-CT: held-out AUROC per label}\\[2pt]
+\noindent\begin{minipage}{\textwidth}\centering\footnotesize\textit{RSNA19 ICH, TAP-CT: held-out AUROC per label}\\[2pt]
 \adjustbox{max width=\textwidth}{%
 \setlength{\tabcolsep}{3pt}
 \begin{tabular}{@{}lccccccccccc@{}}
