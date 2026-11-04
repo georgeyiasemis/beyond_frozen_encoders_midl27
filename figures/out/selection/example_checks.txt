@@ -1,0 +1,17 @@
+fig_examples_seg lits/liver_98 tapct/lin: saved prediction 0.7902, per-case file 0.7902 (printed), |diff| 0.00e+00; checkpoint iteration 16000 vs selected 16000
+fig_examples_seg lits/liver_98 tapct/dec: saved prediction 0.8335, per-case file 0.8333 (printed), |diff| 1.99e-04; checkpoint iteration 12000 vs selected 12000
+fig_examples_seg lits/liver_98 tapct/lora: saved prediction 0.8685, per-case file 0.8684 (printed), |diff| 1.39e-04; checkpoint iteration 16000 vs selected 16000
+fig_examples_seg lits/liver_98 tapct/fullft: saved prediction 0.8409, per-case file 0.8409 (printed), |diff| 1.37e-05; checkpoint iteration 16000 vs selected 16000
+fig_examples_seg lits/liver_98 spectre/lin: saved prediction 0.8041, per-case file 0.8041 (printed), |diff| 0.00e+00; checkpoint iteration 12000 vs selected 12000
+fig_examples_seg lits/liver_98 spectre/dec: saved prediction 0.8620, per-case file 0.8620 (printed), |diff| 2.26e-05; checkpoint iteration 14000 vs selected 14000
+fig_examples_seg lits/liver_98 spectre/lora: saved prediction 0.8713, per-case file 0.8713 (printed), |diff| 1.19e-06; checkpoint iteration 12000 vs selected 12000
+fig_examples_seg lits/liver_98 spectre/fullft: saved prediction 0.8403, per-case file 0.8403 (printed), |diff| 0.00e+00; checkpoint iteration 16000 vs selected 16000
+fig_examples_seg amos22/amos_0284 tapct/lin: saved prediction 0.6946, per-case file 0.6946 (printed), |diff| 1.99e-09; checkpoint iteration 38000 vs selected 38000
+fig_examples_seg amos22/amos_0284 tapct/dec: saved prediction 0.7538, per-case file 0.7538 (printed), |diff| 5.13e-06; checkpoint iteration 46000 vs selected 46000
+fig_examples_seg amos22/amos_0284 tapct/lora: saved prediction 0.7719, per-case file 0.7719 (printed), |diff| 6.27e-05; checkpoint iteration 46000 vs selected 46000
+fig_examples_seg amos22/amos_0284 tapct/fullft: saved prediction 0.7260, per-case file 0.7260 (printed), |diff| 1.08e-05; checkpoint iteration 46000 vs selected 46000
+fig_examples_seg amos22/amos_0284 spectre/lin: saved prediction 0.7261, per-case file 0.7261 (printed), |diff| 4.57e-08; checkpoint iteration 46000 vs selected 46000
+fig_examples_seg amos22/amos_0284 spectre/dec: saved prediction 0.6889, per-case file 0.6889 (printed), |diff| 6.76e-08; checkpoint iteration 42000 vs selected 42000
+fig_examples_seg amos22/amos_0284 spectre/lora: saved prediction 0.8205, per-case file 0.8205 (printed), |diff| 7.96e-06; checkpoint iteration 22000 vs selected 22000
+fig_examples_seg amos22/amos_0284 spectre/fullft: saved prediction 0.7007, per-case file 0.7007 (printed), |diff| 1.37e-05; checkpoint iteration 46000 vs selected 46000
+fig_examples_seg: titles print the per-case-file Dice; max |saved prediction - per-case file| = 1.99e-04 over 16 panels

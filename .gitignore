@@ -1,0 +1,13 @@
+# caches (percase.pkl is 134 MB, over GitHub's 100 MB limit; rebuilt by metrics/)
+metrics/out/_cache/
+__pycache__/
+*.pyc
+# LaTeX build by-products
+*.aux
+*.log
+*.blg
+*.out
+*.bbl
+*.synctex.gz
+*.fls
+*.fdb_latexmk

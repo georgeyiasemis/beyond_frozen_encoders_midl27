@@ -1,0 +1,19 @@
+\begin{tabular}{lrrrrr}
+\toprule
+Cohort & LoRA & rsLoRA & rsLoRA (LR$/4$) & Attn-only FT & MLP-only FT \\
+\midrule
+\multicolumn{6}{@{}l}{\textit{TAP-CT}} \\
+CVPR26 & 0.733 & 0.722 & 0.741 & 0.739 & 0.745 \\
+FDG-PET/CT & 0.866 & 0.785 & 0.855 & 0.870 & 0.866 \\
+RSNA23 trauma & 0.757 & 0.684 & 0.751 & 0.833 & 0.894 \\
+RSNA22 C-spine & 0.714 & 0.601 & 0.611 & 0.712 & 0.627 \\
+RSNA19 ICH & 0.906 & 0.869 & 0.901 & 0.915 & 0.907 \\
+\multicolumn{6}{@{}l}{\textit{SPECTRE}} \\
+CVPR26 & 0.716 & 0.690 & 0.739 & 0.740 & 0.681 \\
+FDG-PET/CT & 0.901 & 0.900 & 0.908 & 0.906 & 0.814 \\
+RSNA23 trauma & 0.846 & 0.850 & 0.834 & 0.803 & 0.838 \\
+RSNA22 C-spine & 0.706 & 0.691 & 0.672 & 0.718 & 0.626 \\
+\multicolumn{6}{@{}l}{\textit{Pillar-0}} \\
+RSNA19 ICH & 0.912 & 0.918 & 0.920 & 0.912 & 0.912 \\
+\bottomrule
+\end{tabular}

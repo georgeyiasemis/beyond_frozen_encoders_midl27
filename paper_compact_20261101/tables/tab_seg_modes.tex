@@ -1,0 +1,22 @@
+\begin{tabular}{@{}llcccccc@{}}
+\toprule
+Dataset (structures) & Backbone & \multicolumn{2}{c}{per-task} & \multicolumn{2}{c}{joint} & \multicolumn{2}{c}{joint, 8000 steps} \\
+\cmidrule(lr){3-4}\cmidrule(lr){5-6}\cmidrule(lr){7-8}
+ & & LoRA $-$ Dec & Full FT $-$ Dec & LoRA $-$ Dec & Full FT $-$ Dec & LoRA $-$ Dec & Full FT $-$ Dec \\
+\midrule
+AMOS22 (15) & TAP-CT & -0.026 & +0.012 & +0.031 & -0.027 & -0.125 & +0.007 \\
+ & SPECTRE & +0.004 & -0.016 & +0.126 & +0.011 & -0.071 & +0.010 \\
+\addlinespace
+KiTS23 (3) & TAP-CT & -0.021 & +0.005 & +0.068 & +0.006 & -- & -- \\
+ & SPECTRE & +0.014 & -0.071 & +0.016 & -0.052 & -- & -- \\
+\addlinespace
+LiTS (2) & TAP-CT & +0.007 & +0.001 & +0.016 & +0.016 & -- & -- \\
+ & SPECTRE & +0.015 & -0.002 & +0.011 & -0.030 & -- & -- \\
+\addlinespace
+MSD Pancreas (2) & TAP-CT & +0.013 & +0.021 & +0.025 & +0.008 & -- & -- \\
+ & SPECTRE & +0.047 & 0.000 & +0.037 & +0.016 & -- & -- \\
+\addlinespace
+TotalSegmentator (15) & TAP-CT & -0.024 & -0.011 & -0.022 & +0.017 & -0.199 & +0.022 \\
+ & SPECTRE & +0.001 & -0.009 & -0.036 & +0.025 & -0.254 & +0.037 \\
+\bottomrule
+\end{tabular}

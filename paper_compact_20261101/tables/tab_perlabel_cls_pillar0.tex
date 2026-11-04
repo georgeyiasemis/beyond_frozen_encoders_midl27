@@ -1,0 +1,26 @@
+\noindent\begin{minipage}{\textwidth}\centering\footnotesize\textit{RSNA 2019 hemorrhage, Pillar-0: held-out AUROC per label}\\[2pt]
+\adjustbox{max width=\textwidth}{%
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lccccccccccc@{}}
+\toprule
+Label & Lin & Attn & LoRA & LoRA$_{\text{late}}$ & \begin{tabular}[b]{@{}c@{}}LoRA+\\ABMIL\end{tabular} & DoRA & rsLoRA & \begin{tabular}[b]{@{}c@{}}Lin$\to$\\LoRA\end{tabular} & \begin{tabular}[b]{@{}c@{}}Attn$\to$\\LoRA\end{tabular} & \begin{tabular}[b]{@{}c@{}}Attn-only\\FT\end{tabular} & \begin{tabular}[b]{@{}c@{}}Full\\FT\end{tabular} \\
+\midrule
+\multicolumn{12}{@{}l}{\textit{per-task}} \\
+any & 0.910 & 0.928 & \underline{0.957} & 0.944 & 0.952 & 0.954 & \textbf{0.958} & 0.944 & 0.939 & \textbf{0.958} & 0.955 \\
+epidural & 0.816 & 0.770 & 0.875 & 0.857 & 0.810 & \textbf{0.892} & 0.818 & 0.856 & 0.829 & \underline{0.887} & 0.825 \\
+intraparenchymal & 0.910 & 0.918 & \underline{0.947} & 0.933 & 0.931 & 0.945 & \underline{0.947} & 0.930 & 0.924 & \textbf{0.948} & 0.942 \\
+intraventricular & 0.945 & 0.941 & \underline{0.962} & 0.954 & 0.959 & 0.956 & \textbf{0.963} & 0.951 & 0.952 & \textbf{0.963} & 0.961 \\
+subarachnoid & 0.863 & 0.862 & 0.913 & 0.887 & 0.845 & \textbf{0.918} & \textbf{0.918} & 0.884 & 0.875 & \underline{0.916} & 0.852 \\
+subdural & 0.872 & 0.883 & \textbf{0.919} & 0.911 & 0.917 & \underline{0.918} & 0.917 & 0.908 & 0.901 & 0.914 & 0.890 \\
+\addlinespace
+\multicolumn{12}{@{}l}{\textit{joint}} \\
+any & 0.912 & 0.917 & 0.951 & 0.943 & 0.952 & 0.953 & \underline{0.954} & 0.940 & 0.933 & \textbf{0.957} & 0.939 \\
+epidural & 0.826 & 0.820 & 0.857 & 0.815 & \textbf{0.885} & 0.858 & \underline{0.872} & 0.846 & 0.843 & 0.851 & 0.782 \\
+intraparenchymal & 0.911 & 0.907 & 0.935 & 0.923 & \textbf{0.942} & 0.931 & 0.934 & 0.923 & 0.915 & \underline{0.936} & 0.924 \\
+intraventricular & 0.946 & 0.940 & 0.940 & 0.939 & \textbf{0.952} & 0.941 & \underline{0.948} & 0.947 & 0.942 & 0.937 & 0.929 \\
+subarachnoid & 0.863 & 0.862 & 0.884 & 0.865 & \textbf{0.904} & 0.888 & \underline{0.896} & 0.880 & 0.866 & 0.886 & 0.875 \\
+subdural & 0.872 & 0.885 & 0.905 & 0.866 & \textbf{0.915} & 0.903 & \underline{0.907} & 0.897 & 0.886 & \underline{0.907} & 0.821 \\
+\bottomrule
+\end{tabular}
+}\end{minipage}
+\par\bigskip

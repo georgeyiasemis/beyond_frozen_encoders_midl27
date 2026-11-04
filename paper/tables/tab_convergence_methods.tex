@@ -1,0 +1,36 @@
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}lcccccc@{}}
+\toprule
+Method & \multicolumn{2}{c}{TAP-CT} & \multicolumn{2}{c}{SPECTRE} & \multicolumn{2}{c}{Pillar-0} \\
+\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-7}
+ & per-task & joint & per-task & joint & per-task & joint \\
+\midrule
+\multicolumn{7}{@{}l}{\textit{Classification}} \\
+Lin & 36 (39) & 73 (15) & 27 (33) & 75 (12) & 50 (8) & 75 (4) \\
+Attn & 38 (39) & 100 (5) & 42 (33) & 100 (4) & 50 (8) & 100 (2) \\
+LoRA & 36 (39) & 67 (15) & 21 (33) & 100 (12) & 75 (8) & 50 (4) \\
+LoRA$_{\text{late}}$ & 33 (39) & 80 (5) & 39 (33) & 100 (4) & 50 (8) & 50 (2) \\
+LoRA+ABMIL & 38 (39) & 100 (5) & 36 (33) & 100 (4) & 62 (8) & 100 (2) \\
+DoRA & 46 (39) & 80 (5) & 21 (33) & 75 (4) & 88 (8) & 50 (2) \\
+rsLoRA & 33 (39) & 40 (5) & 21 (33) & 75 (4) & 62 (8) & 100 (2) \\
+Lin$\to$LoRA & 62 (39) & 60 (5) & 67 (33) & 75 (4) & 75 (8) & 100 (2) \\
+Attn$\to$LoRA & 51 (39) & 100 (5) & 70 (33) & 100 (4) & 88 (8) & 100 (2) \\
+Attn-only FT & 41 (39) & 93 (15) & 36 (33) & 83 (12) & 75 (8) & 75 (4) \\
+Full FT & 51 (39) & 80 (15) & 30 (33) & 25 (4) & 50 (8) & 75 (4) \\
+Full FT, lower LR & -- & 80 (5) & -- & 50 (4) & -- & 100 (1) \\
+Full FT, layer decay & -- & 60 (5) & -- & 75 (4) & -- & 100 (1) \\
+Full FT, accumulation & -- & 80 (5) & -- & 50 (4) & -- & 100 (1) \\
+MLP-only FT & -- & 100 (5) & -- & 50 (4) & -- & 100 (1) \\
+rsLoRA, matched LR & -- & 80 (5) & -- & 75 (4) & -- & 100 (1) \\
+\addlinespace
+\multicolumn{7}{@{}l}{\textit{Segmentation}} \\
+Lin & 59 (37) & 0 (5) & 70 (37) & 40 (5) & -- & -- \\
+Dec & 86 (37) & 53 (15) & 86 (37) & 60 (15) & -- & -- \\
+LoRA & 78 (37) & 67 (15) & 76 (37) & 47 (15) & -- & -- \\
+LoRA$_{\text{late}}$ & 91 (22) & 60 (5) & 82 (22) & 60 (5) & -- & -- \\
+DoRA & 86 (22) & 80 (5) & 86 (22) & 20 (5) & -- & -- \\
+Full FT & 86 (37) & 80 (15) & 76 (37) & 67 (15) & -- & -- \\
+Dec$\to$LoRA & 77 (22) & 40 (5) & 82 (22) & 40 (5) & -- & -- \\
+From scratch & -- & 100 (5) & -- & -- & -- & -- \\
+\bottomrule
+\end{tabular}

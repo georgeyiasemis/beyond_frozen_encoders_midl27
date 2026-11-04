@@ -1,0 +1,33 @@
+fig_examples_seg lits/liver_98 tapct/lin: saved prediction 0.7902, per-case file 0.7902 (printed), |diff| 0.00e+00; checkpoint iteration 16000 vs selected 16000
+fig_examples_seg lits/liver_98 tapct/dec: saved prediction 0.8335, per-case file 0.8333 (printed), |diff| 1.99e-04; checkpoint iteration 12000 vs selected 12000
+fig_examples_seg lits/liver_98 tapct/lora: saved prediction 0.8685, per-case file 0.8684 (printed), |diff| 1.39e-04; checkpoint iteration 16000 vs selected 16000
+fig_examples_seg lits/liver_98 tapct/fullft: saved prediction 0.8409, per-case file 0.8409 (printed), |diff| 1.37e-05; checkpoint iteration 16000 vs selected 16000
+fig_examples_seg lits/liver_98 spectre/lin: saved prediction 0.8041, per-case file 0.8041 (printed), |diff| 0.00e+00; checkpoint iteration 12000 vs selected 12000
+fig_examples_seg lits/liver_98 spectre/dec: saved prediction 0.8620, per-case file 0.8620 (printed), |diff| 2.26e-05; checkpoint iteration 14000 vs selected 14000
+fig_examples_seg lits/liver_98 spectre/lora: saved prediction 0.8713, per-case file 0.8713 (printed), |diff| 1.19e-06; checkpoint iteration 12000 vs selected 12000
+fig_examples_seg lits/liver_98 spectre/fullft: saved prediction 0.8403, per-case file 0.8403 (printed), |diff| 0.00e+00; checkpoint iteration 16000 vs selected 16000
+fig_examples_seg lits/liver_98 voco/lin: saved prediction 0.0000, per-case file 0.0000 (printed), |diff| 0.00e+00; checkpoint iteration 2000 vs selected 2000
+fig_examples_seg lits/liver_98 voco/dec: saved prediction 0.8454, per-case file 0.8450 (printed), |diff| 3.72e-04; checkpoint iteration 12000 vs selected 12000  (2-decimal value differs: saved prediction 0.85, printed 0.84)
+fig_examples_seg lits/liver_98 voco/lora: saved prediction 0.8990, per-case file 0.8988 (printed), |diff| 1.98e-04; checkpoint iteration 14000 vs selected 14000
+fig_examples_seg lits/liver_98 voco/fullft: saved prediction 0.8858, per-case file 0.8857 (printed), |diff| 1.83e-04; checkpoint iteration 16000 vs selected 16000
+fig_examples_seg amos22/amos_0284 tapct/lin: saved prediction 0.6946, per-case file 0.6946 (printed), |diff| 1.99e-09; checkpoint iteration 38000 vs selected 38000
+fig_examples_seg amos22/amos_0284 tapct/dec: saved prediction 0.7538, per-case file 0.7538 (printed), |diff| 5.13e-06; checkpoint iteration 46000 vs selected 46000
+fig_examples_seg amos22/amos_0284 tapct/lora: saved prediction 0.7719, per-case file 0.7719 (printed), |diff| 6.27e-05; checkpoint iteration 46000 vs selected 46000
+fig_examples_seg amos22/amos_0284 tapct/fullft: saved prediction 0.7260, per-case file 0.7260 (printed), |diff| 1.08e-05; checkpoint iteration 46000 vs selected 46000
+fig_examples_seg amos22/amos_0284 spectre/lin: saved prediction 0.7261, per-case file 0.7261 (printed), |diff| 4.57e-08; checkpoint iteration 46000 vs selected 46000
+fig_examples_seg amos22/amos_0284 spectre/dec: saved prediction 0.6889, per-case file 0.6889 (printed), |diff| 6.76e-08; checkpoint iteration 42000 vs selected 42000
+fig_examples_seg amos22/amos_0284 spectre/lora: saved prediction 0.8205, per-case file 0.8205 (printed), |diff| 7.96e-06; checkpoint iteration 22000 vs selected 22000
+fig_examples_seg amos22/amos_0284 spectre/fullft: saved prediction 0.7007, per-case file 0.7007 (printed), |diff| 1.37e-05; checkpoint iteration 46000 vs selected 46000
+fig_examples_seg amos22/amos_0284 voco/lin: saved prediction 0.0421, per-case file 0.0420 (printed), |diff| 2.03e-05; checkpoint iteration 30000 vs selected 30000
+fig_examples_seg amos22/amos_0284 voco/dec: saved prediction 0.7888, per-case file 0.7885 (printed), |diff| 3.37e-04; checkpoint iteration 46000 vs selected 46000
+fig_examples_seg amos22/amos_0284 voco/lora: saved prediction 0.8189, per-case file 0.8187 (printed), |diff| 1.87e-04; checkpoint iteration 48000 vs selected 48000
+fig_examples_seg amos22/amos_0284 voco/fullft: saved prediction 0.8022, per-case file 0.8022 (printed), |diff| 6.98e-05; checkpoint iteration 48000 vs selected 48000
+fig_examples_seg: titles print the per-case-file Dice; max |saved prediction - per-case file| = 3.72e-04 over 24 panels
+fig_examples_pred amos tapct/pertask/lin/fatty_liver: |saved prob - per-case file prob| over the 4 macro cases: 0.000, 0.008, 0.000, 0.000 (the per-case file values are printed and written)
+fig_examples_pred amos tapct/pertask/babmil/fatty_liver: |saved prob - per-case file prob| over the 4 macro cases: 0.000, 0.001, 0.000, 0.002 (the per-case file values are printed and written)
+fig_examples_pred fdg tapct/pertask/lin/LUNG_CANCER: |saved prob - per-case file prob| over the 4 macro cases: 0.001, 0.016, 0.004, 0.000 (the per-case file values are printed and written)
+fig_examples_pred fdg tapct/pertask/babmil/LUNG_CANCER: |saved prob - per-case file prob| over the 4 macro cases: 0.001, 0.020, 0.004, 0.008 (the per-case file values are printed and written)
+fig_examples_pred rsna2023 tapct/pertask/lin/any_injury: |saved prob - per-case file prob| over the 4 macro cases: 0.000, 0.002, 0.002, 0.000 (the per-case file values are printed and written)
+fig_examples_pred rsna2023 tapct/pertask/babmil/any_injury: |saved prob - per-case file prob| over the 4 macro cases: 0.002, 0.004, 0.004, 0.000 (the per-case file values are printed and written)
+fig_examples_pred ich tapct/pertask/lin/any: |saved prob - per-case file prob| over the 4 macro cases: 0.023, 0.004, 0.033, 0.000 (the per-case file values are printed and written)
+fig_examples_pred ich tapct/pertask/babmil/any: |saved prob - per-case file prob| over the 4 macro cases: 0.039, 0.070, 0.051, 0.000 (the per-case file values are printed and written)

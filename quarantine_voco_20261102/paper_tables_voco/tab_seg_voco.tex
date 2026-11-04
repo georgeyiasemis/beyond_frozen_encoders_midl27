@@ -1,0 +1,21 @@
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lllccccccc@{}}
+\toprule
+Dataset (structures) & Backbone & Mode & Lin & Dec & LoRA & LoRA$_{\text{late}}$ & DoRA & \begin{tabular}[b]{@{}c@{}}Full\\FT\end{tabular} & \begin{tabular}[b]{@{}c@{}}Dec$\to$\\LoRA\end{tabular} \\
+\midrule
+AMOS22 (15) & VoCo & per-task & \cellcolor{modebest}0.041 & \cellcolor{modebest}\underline{0.805} & \cellcolor{modebest}0.782 & \cellcolor{modebest}0.783 & \cellcolor{modebest}0.783 & \cellcolor{modebest}\textbf{0.818} & \cellcolor{modebest}0.799 \\
+ &  & joint & 0.038 & 0.739 & \underline{0.762} & 0.758 & \textbf{0.764} & 0.752 & 0.736 \\
+\addlinespace
+KiTS23 (3) & VoCo & per-task & 0.017 & \cellcolor{modebest}\underline{0.519} & 0.501 & 0.500 & 0.493 & \cellcolor{modebest}\textbf{0.564} & \cellcolor{modebest}0.481 \\
+ &  & joint & \cellcolor{modebest}0.037 & 0.465 & 0.501 & \cellcolor{modebest}\textbf{0.516} & \cellcolor{modebest}\underline{0.507} & 0.481 & 0.452 \\
+\addlinespace
+LiTS (2) & VoCo & per-task & 0.342 & \cellcolor{modebest}\underline{0.733} & 0.692 & 0.694 & 0.688 & \cellcolor{modebest}\textbf{0.748} & 0.720 \\
+ &  & joint & \cellcolor{modebest}0.345 & \underline{0.732} & \cellcolor{modebest}0.720 & \cellcolor{modebest}0.710 & \cellcolor{modebest}0.718 & \textbf{0.737} & \cellcolor{modebest}0.726 \\
+\addlinespace
+MSD Pancreas (2) & VoCo & per-task & 0.000 & \cellcolor{modebest}\textbf{0.569} & 0.539 & 0.545 & 0.541 & \cellcolor{modebest}\underline{0.566} & 0.558 \\
+ &  & joint & 0.000 & 0.559 & \cellcolor{modebest}0.552 & 0.545 & \cellcolor{modebest}0.552 & \underline{0.560} & \cellcolor{modebest}\textbf{0.561} \\
+\addlinespace
+TotalSegmentator (15) & VoCo & per-task & \cellcolor{modebest}0.055 & \cellcolor{modebest}\underline{0.822} & \cellcolor{modebest}0.771 & -- & -- & \cellcolor{modebest}\textbf{0.838} & -- \\
+ &  & joint & 0.047 & \underline{0.732} & 0.705 & 0.697 & 0.709 & \textbf{0.750} & 0.723 \\
+\bottomrule
+\end{tabular}

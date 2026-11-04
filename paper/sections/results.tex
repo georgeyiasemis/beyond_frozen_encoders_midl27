@@ -1,0 +1,74 @@
+\begin{table}[tb]
+\centering
+\caption{Main comparisons between methods, per backbone. Each entry is the held-out AUROC (classification) or Dice (segmentation) of the first method in the row minus that of the second, averaged over labels or structures. Brackets: 95\% bootstrap interval over cohorts, labels and cases (Appendix~\ref{app:stats}). $>0$: cohorts (datasets) with a positive mean difference. Lin and Attn: linear and attentive probes on the frozen encoder; Dec: multi-depth decoder on the frozen encoder; Joint $-$ per-task: one model for all labels of a cohort minus one model per label. Each label's per-task and joint values are averaged, except in the two LoRA $-$ Dec sub-rows. Estimates pooled over backbones are in Table~\ref{tab:cis}.}
+\label{tab:key}
+\vspace{-6pt}
+\renewcommand{\mci}[3]{#1\,{\scriptsize[#2, #3]}}\adjustbox{max width=\textwidth}{\small\input{tables/tab_key.tex}}
+\end{table}
+
+Table~\ref{tab:key} summarizes the main comparisons. Per-label and per-structure results are in Appendix~\ref{app:perlabel}, paired tests and further analyses in Appendix~\ref{app:paired}, seed repeats and controls in Appendix~\ref{app:revision}, and success and failure cases in Appendix~\ref{app:cases}.
+
+\subsection{Classification: adapt the encoder}
+\label{sec:clsres}
+
+\begin{figure}[tb]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_cls.pdf}
+\vspace{-8pt}
+\caption{Classification: per-label change in held-out AUROC relative to the linear probe of the same backbone, cohort and mode, for (a) the frozen attentive probe, (b) LoRA, (c) attention-only fine-tuning and (d) full fine-tuning (small markers: label--mode pairs; large: cohort means; titles: mean and share above zero over all backbones, without SPECTRE Full FT, which did not train). All methods are in Figure~\ref{fig:methods}.}
+\label{fig:cls}
+\end{figure}
+
+\begin{figure}[tb]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_gain_vs_probe.pdf}
+\vspace{-8pt}
+\caption{Where does adapting the encoder help? LoRA minus linear-probe held-out AUROC per label--mode pair against the linear probe's selection AUROC (markers: backbone), with bin means (bars, printed) and, as a negative control, the bin means of the frozen attentive probe minus the linear probe (dotted).}
+\label{fig:gainprobe}
+\end{figure}
+
+\paragraph{Updating the encoder's attention weights beats both frozen probes.} On TAP-CT, SPECTRE and Pillar-0, LoRA raises held-out AUROC by $\numCiClsloralinAllMeandiff$ over the linear probe and by $\numCiClsloraattnAllMeandiff$ over the frozen attentive probe, which has the same head; both intervals exclude zero, and the gain over the attentive probe is positive in all \numCiClsloraattnAllClustersN{} cohort--backbone pairs (Table~\ref{tab:key}, Figure~\ref{fig:cls}). Training the attention projections in full gains $\numCiClsattnftlinAllMeandiff$ and $\numCiClsattnftattnAllMeandiff$, again positive against the attentive probe in all \numCiClsattnftattnAllClustersN{} pairs. The gain comes from the encoder, not the head: the frozen attentive probe adds only $\numCiClsattnlinAllMeandiff$ to the linear probe. It is largest where the frozen probe is weakest ($\numGainbinLowMeandiff$ at a selection AUROC of at most 0.6, $\numGainbinTopMeandiff$ above 0.8; Figure~\ref{fig:gainprobe}), it survives the removal of FDG-PET/CT and COVID-CTset, whose labels may be predictable from the acquisition rather than the anatomy ($\numCiClsloralinnoscAllMeandiff$), and LoRA is ahead of the linear probe in \numSeedsclsLoraLinAllPosN{} of \numSeedsclsLoraLinAllPairsN{} cohort--seed pairs of the repeated joint models.
+
+\paragraph{At default settings, attention-only fine-tuning ranks best; LoRA comes close with \numParamsratioPillarZAttnftLora{} to \numParamsratioSpectreAttnftLora{} times fewer encoder parameters.} Attention-only fine-tuning has the best mean rank over all label--mode pairs (\numRankAttnftMean{}; LoRA \numRankLoraMean{}; Figure~\ref{fig:overview}c) and ranks above LoRA on every backbone. It is ahead of LoRA in \numSeedsclsAttnftLoraAllPosN{} of \numSeedsclsAttnftLoraAllPairsN{} cohort--seed pairs of the repeated joint models, and over the main runs by $\numCiClsattnftloraAllMeandiff$ (interval $\numCiClsattnftloraAllLodiff$ to $\numCiClsattnftloraAllHidiff$), most on TAP-CT ($\numCiClsattnftloraTapctMeandiff$). LoRA updates \numParamsbbTapctLora{} instead of \numParamsbbTapctAttnft{} encoder parameters on TAP-CT, \numParamsbbSpectreLora{} instead of \numParamsbbSpectreAttnft{} on SPECTRE and \numParamsbbPillarZLora{} instead of \numParamsbbPillarZAttnft{} on Pillar-0, but this did not make training cheaper: its peak GPU memory per step was within \numCostClsLoraAttnftMaxGibdiff{}\,GiB of attention-only fine-tuning on every backbone and its steps were not faster (Table~\ref{tab:cost}), so the saving is in the weights stored per model. Which weights are adapted mattered less than adapting the encoder at all: fine-tuning the MLP weights instead of the attention weights was close to attention-only fine-tuning on TAP-CT ($\numCtrlTapctMlpftAttnftMeandiff$) and Pillar-0 ($\numCtrlPillarZMlpftAttnftMeandiff$) and behind it only on SPECTRE ($\numCtrlSpectreMlpftAttnftMeandiff$; joint models, Table~\ref{tab:controls}).
+
+\paragraph{Full fine-tuning needs its own setting.} With the default setting, Full FT is ahead of the linear probe on TAP-CT ($\numCiClsfullftlinTapctMeandiff$, and best on RSNA 2023 trauma, as \citet{liu2025anymc3d} found for spleen injury), level with it on Pillar-0, but does not train on SPECTRE: its median validation AUROC stays at \numTrajSpectrefullftLast{}, whereas attention-only fine-tuning at the same learning rates reaches \numTrajSpectreattnftLast{} (Figure~\ref{fig:fullftspectre}). With layer-wise learning-rate decay (0.75 per block), the best of three alternative settings on selection data, SPECTRE Full FT trains and is ahead of LoRA by $\numFixselSpectreLoraMeandiff$ (Table~\ref{tab:fullftfix}), a comparison that favors Full FT, as LoRA was not re-tuned.
+
+\paragraph{Plain LoRA is enough.} No variant improves on LoRA by more than $\numVsloraAllBabmilMeandiff$ on average: LoRA$_{\text{late}}$ changes held-out AUROC by $\numVsloraAllLoragMeandiff$, DoRA by $\numVsloraAllDoraMeandiff$, rsLoRA by $\numVsloraAllRsloraMeandiff$, LoRA+ABMIL by $\numVsloraAllBabmilMeandiff$ and the two-stage schedules by $\numVsloraAllLinThenLoragMeandiff$ and $\numVsloraAllAttnThenLoragMeandiff$; rsLoRA at a quarter of the learning rate, which matches its update scale to LoRA's, is level with LoRA on SPECTRE ($\numCtrlSpectreRsloraLowlrLoraMeandiff$) and Pillar-0 ($\numCtrlPillarZRsloraLowlrLoraMeandiff$) and behind on TAP-CT ($\numCtrlTapctRsloraLowlrLoraMeandiff$; Table~\ref{tab:controls}). These rankings hold for one default setting and 8000 steps per method: on CVPR26, a 26\,000-step schedule changed the joint models by $\numJointlongTapctMindiff$ to $\numJointlongTapctMaxdiff$ on TAP-CT and $\numJointlongSpectreMindiff$ to $\numJointlongSpectreMaxdiff$ on SPECTRE, depending on the method (Table~\ref{tab:ladder}), as much as the differences between methods.
+
+\subsection{Segmentation: a decoder on the encoder}
+\label{sec:segres}
+
+\paragraph{A multi-depth decoder on the frozen encoder gives most of the gain.} Replacing the linear probe by the frozen decoder raises Dice on every dataset and backbone, by $\numSegdeltaTapctLinDecMeandiff$ on TAP-CT and $\numSegdeltaSpectreLinDecMeandiff$ on SPECTRE (Table~\ref{tab:key}; examples in Figure~\ref{fig:examplesseg}). On TAP-CT this is all of LoRA's gain over the linear probe ($\numSegdeltaTapctLinLoraMeandiff$) and on SPECTRE most of it ($\numSegdeltaSpectreLinLoraMeandiff$). The pretrained weights matter: the TAP-CT architecture trained from a random initialization is behind fine-tuning of the pretrained encoder at the same budget on every dataset, by $\numScratchLitsTapctMeandiff$ to $\numScratchTotalsegTapctMeandiff$ Dice (Table~\ref{tab:scratch}).
+
+\begin{figure}[tb]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_seg.pdf}
+\vspace{-8pt}
+\caption{Segmentation: per-structure change in held-out Dice relative to the frozen decoder of the same backbone, dataset and mode, for (a) TAP-CT and (b) SPECTRE (grey: structure--mode pairs, triangles beyond the axis; colored: mean, printed on the right).}
+\label{fig:seg}
+\end{figure}
+
+\begin{figure}[tb]
+\centering
+\includegraphics[width=0.94\textwidth]{figures/fig_examples_seg.pdf}
+\vspace{-8pt}
+\caption{Segmentation examples on held-out cases, each on the backbone's own grid at the soft-tissue window; panel titles give the case's Dice (mean over structures in b). (a) LiTS liver tumor with one model per structure; yellow is the reference outline, orange the prediction. (b) AMOS22 with one joint model for all 15 structures (colors are structures). On both backbones the decoder improves on the linear probe, LoRA has the highest Dice in both panels, and full fine-tuning does not improve on LoRA. The LiTS case has a large tumor and a higher tumor Dice than the dataset mean. Cases were chosen by a fixed rule on TAP-CT and SPECTRE among held-out cases with a valid Dice in every run: the case agrees with each backbone's mean held-out Dice on the best and the worst method (a) or on the full ranking (b), and among such cases its pairwise Dice differences are closest to the mean differences; \numSegExLitsMatchN{} of \numSegExLitsCasesN{} cases qualify for (a) and \numSegExAmosMatchN{} of \numSegExAmosCasesN{} for (b).}
+\label{fig:examplesseg}
+\end{figure}
+
+\paragraph{On top of the decoder, full fine-tuning ranks best and LoRA changes Dice little.} Full fine-tuning has the best mean rank (\numSegrankFullftMean{}; LoRA \numSegrankLoraMean{}; Figure~\ref{fig:overview}e) on the strength of TAP-CT (\numSegrankTapctFullftMean{}), but its mean change there is $\numSegdeltaTapctDecFullftMeandiff$ because \numSegdeltaTapctDecFullftDropN{} structure--mode pairs lose more than 0.1, among them the AMOS22 esophagus of the joint model ($\numSegdeltaTapctDecFullftMindiff$; Appendix~\ref{app:cases}). LoRA changes Dice relative to the frozen decoder by $\numCiSegloradecTapctMeandiff$ and $\numCiSegloradecSpectreMeandiff$ on TAP-CT and SPECTRE, with intervals that include zero (Figure~\ref{fig:seg}); it gains most where the frozen decoder fails, in the SPECTRE AMOS22 joint model (\numSegAmosBBSpectreJointDec{} to \numSegAmosBBSpectreJointLora{}; Table~\ref{tab:segmodes}). Tripling the steps of the 15-structure joint models raised their Dice by $\numSegbudgetgainTapctMeandiff$ and $\numSegbudgetgainSpectreMeandiff$ (Table~\ref{tab:segbudget}), and \numConvSegAllLateBetter\% of segmentation runs selected one of their last two validations (Figure~\ref{fig:segconv}), so these comparisons rank methods at a fixed budget, not at convergence.
+
+\begin{figure}[tb]
+\centering
+\includegraphics[width=\textwidth]{figures/fig_joint_main.pdf}
+\vspace{-14pt}
+\caption{One model per dataset against one model per label. (a) Joint minus per-task held-out AUROC per classification cohort and (b) joint minus per-structure held-out Dice per segmentation dataset; large markers: mean over methods and labels (structures) per backbone; grey dots: individual methods. Per-label values are in Appendix~\ref{app:perlabel} and Figure~\ref{fig:joint}.}
+\label{fig:jointmain}
+\end{figure}
+
+\subsection{One model per dataset or one per label}
+\label{sec:jointres}
+
+\paragraph{In classification, one model per cohort is on average level with one per label, at a fraction of the training.} Joint minus per-task AUROC is $\numCiClsjointAllMeandiff$ on TAP-CT, SPECTRE and Pillar-0 (interval $\numCiClsjointAllLodiff$ to $\numCiClsjointAllHidiff$), while a joint model uses $1/K$ of the training steps of the $K$ per-label models it replaces; per cohort, averaged over methods, the difference ranges from $\numJointdeltaMin$ to $\numJointdeltaMax$ (Figure~\ref{fig:jointmain}a; per method in Figure~\ref{fig:joint}).
+
+\paragraph{In segmentation, the cost of one joint model lies in small structures and in the budget per structure.}\label{sec:jointseg} One joint model per dataset changes Dice by $\numCiSegjointTapctMeandiff$ and $\numCiSegjointSpectreMeandiff$ on TAP-CT and SPECTRE, most on the 15-structure AMOS22 (Figure~\ref{fig:jointmain}b). Much of this comes from \numSegcollapseN{} of \numSegcollapseCellsN{} structure--method pairs on small structures (adrenal glands and esophagus of AMOS22, merged glands of TotalSegmentator), where the joint model scores below 0.01 Dice; without them the mean over structure--method pairs moves from $\numSegjointTapctMeandiff$ to $\numSegjointTapctNocollapseMeandiff$ on TAP-CT and from $\numSegjointSpectreMeandiff$ to $\numSegjointSpectreNocollapseMeandiff$ on SPECTRE. Training crops are centered on a random foreground voxel of all structures together, so small structures rarely lie at the center of a crop; we did not test structure-balanced sampling \citep{isensee2021nnunet}. At matched total compute, the joint frozen decoder and joint full fine-tuning are behind per-structure models in three of the four pairs; the joint LoRA model is ahead of per-structure LoRA ($\numCmTotalsegSpectreLoraJointdiff$ to $\numCmAmosBBSpectreLoraJointdiff$ Dice), but per-structure LoRA at 1600 steps reaches only \numCmAmosBBTapctLoraMatchedMean{} to \numCmTotalsegSpectreLoraMatchedMean{} Dice, against \numCmAmosBBSpectreDecMatchedMean{} to \numCmTotalsegSpectreDecMatchedMean{} for per-structure decoders (Table~\ref{tab:segcm}).

@@ -1,0 +1,32 @@
+\begin{tabular}{@{}llrcc@{}}
+\toprule
+Backbone & Mode & Runs & \begin{tabular}[b]{@{}c@{}}Last validation\\{\scriptsize selected (\%)}\end{tabular} & \begin{tabular}[b]{@{}c@{}}One of last two\\{\scriptsize selected (\%)}\end{tabular} \\
+\midrule
+\multicolumn{5}{@{}l}{\textit{Classification}} \\
+TAP-CT & per-task & 429 & 30 & 42 \\
+ & joint & 120 & 64 & 79 \\
+ & joint (26\,000 steps) & 11 & 9 & 9 \\
+\addlinespace[2pt]
+SPECTRE & per-task & 363 & 25 & 37 \\
+ & joint & 88 & 56 & 78 \\
+ & joint (26\,000 steps) & 11 & 18 & 27 \\
+\addlinespace[2pt]
+Pillar-0 & per-task & 88 & 53 & 66 \\
+ & joint & 35 & 60 & 80 \\
+\addlinespace[2pt]
+All & all & 1112 & 37 & 51 \\
+\addlinespace
+\multicolumn{5}{@{}l}{\textit{Segmentation}} \\
+TAP-CT & per-task & 214 & 57 & 80 \\
+ & joint & 70 & 34 & 63 \\
+ & joint (8000 steps) & 14 & 79 & 93 \\
+ & per-task, compute-matched & 90 & 49 & 74 \\
+\addlinespace[2pt]
+SPECTRE & per-task & 214 & 57 & 79 \\
+ & joint & 65 & 35 & 52 \\
+ & joint (8000 steps) & 14 & 93 & 100 \\
+ & per-task, compute-matched & 90 & 66 & 90 \\
+\addlinespace[2pt]
+All & all & 771 & 54 & 77 \\
+\bottomrule
+\end{tabular}

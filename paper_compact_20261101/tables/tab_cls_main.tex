@@ -1,0 +1,36 @@
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lllccccccccccc@{}}
+\toprule
+Cohort (labels) & Backbone & Mode & Lin & Attn & LoRA & LoRA$_{\text{late}}$ & \begin{tabular}[b]{@{}c@{}}LoRA+\\ABMIL\end{tabular} & DoRA & rsLoRA & \begin{tabular}[b]{@{}c@{}}Lin$\to$\\LoRA\end{tabular} & \begin{tabular}[b]{@{}c@{}}Attn$\to$\\LoRA\end{tabular} & \begin{tabular}[b]{@{}c@{}}Attn-only\\FT\end{tabular} & \begin{tabular}[b]{@{}c@{}}Full\\FT\end{tabular} \\
+\midrule
+CVPR26 (17) & TAP-CT & per-task & 0.677 & 0.718 & \underline{0.732} & 0.704 & 0.728 & 0.717 & \cellcolor{modebest}0.724 & \cellcolor{modebest}0.697 & 0.707 & \cellcolor{modebest}\textbf{0.744} & 0.720 \\
+ &  & joint & \cellcolor{modebest}0.707 & \cellcolor{modebest}0.720 & \cellcolor{modebest}0.733 & \cellcolor{modebest}0.726 & \cellcolor{modebest}0.729 & \cellcolor{modebest}0.733 & 0.722 & 0.695 & \cellcolor{modebest}0.708 & \underline{0.739} & \cellcolor{modebest}\textbf{0.744} \\
+\addlinespace[1.5pt]
+ & SPECTRE & per-task & \cellcolor{modebest}0.736 & 0.725 & \cellcolor{modebest}0.769 & \cellcolor{modebest}0.769 & \cellcolor{modebest}\underline{0.776} & \cellcolor{modebest}0.766 & \cellcolor{modebest}0.768 & \cellcolor{modebest}0.769 & \cellcolor{modebest}0.765 & \cellcolor{modebest}\textbf{0.778} & 0.627$^{\dagger}$ \\
+ &  & joint & 0.702 & \cellcolor{modebest}0.738 & 0.716 & 0.731 & \textbf{0.747} & 0.731 & 0.690 & \underline{0.744} & 0.728 & 0.740 & 0.575$^{\dagger}$ \\
+\addlinespace
+FDG-PET/CT (4) & TAP-CT & per-task & \cellcolor{modebest}0.863 & 0.836 & 0.852 & \cellcolor{modebest}\textbf{0.868} & 0.839 & 0.847 & \cellcolor{modebest}0.817 & \cellcolor{modebest}\underline{0.866} & 0.856 & 0.832 & \cellcolor{modebest}0.769 \\
+ &  & joint & 0.858 & \cellcolor{modebest}0.860 & \cellcolor{modebest}\underline{0.866} & 0.864 & \cellcolor{modebest}0.849 & \cellcolor{modebest}0.858 & 0.785 & 0.860 & \cellcolor{modebest}0.862 & \cellcolor{modebest}\textbf{0.870} & 0.608 \\
+\addlinespace[1.5pt]
+ & SPECTRE & per-task & 0.857 & 0.862 & 0.882 & 0.879 & 0.874 & \textbf{0.892} & 0.872 & \cellcolor{modebest}\underline{0.887} & 0.867 & 0.848 & 0.617$^{\dagger}$ \\
+ &  & joint & \cellcolor{modebest}0.884 & \cellcolor{modebest}0.880 & \cellcolor{modebest}\underline{0.901} & \cellcolor{modebest}0.888 & \cellcolor{modebest}0.889 & \cellcolor{modebest}0.900 & \cellcolor{modebest}0.900 & 0.884 & \cellcolor{modebest}0.884 & \cellcolor{modebest}\textbf{0.906} & 0.673$^{\dagger}$ \\
+\addlinespace
+RSNA 2022 C-spine (8) & TAP-CT & per-task & 0.619 & \cellcolor{modebest}0.625 & 0.623 & 0.608 & 0.613 & \underline{0.641} & \cellcolor{modebest}0.635 & 0.606 & \cellcolor{modebest}0.629 & \textbf{0.660} & 0.637 \\
+ &  & joint & \cellcolor{modebest}0.626 & 0.624 & \cellcolor{modebest}\underline{0.714} & \cellcolor{modebest}0.706 & \cellcolor{modebest}0.713 & \cellcolor{modebest}0.680 & 0.601 & \cellcolor{modebest}0.624 & 0.620 & \cellcolor{modebest}0.712 & \cellcolor{modebest}\textbf{0.732} \\
+\addlinespace[1.5pt]
+ & SPECTRE & per-task & 0.579 & 0.591 & 0.635 & \cellcolor{modebest}\textbf{0.654} & \underline{0.644} & 0.619 & 0.638 & 0.615 & 0.591 & 0.635 & 0.566$^{\dagger}$ \\
+ &  & joint & \cellcolor{modebest}0.629 & \cellcolor{modebest}0.601 & \cellcolor{modebest}0.706 & 0.644 & \cellcolor{modebest}\textbf{0.730} & \cellcolor{modebest}0.692 & \cellcolor{modebest}0.691 & \cellcolor{modebest}0.670 & \cellcolor{modebest}0.611 & \cellcolor{modebest}\underline{0.718} & 0.554$^{\dagger}$ \\
+\addlinespace
+RSNA 2023 trauma (4) & TAP-CT & per-task & 0.737 & 0.718 & 0.739 & \cellcolor{modebest}0.756 & 0.703 & 0.752 & \cellcolor{modebest}0.725 & 0.738 & 0.716 & \cellcolor{modebest}\textbf{0.859} & \underline{0.775} \\
+ &  & joint & \cellcolor{modebest}0.739 & \cellcolor{modebest}0.738 & \cellcolor{modebest}0.757 & 0.744 & \cellcolor{modebest}0.758 & \cellcolor{modebest}0.768 & 0.684 & \cellcolor{modebest}0.746 & \cellcolor{modebest}0.758 & \underline{0.833} & \cellcolor{modebest}\textbf{0.881} \\
+\addlinespace[1.5pt]
+ & SPECTRE & per-task & \cellcolor{modebest}0.791 & 0.778 & 0.824 & 0.832 & \textbf{0.852} & \cellcolor{modebest}\underline{0.842} & 0.836 & 0.825 & 0.798 & 0.772 & 0.624$^{\dagger}$ \\
+ &  & joint & 0.789 & \cellcolor{modebest}0.788 & \cellcolor{modebest}0.846 & \cellcolor{modebest}0.835 & \cellcolor{modebest}\textbf{0.859} & 0.838 & \cellcolor{modebest}\underline{0.850} & \cellcolor{modebest}0.827 & \cellcolor{modebest}0.810 & \cellcolor{modebest}0.803 & 0.654$^{\dagger}$ \\
+\addlinespace
+RSNA 2019 hemorrhage (6) & TAP-CT & per-task & 0.870 & 0.873 & 0.894 & 0.894 & \cellcolor{modebest}0.891 & \underline{0.897} & \cellcolor{modebest}0.870 & \cellcolor{modebest}0.877 & \cellcolor{modebest}0.878 & \textbf{0.911} & \cellcolor{modebest}0.888 \\
+ &  & joint & \cellcolor{modebest}0.871 & \cellcolor{modebest}0.877 & \cellcolor{modebest}\underline{0.906} & \cellcolor{modebest}0.895 & 0.886 & 0.897 & 0.869 & 0.868 & 0.876 & \cellcolor{modebest}\textbf{0.915} & 0.854 \\
+\addlinespace[1.5pt]
+ & Pillar-0 & per-task & 0.886 & 0.884 & \cellcolor{modebest}\underline{0.929} & \cellcolor{modebest}0.914 & 0.902 & \cellcolor{modebest}\textbf{0.931} & \cellcolor{modebest}0.920 & \cellcolor{modebest}0.912 & \cellcolor{modebest}0.903 & \cellcolor{modebest}\textbf{0.931} & \cellcolor{modebest}0.904 \\
+ &  & joint & \cellcolor{modebest}0.888 & \cellcolor{modebest}0.888 & 0.912 & 0.892 & \cellcolor{modebest}\textbf{0.925} & 0.912 & \underline{0.918} & 0.905 & 0.898 & 0.912 & 0.878 \\
+\bottomrule
+\end{tabular}

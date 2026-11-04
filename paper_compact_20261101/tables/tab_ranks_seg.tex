@@ -1,0 +1,13 @@
+\begin{tabular}{@{}lccccc@{}}
+\toprule
+Method & \multicolumn{1}{c}{\begin{tabular}[b]{@{}c@{}}TAP-CT\\{\scriptsize 59 slots}\end{tabular}} & \multicolumn{1}{c}{\begin{tabular}[b]{@{}c@{}}SPECTRE\\{\scriptsize 59 slots}\end{tabular}} & \multicolumn{1}{c}{\begin{tabular}[b]{@{}c@{}}All\\{\scriptsize 118 slots}\end{tabular}} & \begin{tabular}[b]{@{}c@{}}Within 0.01\\{\scriptsize of best (\%)}\end{tabular} & \begin{tabular}[b]{@{}c@{}}Regret\\{\scriptsize all}\end{tabular} \\
+\midrule
+Lin & 6.49 & 6.25 & 6.37 & 4 & 0.116 \\
+Dec & 3.70 & 4.35 & 4.03 & 21 & 0.051 \\
+LoRA & 3.38 & 3.06 & 3.22 & 47 & \textbf{0.037} \\
+LoRA$_{\text{late}}$ & 4.03 & 3.92 & 3.97 & 31 & 0.046 \\
+DoRA & 3.91 & \textbf{2.86} & 3.38 & 44 & 0.043 \\
+Full FT & \textbf{2.05} & 3.84 & \textbf{2.94} & \textbf{64} & 0.051 \\
+Dec$\to$LoRA & 4.44 & 3.72 & 4.08 & 24 & 0.058 \\
+\bottomrule
+\end{tabular}

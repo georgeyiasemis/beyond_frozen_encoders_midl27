@@ -1,0 +1,41 @@
+\begin{tabular}{@{}llrrrlcc@{}}
+\toprule
+Backbone & Method & \multicolumn{3}{c}{SD over seeds 42--44} & Comparison & \multicolumn{2}{c}{Cohort pairs ahead} \\
+\cmidrule(lr){3-5}\cmidrule(lr){7-8}
+ & & median & max & cells & & all seeds & seeds 43, 44 \\
+\midrule
+\multicolumn{8}{@{}l}{\textit{Classification (AUROC)}} \\
+TAP-CT & Lin & 0.004 & 0.008 & 5 &  &  &  \\
+ & LoRA & 0.009 & 0.050 & 5 & LoRA $>$ Lin & 12/15 & 7/10 \\
+ & Attn-only FT & 0.019 & 0.030 & 5 & Attn-only FT $>$ LoRA & 13/15 & 9/10 \\
+ & Full FT & 0.086 & 0.157 & 5 &  &  &  \\
+\addlinespace[2pt]
+SPECTRE & Lin & 0.006 & 0.046 & 4 &  &  &  \\
+ & LoRA & 0.005 & 0.024 & 4 & LoRA $>$ Lin & 12/12 & 8/8 \\
+ & Attn-only FT & 0.026 & 0.052 & 4 & Attn-only FT $>$ LoRA & 9/12 & 6/8 \\
+ & Full FT & --$^{\dagger}$ & -- & 0 &  &  &  \\
+\addlinespace[2pt]
+Pillar-0 & Lin & 0.000 & 0.000 & 1 &  &  &  \\
+ & LoRA & 0.004 & 0.004 & 1 & LoRA $>$ Lin & 3/3 & 2/2 \\
+ & Attn-only FT & 0.007 & 0.007 & 1 & Attn-only FT $>$ LoRA & 3/3 & 2/2 \\
+ & Full FT & 0.015 & 0.015 & 1 &  &  &  \\
+\addlinespace[2pt]
+All & Lin & 0.004 & 0.046 & 10 &  &  &  \\
+ & LoRA & 0.008 & 0.050 & 10 & LoRA $>$ Lin & 27/30 & 17/20 \\
+ & Attn-only FT & 0.019 & 0.052 & 10 & Attn-only FT $>$ LoRA & 25/30 & 17/20 \\
+ & Full FT & 0.060 & 0.157 & 6 &  &  &  \\
+\addlinespace
+\multicolumn{8}{@{}l}{\textit{Segmentation (Dice)}} \\
+TAP-CT & Dec & 0.016 & 0.029 & 5 &  &  &  \\
+ & LoRA & 0.008 & 0.059 & 5 & LoRA $>$ Dec & 11/15 & 7/10 \\
+ & Full FT & 0.007 & 0.027 & 5 & Full FT $>$ Dec & 12/15 & 8/10 \\
+\addlinespace[2pt]
+SPECTRE & Dec & 0.004 & 0.025 & 5 &  &  &  \\
+ & LoRA & 0.012 & 0.024 & 5 & LoRA $>$ Dec & 12/15 & 8/10 \\
+ & Full FT & 0.015 & 0.028 & 5 & Full FT $>$ Dec & 7/15 & 4/10 \\
+\addlinespace[2pt]
+All & Dec & 0.007 & 0.029 & 10 &  &  &  \\
+ & LoRA & 0.010 & 0.059 & 10 & LoRA $>$ Dec & 23/30 & 15/20 \\
+ & Full FT & 0.012 & 0.028 & 10 & Full FT $>$ Dec & 19/30 & 12/20 \\
+\bottomrule
+\end{tabular}

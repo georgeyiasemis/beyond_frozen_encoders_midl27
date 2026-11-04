@@ -1,0 +1,10 @@
+backbone,method,no_grad_backbone
+pillar0,lora,552960
+pillar0,babmil,552960
+pillar0,rslora,552960
+pillar0,dora,573696
+pillar0,lorag,491520
+pillar0,lin_then_lorag,491520
+pillar0,attn_then_lorag,491520
+pillar0,attnft,10644480
+pillar0,fullft,49300737

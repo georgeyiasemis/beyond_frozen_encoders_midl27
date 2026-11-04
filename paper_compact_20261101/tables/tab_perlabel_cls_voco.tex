@@ -1,0 +1,74 @@
+\noindent\begin{minipage}{\textwidth}\centering\footnotesize\textit{FDG-PET/CT, VoCo: held-out AUROC per label}\\[2pt]
+\adjustbox{max width=\textwidth}{%
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lccccccccccc@{}}
+\toprule
+Label & Lin & Attn & LoRA & LoRA$_{\text{late}}$ & \begin{tabular}[b]{@{}c@{}}LoRA+\\ABMIL\end{tabular} & DoRA & rsLoRA & \begin{tabular}[b]{@{}c@{}}Lin$\to$\\LoRA\end{tabular} & \begin{tabular}[b]{@{}c@{}}Attn$\to$\\LoRA\end{tabular} & \begin{tabular}[b]{@{}c@{}}Attn-only\\FT\end{tabular} & \begin{tabular}[b]{@{}c@{}}Full\\FT\end{tabular} \\
+\midrule
+\multicolumn{12}{@{}l}{\textit{per-task}} \\
+negative & \underline{0.713} & 0.626 & 0.561 & 0.682 & 0.511 & 0.563 & 0.549 & \textbf{0.731} & 0.622 & 0.601 & 0.555 \\
+melanoma & 0.555 & 0.481 & 0.432 & \textbf{0.660} & 0.593 & \underline{0.644} & 0.514 & 0.580 & 0.532 & 0.544 & 0.586 \\
+lung cancer & \textbf{0.801} & 0.777 & 0.469 & 0.696 & 0.671 & 0.714 & 0.742 & \underline{0.794} & 0.664 & 0.662 & 0.643 \\
+lymphoma & 0.811 & \textbf{0.858} & 0.586 & 0.645 & 0.471 & 0.755 & 0.586 & 0.840 & 0.546 & \underline{0.852} & 0.639 \\
+\addlinespace
+\multicolumn{12}{@{}l}{\textit{joint}} \\
+negative & \textbf{0.736} & 0.723 & 0.591 & 0.488 & 0.486 & 0.539 & 0.519 & \underline{0.735} & 0.521 & 0.648 & 0.521 \\
+melanoma & 0.633 & \underline{0.691} & 0.493 & 0.410 & \textbf{0.722} & 0.431 & 0.394 & 0.624 & 0.486 & 0.516 & 0.591 \\
+lung cancer & \textbf{0.795} & 0.731 & 0.601 & 0.606 & 0.669 & 0.559 & 0.596 & \underline{0.791} & 0.548 & 0.658 & 0.636 \\
+lymphoma & \underline{0.814} & 0.810 & 0.717 & 0.519 & 0.744 & 0.725 & 0.599 & \textbf{0.850} & 0.524 & 0.739 & 0.579 \\
+\bottomrule
+\end{tabular}
+}\end{minipage}
+\par\bigskip
+\noindent\begin{minipage}{\textwidth}\centering\footnotesize\textit{RSNA 2022 C-spine, VoCo: held-out AUROC per label}\\[2pt]
+\adjustbox{max width=\textwidth}{%
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lccccccccccc@{}}
+\toprule
+Label & Lin & Attn & LoRA & LoRA$_{\text{late}}$ & \begin{tabular}[b]{@{}c@{}}LoRA+\\ABMIL\end{tabular} & DoRA & rsLoRA & \begin{tabular}[b]{@{}c@{}}Lin$\to$\\LoRA\end{tabular} & \begin{tabular}[b]{@{}c@{}}Attn$\to$\\LoRA\end{tabular} & \begin{tabular}[b]{@{}c@{}}Attn-only\\FT\end{tabular} & \begin{tabular}[b]{@{}c@{}}Full\\FT\end{tabular} \\
+\midrule
+\multicolumn{12}{@{}l}{\textit{per-task}} \\
+patient overall & 0.617 & 0.542 & 0.567 & 0.611 & 0.595 & \underline{0.625} & 0.597 & \textbf{0.649} & 0.425 & 0.560 & 0.544 \\
+C1 & 0.693 & 0.566 & \textbf{0.771} & 0.623 & 0.629 & 0.635 & \underline{0.765} & 0.634 & 0.519 & 0.652 & 0.708 \\
+C2 & 0.718 & 0.642 & 0.652 & \textbf{0.764} & 0.700 & \underline{0.756} & 0.751 & 0.723 & 0.641 & 0.642 & 0.736 \\
+C3 & 0.500 & 0.332 & 0.249 & 0.322 & \textbf{0.768} & 0.401 & 0.524 & 0.496 & 0.476 & \underline{0.542} & 0.439 \\
+C4 & 0.520 & 0.484 & 0.519 & 0.349 & 0.534 & 0.404 & 0.600 & \underline{0.616} & 0.610 & 0.557 & \textbf{0.727} \\
+C5 & 0.587 & 0.572 & 0.478 & 0.538 & 0.473 & 0.540 & 0.561 & 0.492 & 0.591 & \underline{0.597} & \textbf{0.621} \\
+C6 & \underline{0.604} & 0.412 & 0.452 & 0.567 & 0.551 & 0.519 & \textbf{0.626} & 0.589 & 0.398 & 0.493 & 0.489 \\
+C7 & 0.613 & 0.514 & 0.605 & \textbf{0.631} & 0.514 & 0.609 & 0.509 & \underline{0.614} & 0.511 & 0.562 & 0.572 \\
+\addlinespace
+\multicolumn{12}{@{}l}{\textit{joint}} \\
+patient overall & \underline{0.653} & 0.521 & 0.534 & 0.581 & 0.563 & 0.592 & 0.573 & \textbf{0.661} & 0.496 & 0.613 & 0.537 \\
+C1 & 0.670 & 0.700 & 0.737 & \textbf{0.753} & 0.741 & \underline{0.745} & 0.684 & 0.675 & 0.666 & \underline{0.745} & 0.726 \\
+C2 & 0.724 & 0.648 & 0.716 & 0.713 & \underline{0.731} & 0.725 & 0.715 & 0.707 & 0.618 & \textbf{0.732} & 0.683 \\
+C3 & 0.465 & 0.504 & 0.290 & 0.313 & 0.493 & 0.432 & 0.509 & \textbf{0.610} & 0.482 & 0.467 & \underline{0.564} \\
+C4 & 0.548 & \textbf{0.594} & \underline{0.591} & 0.582 & 0.568 & 0.520 & 0.507 & 0.590 & 0.588 & 0.577 & 0.551 \\
+C5 & 0.526 & 0.506 & 0.472 & 0.536 & 0.458 & \textbf{0.638} & 0.530 & 0.521 & 0.515 & 0.475 & \underline{0.600} \\
+C6 & 0.483 & 0.434 & \underline{0.532} & 0.407 & 0.418 & 0.426 & 0.499 & \textbf{0.568} & 0.406 & 0.501 & 0.513 \\
+C7 & 0.620 & 0.477 & 0.606 & 0.520 & 0.548 & \textbf{0.631} & 0.610 & \underline{0.621} & 0.447 & 0.601 & 0.573 \\
+\bottomrule
+\end{tabular}
+}\end{minipage}
+\par\bigskip
+\noindent\begin{minipage}{\textwidth}\centering\footnotesize\textit{RSNA 2023 trauma, VoCo: held-out AUROC per label}\\[2pt]
+\adjustbox{max width=\textwidth}{%
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{@{}lccccccccccc@{}}
+\toprule
+Label & Lin & Attn & LoRA & LoRA$_{\text{late}}$ & \begin{tabular}[b]{@{}c@{}}LoRA+\\ABMIL\end{tabular} & DoRA & rsLoRA & \begin{tabular}[b]{@{}c@{}}Lin$\to$\\LoRA\end{tabular} & \begin{tabular}[b]{@{}c@{}}Attn$\to$\\LoRA\end{tabular} & \begin{tabular}[b]{@{}c@{}}Attn-only\\FT\end{tabular} & \begin{tabular}[b]{@{}c@{}}Full\\FT\end{tabular} \\
+\midrule
+\multicolumn{12}{@{}l}{\textit{per-task}} \\
+any injury & 0.621 & 0.614 & 0.613 & \textbf{0.628} & 0.593 & 0.604 & 0.618 & \underline{0.626} & 0.605 & 0.596 & 0.611 \\
+kidney injury & \underline{0.672} & 0.664 & \textbf{0.674} & 0.538 & 0.637 & 0.632 & 0.637 & 0.664 & 0.562 & 0.568 & 0.584 \\
+liver injury & 0.595 & \textbf{0.637} & 0.598 & 0.619 & 0.588 & 0.608 & 0.593 & \underline{0.632} & 0.575 & 0.599 & 0.613 \\
+spleen injury & 0.581 & 0.584 & \underline{0.604} & \textbf{0.619} & 0.564 & 0.601 & 0.585 & 0.601 & 0.532 & 0.589 & 0.575 \\
+\addlinespace
+\multicolumn{12}{@{}l}{\textit{joint}} \\
+any injury & \underline{0.633} & 0.614 & 0.594 & \textbf{0.635} & 0.600 & 0.625 & 0.584 & 0.610 & 0.632 & 0.628 & 0.624 \\
+kidney injury & 0.673 & 0.663 & 0.662 & 0.668 & 0.521 & 0.536 & 0.643 & 0.668 & \underline{0.676} & 0.536 & \textbf{0.716} \\
+liver injury & 0.619 & 0.645 & 0.590 & 0.640 & 0.569 & 0.588 & 0.625 & 0.623 & \underline{0.661} & 0.590 & \textbf{0.671} \\
+spleen injury & 0.599 & 0.541 & 0.566 & 0.565 & 0.590 & 0.582 & 0.575 & \underline{0.603} & 0.572 & \textbf{0.620} & 0.582 \\
+\bottomrule
+\end{tabular}
+}\end{minipage}
+\par\bigskip

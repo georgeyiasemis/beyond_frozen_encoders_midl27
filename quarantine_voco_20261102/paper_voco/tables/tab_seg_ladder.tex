@@ -1,0 +1,51 @@
+\begin{tabular}{lllccccccc}
+\toprule
+Dataset (structures) & Backbone & Mode & Lin & Dec & LoRA & LoRA$_{\text{late}}$ & DoRA & Full FT & Dec$\to$LoRA \\
+\midrule
+AMOS22 (15) & TAP-CT & per-task & \cellcolor{modebest}0.658 & \cellcolor{modebest}\underline{0.793} & \cellcolor{modebest}0.767 & \cellcolor{modebest}0.764 & \cellcolor{modebest}0.761 & \cellcolor{modebest}\textbf{0.805} & \cellcolor{modebest}0.791 \\
+ &  & joint & 0.646 & \underline{0.708} & \textbf{0.739} & 0.698 & \underline{0.708} & 0.681 & 0.656 \\
+\addlinespace[2pt]
+AMOS22 (15) & SPECTRE & per-task & \cellcolor{modebest}0.683 & \cellcolor{modebest}0.808 & \cellcolor{modebest}\underline{0.812} & \cellcolor{modebest}0.806 & \cellcolor{modebest}\textbf{0.814} & \cellcolor{modebest}0.792 & \cellcolor{modebest}\textbf{0.814} \\
+ &  & joint & 0.682 & 0.658 & \textbf{0.784} & 0.764 & \underline{0.775} & 0.669 & 0.664 \\
+\addlinespace[2pt]
+AMOS22 (15) & VoCo & per-task & \cellcolor{modebest}0.041 & \cellcolor{modebest}\underline{0.805} & \cellcolor{modebest}0.782 & \cellcolor{modebest}0.783 & \cellcolor{modebest}0.783 & \cellcolor{modebest}\textbf{0.818} & \cellcolor{modebest}0.799 \\
+ &  & joint & 0.038 & 0.739 & \underline{0.762} & 0.758 & \textbf{0.764} & 0.752 & 0.736 \\
+\addlinespace[2pt]
+KiTS23 (3) & TAP-CT & per-task & \cellcolor{modebest}0.531 & \cellcolor{modebest}0.584 & 0.563 & \cellcolor{modebest}0.567 & \cellcolor{modebest}0.563 & \cellcolor{modebest}\textbf{0.588} & \cellcolor{modebest}\underline{0.587} \\
+ &  & joint & 0.430 & 0.514 & \cellcolor{modebest}\textbf{0.582} & 0.556 & \underline{0.560} & 0.519 & 0.500 \\
+\addlinespace[2pt]
+KiTS23 (3) & SPECTRE & per-task & \cellcolor{modebest}0.583 & \cellcolor{modebest}0.599 & \cellcolor{modebest}0.613 & \cellcolor{modebest}\underline{0.617} & \cellcolor{modebest}\textbf{0.622} & \cellcolor{modebest}0.528 & \cellcolor{modebest}0.603 \\
+ &  & joint & 0.530 & 0.572 & \underline{0.588} & \underline{0.588} & \textbf{0.593} & 0.519 & 0.570 \\
+\addlinespace[2pt]
+KiTS23 (3) & VoCo & per-task & 0.017 & \cellcolor{modebest}\underline{0.519} & 0.501 & 0.500 & 0.493 & \cellcolor{modebest}\textbf{0.564} & \cellcolor{modebest}0.481 \\
+ &  & joint & \cellcolor{modebest}0.037 & 0.465 & 0.501 & \cellcolor{modebest}\textbf{0.516} & \cellcolor{modebest}\underline{0.507} & 0.481 & 0.452 \\
+\addlinespace[2pt]
+LiTS (2) & TAP-CT & per-task & \cellcolor{modebest}0.659 & \cellcolor{modebest}0.709 & \cellcolor{modebest}\textbf{0.716} & 0.709 & \cellcolor{modebest}\underline{0.714} & 0.710 & \cellcolor{modebest}\underline{0.714} \\
+ &  & joint & 0.656 & 0.699 & \underline{0.715} & \cellcolor{modebest}\textbf{0.721} & 0.692 & \cellcolor{modebest}\underline{0.715} & 0.703 \\
+\addlinespace[2pt]
+LiTS (2) & SPECTRE & per-task & 0.688 & \underline{0.741} & \cellcolor{modebest}\textbf{0.756} & 0.723 & \cellcolor{modebest}\textbf{0.756} & \cellcolor{modebest}0.739 & 0.729 \\
+ &  & joint & \cellcolor{modebest}0.696 & \cellcolor{modebest}0.742 & \textbf{0.753} & \cellcolor{modebest}0.736 & \underline{0.743} & 0.713 & \cellcolor{modebest}\underline{0.743} \\
+\addlinespace[2pt]
+LiTS (2) & VoCo & per-task & 0.342 & \cellcolor{modebest}\underline{0.733} & 0.692 & 0.694 & 0.688 & \cellcolor{modebest}\textbf{0.748} & 0.720 \\
+ &  & joint & \cellcolor{modebest}0.345 & \underline{0.732} & \cellcolor{modebest}0.720 & \cellcolor{modebest}0.710 & \cellcolor{modebest}0.718 & \textbf{0.737} & \cellcolor{modebest}0.726 \\
+\addlinespace[2pt]
+MSD Pancreas (2) & TAP-CT & per-task & \cellcolor{modebest}0.427 & \cellcolor{modebest}0.491 & \underline{0.504} & \cellcolor{modebest}0.501 & \cellcolor{modebest}0.502 & \cellcolor{modebest}\textbf{0.512} & \cellcolor{modebest}0.495 \\
+ &  & joint & 0.334 & 0.480 & \cellcolor{modebest}\textbf{0.505} & 0.492 & \underline{0.493} & 0.487 & 0.468 \\
+\addlinespace[2pt]
+MSD Pancreas (2) & SPECTRE & per-task & \cellcolor{modebest}0.475 & \cellcolor{modebest}0.516 & \cellcolor{modebest}\textbf{0.563} & \cellcolor{modebest}0.538 & \cellcolor{modebest}\underline{0.557} & 0.516 & 0.518 \\
+ &  & joint & 0.459 & 0.514 & \textbf{0.550} & 0.529 & \textbf{0.550} & \cellcolor{modebest}\underline{0.530} & \cellcolor{modebest}0.520 \\
+\addlinespace[2pt]
+MSD Pancreas (2) & VoCo & per-task & 0.000 & \cellcolor{modebest}\textbf{0.569} & 0.539 & 0.545 & 0.541 & \cellcolor{modebest}\underline{0.566} & 0.558 \\
+ &  & joint & 0.000 & 0.559 & \cellcolor{modebest}0.552 & 0.545 & \cellcolor{modebest}0.552 & \underline{0.560} & \cellcolor{modebest}\textbf{0.561} \\
+\addlinespace[2pt]
+TotalSegmentator (15) & TAP-CT & per-task & \cellcolor{modebest}0.747 & \cellcolor{modebest}\textbf{0.843} & \cellcolor{modebest}0.819 & -- & -- & \cellcolor{modebest}\underline{0.832} & -- \\
+ &  & joint & 0.740 & \underline{0.798} & 0.776 & 0.776 & 0.776 & \textbf{0.815} & 0.790 \\
+\addlinespace[2pt]
+TotalSegmentator (15) & SPECTRE & per-task & \cellcolor{modebest}0.731 & \cellcolor{modebest}\textbf{0.848} & \cellcolor{modebest}\textbf{0.848} & -- & -- & \cellcolor{modebest}\underline{0.838} & -- \\
+ &  & joint & 0.722 & 0.770 & 0.733 & 0.752 & 0.736 & \textbf{0.795} & \underline{0.772} \\
+\addlinespace[2pt]
+TotalSegmentator (15) & VoCo & per-task & \cellcolor{modebest}0.055 & \cellcolor{modebest}\underline{0.822} & \cellcolor{modebest}0.771 & -- & -- & \cellcolor{modebest}\textbf{0.838} & -- \\
+ &  & joint & 0.047 & \underline{0.732} & 0.705 & 0.697 & 0.709 & \textbf{0.750} & 0.723 \\
+\addlinespace[2pt]
+\bottomrule
+\end{tabular}
