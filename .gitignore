@@ -11,3 +11,7 @@ __pycache__/
 *.synctex.gz
 *.fls
 *.fdb_latexmk
+
+# kept locally, not in the repo
+quarantine_voco_20261102/
+paper_compact_20261101/
