@@ -10,8 +10,8 @@ task_index / class_index follow metrics/recompute.py (imported, not modified).
 
 Segmentation (one model per dataset, the paper's joint mode; for AMOS22 and TotalSegmentator the 24 000-step run):
     case score = mean Dice over the valid structures of a held-out case, averaged over Lin, Dec, LoRA and Full FT on
-    TAP-CT, SPECTRE and VoCo; success = the case at the 90th percentile, failure = the case with the lowest score, among
-    cases scored by all twelve runs.
+    TAP-CT and SPECTRE; success = the case at the 90th percentile, failure = the case with the lowest score, among
+    cases scored by all eight runs. VoCo (quarantined) is included only with WITH_VOCO=1 (style.NO_VOCO).
 Classification (per-task runs): per source, the label with the most held-out positives (FDG: excluding NEGATIVE).
     case score of a positive = share of held-out negatives it outranks (ties count half), i.e. its contribution to
     AUROC; averaged over Lin, LoRA, Attn-only FT and Full FT on every backbone of the cohort; success / failure =
@@ -35,6 +35,7 @@ RES = V2.parent / "midl_paper" / "results"          # per-case files and saved p
 OUT_SEL = HERE / "out" / "selection"
 sys.path.insert(0, str(V2 / "metrics"))
 import recompute as rc  # noqa: E402  (label-name mapping only)
+from style import NO_VOCO  # noqa: E402
 
 SEG_METHODS = ["lin", "dec", "lora", "fullft"]
 CLS_METHODS = ["lin", "lora", "attnft", "fullft"]
@@ -47,6 +48,10 @@ CLS_SOURCES = [("amos", "amos_covid_luna", None, ["tapct", "spectre"]),
                ("rsna2022", "rsna2022", None, ["tapct", "spectre", "voco"]),
                ("rsna2023", "rsna2023", None, ["tapct", "spectre", "voco"]),
                ("ich", "rsna2019_ich", None, ["tapct", "pillar0"])]
+SEG_BACKBONES = ["tapct", "spectre", "voco"]
+if NO_VOCO:
+    CLS_SOURCES = [(k, d, l, [b for b in bbs if b != "voco"]) for k, d, l, bbs in CLS_SOURCES]
+    SEG_BACKBONES = [b for b in SEG_BACKBONES if b != "voco"]
 
 
 # ----------------------------------------------------------------------------- shared data layer (also used by
@@ -112,7 +117,7 @@ def seg() -> dict:
     out = {}
     for ds in SEG_DATASETS:
         per_run, runs_ = {}, {}
-        for bb in ["tapct", "spectre", "voco"]:
+        for bb in SEG_BACKBONES:
             for mt in SEG_METHODS:
                 r = run_row("seg", ds, bb, "joint", mt)
                 per_run[f"{bb}/{mt}"] = seg_case_mean(r)

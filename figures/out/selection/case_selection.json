@@ -4,7 +4,7 @@
    "mode": "joint",
    "n_cases": 50,
    "cases": {
-    "success": "amos_0219",
+    "success": "amos_0409",
     "failure": "amos_0356"
    },
    "runs": {
@@ -39,85 +39,53 @@
     "spectre/fullft": {
      "percase_file": "raw/snellius/seg/amos22/spectre/joint_lm/fullft/config/val_case_metrics/iter_046000/dice.csv",
      "best_iter": 46000
-    },
-    "voco/lin": {
-     "percase_file": "raw/snellius/seg/amos22/voco/joint_lm/lin/config/val_case_metrics/iter_030000/dice.csv",
-     "best_iter": 30000
-    },
-    "voco/dec": {
-     "percase_file": "raw/snellius/seg/amos22/voco/joint_lm/dec/config/val_case_metrics/iter_046000/dice.csv",
-     "best_iter": 46000
-    },
-    "voco/lora": {
-     "percase_file": "raw/snellius/seg/amos22/voco/joint_lm/lora/config/val_case_metrics/iter_048000/dice.csv",
-     "best_iter": 48000
-    },
-    "voco/fullft": {
-     "percase_file": "raw/snellius/seg/amos22/voco/joint_lm/fullft/config/val_case_metrics/iter_048000/dice.csv",
-     "best_iter": 48000
     }
    },
    "case_dice": {
     "tapct/lin": {
-     "amos_0219": 0.7403,
+     "amos_0409": 0.6687,
      "amos_0356": 0.5458
     },
     "tapct/dec": {
-     "amos_0219": 0.7642,
+     "amos_0409": 0.7421,
      "amos_0356": 0.608
     },
     "tapct/lora": {
-     "amos_0219": 0.7815,
+     "amos_0409": 0.7846,
      "amos_0356": 0.6011
     },
     "tapct/fullft": {
-     "amos_0219": 0.7201,
+     "amos_0409": 0.7057,
      "amos_0356": 0.5761
     },
     "spectre/lin": {
-     "amos_0219": 0.718,
+     "amos_0409": 0.7397,
      "amos_0356": 0.4842
     },
     "spectre/dec": {
-     "amos_0219": 0.6742,
+     "amos_0409": 0.7015,
      "amos_0356": 0.5299
     },
     "spectre/lora": {
-     "amos_0219": 0.8318,
+     "amos_0409": 0.845,
      "amos_0356": 0.6987
     },
     "spectre/fullft": {
-     "amos_0219": 0.6894,
+     "amos_0409": 0.7045,
      "amos_0356": 0.5162
-    },
-    "voco/lin": {
-     "amos_0219": 0.0161,
-     "amos_0356": 0.0315
-    },
-    "voco/dec": {
-     "amos_0219": 0.797,
-     "amos_0356": 0.594
-    },
-    "voco/lora": {
-     "amos_0219": 0.8153,
-     "amos_0356": 0.6013
-    },
-    "voco/fullft": {
-     "amos_0219": 0.8046,
-     "amos_0356": 0.6491
     }
    },
    "case_mean": {
-    "amos_0219": 0.696,
-    "amos_0356": 0.5363
+    "amos_0409": 0.7365,
+    "amos_0356": 0.57
    }
   },
   "kits23": {
    "mode": "joint",
    "n_cases": 73,
    "cases": {
-    "success": "case_00056",
-    "failure": "case_00203"
+    "success": "case_00109",
+    "failure": "case_00165"
    },
    "runs": {
     "tapct/lin": {
@@ -151,77 +119,45 @@
     "spectre/fullft": {
      "percase_file": "raw/gaia/seg/kits23/spectre/joint/fullft/config/val_case_metrics/iter_006000/dice.csv",
      "best_iter": 6000
-    },
-    "voco/lin": {
-     "percase_file": "raw/snellius/seg/kits23/voco/joint/lin/config/val_case_metrics/iter_002000/dice.csv",
-     "best_iter": 2000
-    },
-    "voco/dec": {
-     "percase_file": "raw/snellius/seg/kits23/voco/joint/dec/config/val_case_metrics/iter_016000/dice.csv",
-     "best_iter": 16000
-    },
-    "voco/lora": {
-     "percase_file": "raw/snellius/seg/kits23/voco/joint/lora/config/val_case_metrics/iter_016000/dice.csv",
-     "best_iter": 16000
-    },
-    "voco/fullft": {
-     "percase_file": "raw/snellius/seg/kits23/voco/joint/fullft/config/val_case_metrics/iter_016000/dice.csv",
-     "best_iter": 16000
     }
    },
    "case_dice": {
     "tapct/lin": {
-     "case_00056": 0.8679,
-     "case_00203": 0.2834
+     "case_00109": 0.8635,
+     "case_00165": 0.3083
     },
     "tapct/dec": {
-     "case_00056": 0.5792,
-     "case_00203": 0.3016
+     "case_00109": 0.5708,
+     "case_00165": 0.3018
     },
     "tapct/lora": {
-     "case_00056": 0.6364,
-     "case_00203": 0.35
+     "case_00109": 0.6112,
+     "case_00165": 0.442
     },
     "tapct/fullft": {
-     "case_00056": 0.6084,
-     "case_00203": 0.29
+     "case_00109": 0.5788,
+     "case_00165": 0.2721
     },
     "spectre/lin": {
-     "case_00056": 0.901,
-     "case_00203": 0.2824
+     "case_00109": 0.8499,
+     "case_00165": 0.3487
     },
     "spectre/dec": {
-     "case_00056": 0.6325,
-     "case_00203": 0.3617
+     "case_00109": 0.9014,
+     "case_00165": 0.3277
     },
     "spectre/lora": {
-     "case_00056": 0.9573,
-     "case_00203": 0.4284
+     "case_00109": 0.9219,
+     "case_00165": 0.3063
     },
     "spectre/fullft": {
-     "case_00056": 0.5486,
-     "case_00203": 0.3357
-    },
-    "voco/lin": {
-     "case_00056": 0.1539,
-     "case_00203": 0.0531
-    },
-    "voco/dec": {
-     "case_00056": 0.8918,
-     "case_00203": 0.3182
-    },
-    "voco/lora": {
-     "case_00056": 0.5208,
-     "case_00203": 0.3296
-    },
-    "voco/fullft": {
-     "case_00056": 0.8471,
-     "case_00203": 0.3512
+     "case_00109": 0.5666,
+     "case_00165": 0.3126
     }
    },
    "case_mean": {
-    "case_00056": 0.6787,
-    "case_00203": 0.3071
+    "case_00109": 0.733,
+    "case_00165": 0.3274
    }
   },
   "lits": {
@@ -229,7 +165,7 @@
    "n_cases": 20,
    "cases": {
     "success": "liver_47",
-    "failure": "liver_59"
+    "failure": "liver_41"
    },
    "runs": {
     "tapct/lin": {
@@ -263,84 +199,52 @@
     "spectre/fullft": {
      "percase_file": "raw/snellius/seg/lits/spectre/joint/fullft/config/val_case_metrics/iter_016000/dice.csv",
      "best_iter": 16000
-    },
-    "voco/lin": {
-     "percase_file": "raw/snellius/seg/lits/voco/joint/lin/config/val_case_metrics/iter_010000/dice.csv",
-     "best_iter": 10000
-    },
-    "voco/dec": {
-     "percase_file": "raw/snellius/seg/lits/voco/joint/dec/config/val_case_metrics/iter_012000/dice.csv",
-     "best_iter": 12000
-    },
-    "voco/lora": {
-     "percase_file": "raw/snellius/seg/lits/voco/joint/lora/config/val_case_metrics/iter_014000/dice.csv",
-     "best_iter": 14000
-    },
-    "voco/fullft": {
-     "percase_file": "raw/snellius/seg/lits/voco/joint/fullft/config/val_case_metrics/iter_016000/dice.csv",
-     "best_iter": 16000
     }
    },
    "case_dice": {
     "tapct/lin": {
      "liver_47": 0.9244,
-     "liver_59": 0.4646
+     "liver_41": 0.4453
     },
     "tapct/dec": {
      "liver_47": 0.9577,
-     "liver_59": 0.4828
+     "liver_41": 0.4757
     },
     "tapct/lora": {
      "liver_47": 0.4818,
-     "liver_59": 0.4861
+     "liver_41": 0.4784
     },
     "tapct/fullft": {
      "liver_47": 0.9621,
-     "liver_59": 0.4849
+     "liver_41": 0.4751
     },
     "spectre/lin": {
      "liver_47": 0.942,
-     "liver_59": 0.4714
+     "liver_41": 0.4641
     },
     "spectre/dec": {
      "liver_47": 0.9636,
-     "liver_59": 0.484
+     "liver_41": 0.4779
     },
     "spectre/lora": {
      "liver_47": 0.9609,
-     "liver_59": 0.4836
+     "liver_41": 0.4782
     },
     "spectre/fullft": {
      "liver_47": 0.962,
-     "liver_59": 0.4846
-    },
-    "voco/lin": {
-     "liver_47": 0.5533,
-     "liver_59": 0.3215
-    },
-    "voco/dec": {
-     "liver_47": 0.9619,
-     "liver_59": 0.4672
-    },
-    "voco/lora": {
-     "liver_47": 0.4818,
-     "liver_59": 0.4728
-    },
-    "voco/fullft": {
-     "liver_47": 0.9623,
-     "liver_59": 0.4772
+     "liver_41": 0.4767
     }
    },
    "case_mean": {
-    "liver_47": 0.8428,
-    "liver_59": 0.4651
+    "liver_47": 0.8943,
+    "liver_41": 0.4714
    }
   },
   "msd_pancreas": {
    "mode": "joint",
    "n_cases": 42,
    "cases": {
-    "success": "pancreas_182",
+    "success": "pancreas_149",
     "failure": "pancreas_126"
    },
    "runs": {
@@ -375,84 +279,52 @@
     "spectre/fullft": {
      "percase_file": "raw/snellius/seg/msd_pancreas/spectre/joint/fullft/config/val_case_metrics/iter_016000/dice.csv",
      "best_iter": 16000
-    },
-    "voco/lin": {
-     "percase_file": "raw/snellius/seg/msd_pancreas/voco/joint/lin/config/val_case_metrics/iter_002000/dice.csv",
-     "best_iter": 2000
-    },
-    "voco/dec": {
-     "percase_file": "raw/snellius/seg/msd_pancreas/voco/joint/dec/config/val_case_metrics/iter_016000/dice.csv",
-     "best_iter": 16000
-    },
-    "voco/lora": {
-     "percase_file": "raw/snellius/seg/msd_pancreas/voco/joint/lora/config/val_case_metrics/iter_014000/dice.csv",
-     "best_iter": 14000
-    },
-    "voco/fullft": {
-     "percase_file": "raw/snellius/seg/msd_pancreas/voco/joint/fullft/config/val_case_metrics/iter_016000/dice.csv",
-     "best_iter": 16000
     }
    },
    "case_dice": {
     "tapct/lin": {
-     "pancreas_182": 0.2663,
+     "pancreas_149": 0.3021,
      "pancreas_126": 0.0748
     },
     "tapct/dec": {
-     "pancreas_182": 0.6855,
+     "pancreas_149": 0.5844,
      "pancreas_126": 0.097
     },
     "tapct/lora": {
-     "pancreas_182": 0.7574,
+     "pancreas_149": 0.5659,
      "pancreas_126": 0.2743
     },
     "tapct/fullft": {
-     "pancreas_182": 0.7372,
+     "pancreas_149": 0.6311,
      "pancreas_126": 0.4379
     },
     "spectre/lin": {
-     "pancreas_182": 0.6392,
+     "pancreas_149": 0.6704,
      "pancreas_126": 0.1657
     },
     "spectre/dec": {
-     "pancreas_182": 0.6578,
+     "pancreas_149": 0.8091,
      "pancreas_126": 0.3852
     },
     "spectre/lora": {
-     "pancreas_182": 0.7224,
+     "pancreas_149": 0.7691,
      "pancreas_126": 0.5181
     },
     "spectre/fullft": {
-     "pancreas_182": 0.7006,
+     "pancreas_149": 0.7132,
      "pancreas_126": 0.2341
-    },
-    "voco/lin": {
-     "pancreas_182": 0.0,
-     "pancreas_126": 0.0
-    },
-    "voco/dec": {
-     "pancreas_182": 0.7331,
-     "pancreas_126": 0.2211
-    },
-    "voco/lora": {
-     "pancreas_182": 0.7814,
-     "pancreas_126": 0.2664
-    },
-    "voco/fullft": {
-     "pancreas_182": 0.72,
-     "pancreas_126": 0.2374
     }
    },
    "case_mean": {
-    "pancreas_182": 0.6167,
-    "pancreas_126": 0.2427
+    "pancreas_149": 0.6307,
+    "pancreas_126": 0.2734
    }
   },
   "totalseg": {
    "mode": "joint",
    "n_cases": 109,
    "cases": {
-    "success": "s0440",
+    "success": "s0236",
     "failure": "s1728"
    },
    "runs": {
@@ -487,77 +359,45 @@
     "spectre/fullft": {
      "percase_file": "raw/snellius/seg/totalseg/spectre/joint_lm/fullft/config/val_case_metrics/iter_048000/dice.csv",
      "best_iter": 48000
-    },
-    "voco/lin": {
-     "percase_file": "raw/snellius/seg/totalseg/voco/joint_lm/lin/config/val_case_metrics/iter_034000/dice.csv",
-     "best_iter": 34000
-    },
-    "voco/dec": {
-     "percase_file": "raw/snellius/seg/totalseg/voco/joint_lm/dec/config/val_case_metrics/iter_044000/dice.csv",
-     "best_iter": 44000
-    },
-    "voco/lora": {
-     "percase_file": "raw/snellius/seg/totalseg/voco/joint_lm/lora/config/val_case_metrics/iter_046000/dice.csv",
-     "best_iter": 46000
-    },
-    "voco/fullft": {
-     "percase_file": "raw/snellius/seg/totalseg/voco/joint_lm/fullft/config/val_case_metrics/iter_046000/dice.csv",
-     "best_iter": 46000
     }
    },
    "case_dice": {
     "tapct/lin": {
-     "s0440": 0.7824,
+     "s0236": 0.8187,
      "s1728": 0.4724
     },
     "tapct/dec": {
-     "s0440": 0.8411,
+     "s0236": 0.8432,
      "s1728": 0.554
     },
     "tapct/lora": {
-     "s0440": 0.8362,
+     "s0236": 0.8419,
      "s1728": 0.5091
     },
     "tapct/fullft": {
-     "s0440": 0.8529,
+     "s0236": 0.8554,
      "s1728": 0.5728
     },
     "spectre/lin": {
-     "s0440": 0.7597,
+     "s0236": 0.7828,
      "s1728": 0.2906
     },
     "spectre/dec": {
-     "s0440": 0.8186,
+     "s0236": 0.8186,
      "s1728": 0.4292
     },
     "spectre/lora": {
-     "s0440": 0.8159,
+     "s0236": 0.8113,
      "s1728": 0.4557
     },
     "spectre/fullft": {
-     "s0440": 0.8379,
+     "s0236": 0.84,
      "s1728": 0.5582
-    },
-    "voco/lin": {
-     "s0440": 0.0576,
-     "s1728": 0.0
-    },
-    "voco/dec": {
-     "s0440": 0.8386,
-     "s1728": 0.4134
-    },
-    "voco/lora": {
-     "s0440": 0.8252,
-     "s1728": 0.5195
-    },
-    "voco/fullft": {
-     "s0440": 0.844,
-     "s1728": 0.4656
     }
    },
    "case_mean": {
-    "s0440": 0.7592,
-    "s1728": 0.4367
+    "s0236": 0.8265,
+    "s1728": 0.4802
    }
   }
  },
@@ -810,8 +650,8 @@
    "label": "MELANOMA",
    "n_pos": 19,
    "cases": {
-    "success": "PETCT_62ced197ca",
-    "failure": "PETCT_544676de40"
+    "success": "PETCT_09ee00bdc6",
+    "failure": "PETCT_da6161d7eb"
    },
    "runs": {
     "tapct/lin": {
@@ -845,77 +685,45 @@
     "spectre/fullft": {
      "percase_file": "raw/snellius/fdg/spectre/pertask/fullft/MELANOMA/MELANOMA/val_case_metrics/iter_008000/logits.csv",
      "auroc": 0.6338
-    },
-    "voco/lin": {
-     "percase_file": "raw/snellius/fdg/voco/pertask/lin/MELANOMA/MELANOMA/val_case_metrics/iter_002000/logits.csv",
-     "auroc": 0.555
-    },
-    "voco/lora": {
-     "percase_file": "raw/snellius/fdg/voco/pertask/lora/MELANOMA/MELANOMA/val_case_metrics/iter_007000/logits.csv",
-     "auroc": 0.4321
-    },
-    "voco/attnft": {
-     "percase_file": "raw/snellius/fdg/voco/pertask/attnft/MELANOMA/MELANOMA/val_case_metrics/iter_004000/logits.csv",
-     "auroc": 0.5441
-    },
-    "voco/fullft": {
-     "percase_file": "raw/snellius/fdg/voco/pertask/fullft/MELANOMA/MELANOMA/val_case_metrics/iter_004000/logits.csv",
-     "auroc": 0.5858
     }
    },
    "case_score": {
     "tapct/lin": {
-     "PETCT_62ced197ca": 0.8734,
-     "PETCT_544676de40": 0.5316
+     "PETCT_09ee00bdc6": 0.9367,
+     "PETCT_da6161d7eb": 0.4051
     },
     "tapct/lora": {
-     "PETCT_62ced197ca": 0.9241,
-     "PETCT_544676de40": 0.6392
+     "PETCT_09ee00bdc6": 0.9873,
+     "PETCT_da6161d7eb": 0.1392
     },
     "tapct/attnft": {
-     "PETCT_62ced197ca": 0.9367,
-     "PETCT_544676de40": 0.3544
+     "PETCT_09ee00bdc6": 0.9494,
+     "PETCT_da6161d7eb": 0.5063
     },
     "tapct/fullft": {
-     "PETCT_62ced197ca": 0.9051,
-     "PETCT_544676de40": 0.2405
+     "PETCT_09ee00bdc6": 0.9494,
+     "PETCT_da6161d7eb": 0.2658
     },
     "spectre/lin": {
-     "PETCT_62ced197ca": 0.8608,
-     "PETCT_544676de40": 0.2152
+     "PETCT_09ee00bdc6": 1.0,
+     "PETCT_da6161d7eb": 0.5696
     },
     "spectre/lora": {
-     "PETCT_62ced197ca": 0.9494,
-     "PETCT_544676de40": 0.3418
+     "PETCT_09ee00bdc6": 0.9937,
+     "PETCT_da6161d7eb": 0.4684
     },
     "spectre/attnft": {
-     "PETCT_62ced197ca": 0.9241,
-     "PETCT_544676de40": 0.4367
+     "PETCT_09ee00bdc6": 0.981,
+     "PETCT_da6161d7eb": 0.4051
     },
     "spectre/fullft": {
-     "PETCT_62ced197ca": 0.3544,
-     "PETCT_544676de40": 0.3544
-    },
-    "voco/lin": {
-     "PETCT_62ced197ca": 0.7405,
-     "PETCT_544676de40": 0.4557
-    },
-    "voco/lora": {
-     "PETCT_62ced197ca": 0.7532,
-     "PETCT_544676de40": 0.1646
-    },
-    "voco/attnft": {
-     "PETCT_62ced197ca": 0.8924,
-     "PETCT_544676de40": 0.1519
-    },
-    "voco/fullft": {
-     "PETCT_62ced197ca": 0.7532,
-     "PETCT_544676de40": 0.2785
+     "PETCT_09ee00bdc6": 0.9684,
+     "PETCT_da6161d7eb": 0.3544
     }
    },
    "case_mean": {
-    "PETCT_62ced197ca": 0.8223,
-    "PETCT_544676de40": 0.347
+    "PETCT_09ee00bdc6": 0.9707,
+    "PETCT_da6161d7eb": 0.3892
    }
   },
   "rsna2022": {
@@ -923,8 +731,8 @@
    "label": "patient_overall",
    "n_pos": 96,
    "cases": {
-    "success": "1.2.826.0.1.3680043.7077",
-    "failure": "1.2.826.0.1.3680043.8519"
+    "success": "1.2.826.0.1.3680043.22560",
+    "failure": "1.2.826.0.1.3680043.14369"
    },
    "runs": {
     "tapct/lin": {
@@ -958,77 +766,45 @@
     "spectre/fullft": {
      "percase_file": "raw/snellius/rsna2022/spectre/pertask/fullft/patient_overall/patient_overall/val_case_metrics/iter_002000/logits.csv",
      "auroc": 0.5838
-    },
-    "voco/lin": {
-     "percase_file": "raw/snellius/rsna2022/voco/pertask/lin/patient_overall/patient_overall/val_case_metrics/iter_006000/logits.csv",
-     "auroc": 0.6166
-    },
-    "voco/lora": {
-     "percase_file": "raw/snellius/rsna2022/voco/pertask/lora/patient_overall/patient_overall/val_case_metrics/iter_005000/logits.csv",
-     "auroc": 0.5673
-    },
-    "voco/attnft": {
-     "percase_file": "raw/snellius/rsna2022/voco/pertask/attnft/patient_overall/patient_overall/val_case_metrics/iter_008000/logits.csv",
-     "auroc": 0.56
-    },
-    "voco/fullft": {
-     "percase_file": "raw/snellius/rsna2022/voco/pertask/fullft/patient_overall/patient_overall/val_case_metrics/iter_008000/logits.csv",
-     "auroc": 0.5445
     }
    },
    "case_score": {
     "tapct/lin": {
-     "1.2.826.0.1.3680043.7077": 0.9717,
-     "1.2.826.0.1.3680043.8519": 0.0189
+     "1.2.826.0.1.3680043.22560": 0.9528,
+     "1.2.826.0.1.3680043.14369": 0.0283
     },
     "tapct/lora": {
-     "1.2.826.0.1.3680043.7077": 0.9717,
-     "1.2.826.0.1.3680043.8519": 0.2358
+     "1.2.826.0.1.3680043.22560": 0.9717,
+     "1.2.826.0.1.3680043.14369": 0.1368
     },
     "tapct/attnft": {
-     "1.2.826.0.1.3680043.7077": 0.9623,
-     "1.2.826.0.1.3680043.8519": 0.1038
+     "1.2.826.0.1.3680043.22560": 0.9198,
+     "1.2.826.0.1.3680043.14369": 0.2453
     },
     "tapct/fullft": {
-     "1.2.826.0.1.3680043.7077": 0.9717,
-     "1.2.826.0.1.3680043.8519": 0.1745
+     "1.2.826.0.1.3680043.22560": 0.9764,
+     "1.2.826.0.1.3680043.14369": 0.0189
     },
     "spectre/lin": {
-     "1.2.826.0.1.3680043.7077": 0.6179,
-     "1.2.826.0.1.3680043.8519": 0.4387
+     "1.2.826.0.1.3680043.22560": 0.7547,
+     "1.2.826.0.1.3680043.14369": 0.3491
     },
     "spectre/lora": {
-     "1.2.826.0.1.3680043.7077": 0.9198,
-     "1.2.826.0.1.3680043.8519": 0.0425
+     "1.2.826.0.1.3680043.22560": 0.9811,
+     "1.2.826.0.1.3680043.14369": 0.0943
     },
     "spectre/attnft": {
-     "1.2.826.0.1.3680043.7077": 0.9528,
-     "1.2.826.0.1.3680043.8519": 0.0472
+     "1.2.826.0.1.3680043.22560": 0.967,
+     "1.2.826.0.1.3680043.14369": 0.0991
     },
     "spectre/fullft": {
-     "1.2.826.0.1.3680043.7077": 0.8208,
-     "1.2.826.0.1.3680043.8519": 0.4906
-    },
-    "voco/lin": {
-     "1.2.826.0.1.3680043.7077": 0.9717,
-     "1.2.826.0.1.3680043.8519": 0.1604
-    },
-    "voco/lora": {
-     "1.2.826.0.1.3680043.7077": 0.8868,
-     "1.2.826.0.1.3680043.8519": 0.1368
-    },
-    "voco/attnft": {
-     "1.2.826.0.1.3680043.7077": 0.6792,
-     "1.2.826.0.1.3680043.8519": 0.1415
-    },
-    "voco/fullft": {
-     "1.2.826.0.1.3680043.7077": 0.9104,
-     "1.2.826.0.1.3680043.8519": 0.0094
+     "1.2.826.0.1.3680043.22560": 0.8208,
+     "1.2.826.0.1.3680043.14369": 0.2123
     }
    },
    "case_mean": {
-    "1.2.826.0.1.3680043.7077": 0.8864,
-    "1.2.826.0.1.3680043.8519": 0.1667
+    "1.2.826.0.1.3680043.22560": 0.918,
+    "1.2.826.0.1.3680043.14369": 0.148
    }
   },
   "rsna2023": {
@@ -1036,7 +812,7 @@
    "label": "any_injury",
    "n_pos": 91,
    "cases": {
-    "success": "53395/42377",
+    "success": "32772/1757",
     "failure": "53652/12265"
    },
    "runs": {
@@ -1071,77 +847,45 @@
     "spectre/fullft": {
      "percase_file": "raw/snellius/rsna2023/spectre/pertask/fullft/any_injury/any_injury/val_case_metrics/iter_001000/logits.csv",
      "auroc": 0.5736
-    },
-    "voco/lin": {
-     "percase_file": "raw/snellius/rsna2023/voco/pertask/lin/any_injury/any_injury/val_case_metrics/iter_007000/logits.csv",
-     "auroc": 0.621
-    },
-    "voco/lora": {
-     "percase_file": "raw/gaia/rsna2023/voco/pertask/lora/any_injury/any_injury/val_case_metrics/iter_002000/logits.csv",
-     "auroc": 0.613
-    },
-    "voco/attnft": {
-     "percase_file": "raw/snellius/rsna2023/voco/pertask/attnft/any_injury/any_injury/val_case_metrics/iter_002000/logits.csv",
-     "auroc": 0.5962
-    },
-    "voco/fullft": {
-     "percase_file": "raw/snellius/rsna2023/voco/pertask/fullft/any_injury/any_injury/val_case_metrics/iter_001000/logits.csv",
-     "auroc": 0.6114
     }
    },
    "case_score": {
     "tapct/lin": {
-     "53395/42377": 0.9955,
+     "32772/1757": 0.9732,
      "53652/12265": 0.0714
     },
     "tapct/lora": {
-     "53395/42377": 0.9955,
+     "32772/1757": 0.9777,
      "53652/12265": 0.1629
     },
     "tapct/attnft": {
-     "53395/42377": 1.0,
+     "32772/1757": 0.9598,
      "53652/12265": 0.654
     },
     "tapct/fullft": {
-     "53395/42377": 1.0,
+     "32772/1757": 0.9643,
      "53652/12265": 0.279
     },
     "spectre/lin": {
-     "53395/42377": 1.0,
+     "32772/1757": 0.8527,
      "53652/12265": 0.3326
     },
     "spectre/lora": {
-     "53395/42377": 0.9911,
+     "32772/1757": 0.9375,
      "53652/12265": 0.3259
     },
     "spectre/attnft": {
-     "53395/42377": 0.9955,
+     "32772/1757": 0.8996,
      "53652/12265": 0.3996
     },
     "spectre/fullft": {
-     "53395/42377": 0.4509,
+     "32772/1757": 0.8571,
      "53652/12265": 0.096
-    },
-    "voco/lin": {
-     "53395/42377": 0.9152,
-     "53652/12265": 0.0089
-    },
-    "voco/lora": {
-     "53395/42377": 0.6228,
-     "53652/12265": 0.0089
-    },
-    "voco/attnft": {
-     "53395/42377": 0.8103,
-     "53652/12265": 0.0647
-    },
-    "voco/fullft": {
-     "53395/42377": 0.9598,
-     "53652/12265": 0.0804
     }
    },
    "case_mean": {
-    "53395/42377": 0.8947,
-    "53652/12265": 0.207
+    "32772/1757": 0.9277,
+    "53652/12265": 0.2902
    }
   },
   "ich": {

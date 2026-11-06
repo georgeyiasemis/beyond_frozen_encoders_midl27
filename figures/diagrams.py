@@ -342,9 +342,9 @@ def mini_block(ax, x, ytop, w, qkv="frozen", proj="frozen", mlp="frozen", norm="
     sub-box is CH units (10 pt drawn) tall so that its 6.1 pt label (with subscript) keeps a margin. Returns the
     bottom of the block."""
     col = {"frozen": (FROZEN_FC, FROZEN_EC), "train": (TRAIN_FC, TRAIN_EC)}
-    CH, GAP, ADD, ATT = 2.0, 0.55, 1.75, 1.7      # sub-box height, gap, gap holding a residual add, attention row
+    CH, GAP, ADD, ATT = 2.4, 0.4, 1.6, 1.7        # sub-box height (fits W_qkv with its subscript), gap, gap holding a residual add, attention row
     bx, bw = x + 1.25, 7.6                      # same sub-box width in every card; a LoRA card is wider for A, B
-    cx, sx = bx + bw / 2, x + 0.45
+    cx, sx = bx + bw / 2, x + 0.85              # residual rail and its adds inside the card
     # rows bottom to top: (name, state, height, gap above)
     rows = [("LN", norm, CH, GAP), ("$W_{qkv}$", qkv, CH, 0.3), ("attention", None, ATT, 0.3), ("$W_{proj}$", proj, CH, ADD),
             ("LN", norm, CH, GAP), ("MLP", mlp, CH, ADD)]
@@ -397,6 +397,8 @@ def save(fig, name: str) -> None:
     assert printed >= PRINT_MIN - 0.01, (name, printed)
     print(f"{name}: {fig.get_size_inches()[0]:.1f} x {fig.get_size_inches()[1]:.2f} in drawn, smallest text {min(sizes):.2f} pt"
           f" -> {printed:.2f} pt at {TEXTWIDTH_IN} in")
+    for msg in style.text_box_overflows(fig):
+        print(f"TEXT-BOX OVERFLOW {name}: {msg}")
     OUT.mkdir(parents=True, exist_ok=True)
     fig.savefig(OUT / f"{name}.pdf"); fig.savefig(OUT / f"{name}.png", dpi=220)
     plt.close(fig)
@@ -404,7 +406,11 @@ def save(fig, name: str) -> None:
 
 # ================================================================== Figure: pipeline (TAP-CT)
 def fig_pipeline(vol, vpred, seg) -> None:
-    H = 6.17                                   # 7.0 pt printed text needs more room than the 6.0 pt layout (H 5.52)
+    LINE = 1.95                                # height of one label line (8.2 pt drawn) in drawing units
+    A = 3.7                                    # (b) moves up: tighter gap under the (a) labels
+    U = 4 * LINE + A + 0.5                     # (c)/(d) move up: one label line fewer in (a), three in (b), tighter gaps
+    L = U + 2 * LINE - 0.8 - 1.4               # legend and bottom: two lines fewer under the (c) blocks; blocks 1.4 taller
+    H = 6.17 - L * DRAW_W / 100                # 7.0 pt printed text; was 6.17 with the longer labels
     top = 100 * 5.35 / DRAW_W - 1.0 + 7.9
     fig, ax = canvas(H, top - 100 * H / DRAW_W)
     s_in, ar = 0.5, 2.4
@@ -418,13 +424,13 @@ def fig_pipeline(vol, vpred, seg) -> None:
     dx, dy = stack(fig, ax, 1.0, y0, s_in, vol)
     head(ax, 0.8, y0 + dy + 2.6, "(a) Classification")
     ym, lab_y = y0 + dy / 2, y0 - 1.3
-    txt(ax, 0.8, lab_y, "CT volume,\nnative depth,\n224² in-plane", va="top", ha="left")
+    txt(ax, 0.8, lab_y, "CT volume,\n224² in-plane", va="top", ha="left")
     x = go(1.0 + dx, ym)
     stack(fig, ax, x, y0, s_in, vol, mark=(2, 4))
-    txt(ax, x + dx / 2, lab_y, "K windows,\n12 slices,\nstride 3", va="top")
+    txt(ax, x + dx / 2 + 0.8, lab_y, "W windows of 12\nslices, stride 3", va="top")
     x = go(x + dx, ym)
     ps = patch_slabs(fig, ax, x, y0, s_in, vol[2:5])[0]
-    txt(ax, x + ps / 2, lab_y, "4×8×8\npatches,\n3×28² grid", va="top")
+    txt(ax, x + ps / 2, lab_y, "4×8×8\npatches", va="top")
     x = go(x + ps, ym)
     ts = 1.45
     ty = ym - ts / 2
@@ -438,18 +444,18 @@ def fig_pipeline(vol, vpred, seg) -> None:
     txt(ax, x + ts / 2, ty + ts + 1.0, "CLS", fs=4.6, c=CLS_C)
     txt(ax, x + 3.0 * ts, ty - 1.0, "4 registers", fs=4.4, c=INK2)
     txt(ax, x + 7.5 * ts, ty + ts + 1.9, "2352 patch\ntokens", fs=4.4, c=INK2)
-    txt(ax, x + 5.5 * ts, lab_y, "tokens of one\nwindow:\n2357 × 768", va="top")
+    txt(ax, x + 5.5 * ts, lab_y, "2357 tokens\nper window", va="top")
     x = go(x + 11 * ts, ym)
     ew = 8.5
     box(ax, x, y0 + 0.6, ew, dy - 1.2, FROZEN_FC, FROZEN_EC, lw=0.7, r=0.5)
     for k in range(12):
         ax.plot([x + 0.7 + k * (ew - 1.4) / 11] * 2, [y0 + 1.4, y0 + dy - 2.6], color=FROZEN_EC, lw=0.6, zorder=4)
     txt(ax, x + ew / 2, y0 + dy - 1.4, "ViT-B", fs=4.8, c=INK)
-    txt(ax, x + ew / 2, lab_y, "12 blocks\n(panel c),\nper window", va="top")
+    txt(ax, x + ew / 2, lab_y, "12 blocks\n(panel c)", va="top")
     x = go(x + ew, ym)
     for k in range(5):
         token(ax, x, y0 + 0.7 + k * 1.65, 1.4, "cls")
-    txt(ax, x + 0.7, lab_y, "K CLS\ntokens", va="top")
+    txt(ax, x + 0.7, lab_y, "W CLS\ntokens", va="top")
     x += 1.4
     hx = x + 2.6
     hw = 99.0 - 2.4 - hx
@@ -458,30 +464,30 @@ def fig_pipeline(vol, vpred, seg) -> None:
     box(ax, hx, y0 + dy * 0.70, hw, dy * 0.26, HEAD_C, BLUE, lw=0.9, r=0.8)
     txt(ax, hx + hw / 2, y0 + dy * 0.83, "Lin: mean → linear", fs=4.8, c=INK)
     box(ax, hx, y0 + dy * 0.02, hw, dy * 0.62, HEAD_C, BLUE, lw=0.9, r=0.8)
-    txt(ax, hx + hw / 2, y0 + dy * 0.33, "Attn: learned CLS + K\ntokens, two attention\nblocks; CLS → linear", fs=4.6, c=INK)
+    txt(ax, hx + hw / 2, y0 + dy * 0.33, "Attn: two attention\nblocks → linear", fs=4.6, c=INK)
     txt(ax, hx + hw / 2, lab_y, "head: one logit\nper label", va="top")
     for yy in (0.83, 0.33):
         arrow(ax, hx + hw + 0.2, y0 + dy * yy, hx + hw + 1.4, y0 + dy * yy)
         txt(ax, hx + hw + 1.7, y0 + dy * yy, "z", fs=5.6, c=INK, ha="left", style="italic")
 
     # ---------------- (b) segmentation, TAP-CT (backbones.py TapCTDenseBackbone, heads.py MultiTapSegDecoder)
-    y1 = 42.6
-    head(ax, 0.8, y1 + dy + 4.6, "(b) Segmentation")
+    y1 = 42.6 + LINE + A
+    head(ax, 0.8, y1 + dy + 3.6, "(b) Segmentation")
     ym, lab_y = y1 + dy / 2, y1 - 1.3
     stack(fig, ax, 1.0, y1, s_in, vol, mark=(2, 4))
-    txt(ax, 0.8, lab_y, "crop: 12 whole\nslices, centered\non foreground\nwith prob. 0.67", va="top", ha="left")
+    txt(ax, 0.8, lab_y, "crop of 12\nwhole slices", va="top", ha="left")
     x = go(1.0 + dx, ym)
-    ew2 = 20.0
+    ew2 = 30.0                                  # blocks wide enough for the two-digit label 12
     by, bh = y1 + 0.8, dy - 1.6
-    bw = (ew2 - 11 * 0.35) / 12
+    bw = (ew2 - 11 * 0.3) / 12
     tap_x = []
     for k in range(12):
-        bx = x + k * (bw + 0.35)
+        bx = x + k * (bw + 0.3)
         box(ax, bx, by, bw, bh, FROZEN_FC, FROZEN_EC, lw=0.5, r=0.2)
         if k in (2, 5, 8, 11):                      # TAPCT_DEFAULT_TAPS = (2, 5, 8, 11)
             tap_x.append(bx + bw / 2)
             txt(ax, bx + bw / 2, by + bh / 2, str(k + 1), fs=4.6, c=BLUE, bold=True)
-    txt(ax, x + ew2 / 2 + 0.8, lab_y, "tokens of blocks\n3, 6, 9, 12 after\nthe final norm,\n768×3×28² grids\n(Lin: block 12)", va="top")
+    txt(ax, x + ew2 / 2 + 0.8, lab_y, "blocks 3, 6, 9, 12\n(Lin: block 12)", va="top")
     dx0 = x + ew2 + 4.0
     ytop = by + bh + 2.0
     for tx_ in tap_x:
@@ -493,7 +499,7 @@ def fig_pipeline(vol, vpred, seg) -> None:
         yy = by + 0.4 + i * (bh - 0.8) / 4
         ax.plot([dx0 - 0.8, dx0], [yy + 0.8, yy + 0.8], color=BLUE, lw=0.6, zorder=2)
         box(ax, dx0, yy, 2.6, 1.6, HEAD_C, BLUE, lw=0.6, r=0.2)
-    txt(ax, dx0 + 0.3, lab_y + 0.4, "1×1×1\nconv,\n4×128", va="top")
+    txt(ax, dx0 + 0.3, lab_y + 0.4, "1×1×1\nconv", va="top")
     # TAP-CT stride (4, 8, 8): 3 stages with scales (2,2,2), (2,2,2), (1,2,2); channels 128 -> 64 -> 32 -> 16
     stages = [("128", "3×28²", 128, 28, 3), ("64", "6×56²", 64, 56, 6), ("32", "12×112²", 32, 112, 12), ("16", "12×224²", 16, 224, 12)]
     fx = dx0 + 2.6 + 0.6
@@ -509,37 +515,36 @@ def fig_pipeline(vol, vpred, seg) -> None:
         fx = nx + 4.0
     dec_tap = seg.loc[("tapct", "dec")]
     dec_n = int(dec_tap["trainable"])           # logged, joint AMOS22 model (15 structures)
-    txt(ax, 38.5, y1 + dy + 4.4, f"decoder ({dec_n / 1e6:.2f} M parameters for {int(dec_tap['classes'])} structures):\n"
-        "concatenate, 3³ conv to 128 channels; ×2 trilinear\nupsampling (last: in-plane only) with 3³ conv; 1×1×1 conv out", fs=4.5, ha="left", va="center")
+    txt(ax, 44.0, y1 + dy + 3.6, f"multi-depth decoder ({dec_n / 1e6:.2f} M parameters for {int(dec_tap['classes'])} structures)",
+        fs=4.5, ha="left", va="center")
     arrow(ax, fx - 2.4, ym, fx + 1.2, ym)
     fx += 1.6
     stack(fig, ax, fx, y1, s_in, vol, overlays=vpred, alpha=0.55)
-    txt(ax, fx + dx / 2, lab_y, "one sigmoid\nmap per\nstructure", va="top")
+    txt(ax, min(fx + dx / 2, 99.0 - 6.6), lab_y, "one sigmoid map\nper structure", va="top")
 
     # ---------------- (c) what is trained inside one block (lora.py, dora.py, unfreeze_attention_modules)
     y2 = 4.0
-    head(ax, 0.8, 29.4, "(c) What each method trains in every block")
+    head(ax, 0.8, 29.4 + U, "(c) What each method trains in every block")
     specs = [("frozen", dict(), 9.4, "Lin, Attn,\nDec"),
-             ("LoRA", dict(lora=True), 16.1, "LoRA, rsLoRA (α/√r),\nDoRA (+m), LoRA+ABMIL,\nDec→LoRA; " + LATE + ",\n"
-              "Lin→LoRA, Attn→LoRA:\nblocks 9–12"),
-             ("Attn-only FT", dict(qkv="train", proj="train"), 9.4, "attention\nmodule:\nprojections\nand biases"),
+             ("LoRA", dict(lora=True), 16.1, "all LoRA variants;\n" + LATE + ", Lin→LoRA,\nAttn→LoRA: blocks 9–12"),
+             ("Attn-only FT", dict(qkv="train", proj="train"), 9.4, "attention\nprojections\nand biases"),
              ("Full FT", dict(qkv="train", proj="train", mlp="train", norm="train"), 9.4, "all, incl. patch\nembedding")]
     bx = 1.0
     for t, kw, w_, sub in specs:
-        yb = mini_block(ax, bx, 25.9, w_, title=t, **kw)
+        yb = mini_block(ax, bx, 25.9 + U, w_, title=t, **kw)
         txt(ax, bx + w_ / 2, yb - 0.6, sub, fs=4.4, va="top")
         bx += w_ + 5.3
     items = [(FROZEN_FC, FROZEN_EC, "frozen"), (TRAIN_FC, TRAIN_EC, "trained"),
              (ADP_FC, ORANGE, "low-rank adapter: $W_0x + \\frac{\\alpha}{r}BAx$, $\\alpha$ = 32")]
     for k, (fc, ec, t) in enumerate(items):
         xx = 1.0 + [0, 10.0, 21.0][k]
-        box(ax, xx, -3.65, 1.8, 1.3, fc, ec, lw=0.7, r=0.2)
-        txt(ax, xx + 2.4, -3.0, t, fs=4.6, ha="left")
+        box(ax, xx, -3.65 + L, 1.8, 1.3, fc, ec, lw=0.7, r=0.2)
+        txt(ax, xx + 2.4, -3.0 + L, t, fs=4.6, ha="left")
 
     # ---------------- (d) per-task vs joint (code map CLS 4, SEG 5)
     x3 = 64.5
-    head(ax, x3, 29.4, "(d) Two training modes")
-    card(ax, x3, 2.5, 34.5, 25.3)
+    head(ax, x3, 29.4 + U, "(d) Two training modes")
+    card(ax, x3, 2.5 + L, 34.5, 25.3 - (L - U))
     labs = ["#000000", "#999999", "#CC79A7"]   # three labels (not backbone colours)
 
     def model(xm, ym_, outs, w=5.4, h=2.4):
@@ -551,14 +556,14 @@ def fig_pipeline(vol, vpred, seg) -> None:
             oy = ym_ + h / 2 + (o - (len(outs) - 1) / 2) * 1.25
             ax.plot([xm + w + 2.7, xm + w + 3.8], [ym_ + h / 2, oy], color=INK2, lw=0.5, zorder=2)
             ax.add_patch(plt.Circle((xm + w + 4.25, oy), 0.45, color=c, zorder=4))
-    txt(ax, x3 + 1.2, 25.6, "per-task: one model per label", fs=4.9, c=INK, ha="left", bold=True)
+    txt(ax, x3 + 1.2, 25.6 + U, "per-task: one model per label", fs=4.9, c=INK, ha="left", bold=True)
     for q, c in enumerate(labs):
-        model(x3 + 1.5, 21.8 - q * 2.7, [c])
-    txt(ax, x3 + 13.4, 19.4, "K runs; each sees\nits own label only", fs=4.6, ha="left")
-    ax.plot([x3 + 1.0, x3 + 33.5], [15.7, 15.7], color=CARD_EC, lw=0.6)
-    txt(ax, x3 + 1.2, 14.2, "joint: one model per cohort", fs=4.9, c=INK, ha="left", bold=True)
-    model(x3 + 1.5, 7.6, labs)
-    txt(ax, x3 + 13.4, 8.0, "1 run; encoder,\nadapters and head\nshared; K outputs;\nloss over the labels\nknown for a case", fs=4.6, ha="left")
+        model(x3 + 1.5, 21.8 + U - q * 2.7, [c])
+    txt(ax, x3 + 13.4, 19.4 + U, "K runs; each sees\nits own label only", fs=4.6, ha="left")
+    ax.plot([x3 + 1.0, x3 + 33.5], [15.7 + U, 15.7 + U], color=CARD_EC, lw=0.6)
+    txt(ax, x3 + 1.2, 14.2 + U, "joint: one model per cohort", fs=4.9, c=INK, ha="left", bold=True)
+    model(x3 + 1.5, 9.1 + U, labs)
+    txt(ax, x3 + 13.4, 10.3 + U, "1 run; encoder,\nadapters and head\nshared; K outputs", fs=4.6, ha="left")
     # in the caption: "Segmentation: label = structure, cohort = dataset; 15-structure joint models train for 3 × the steps."
     save(fig, "fig_pipeline")
 

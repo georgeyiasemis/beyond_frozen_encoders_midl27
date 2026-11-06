@@ -82,5 +82,40 @@ def setup() -> None:
 def save(fig, out_dir, name: str) -> None:
     from pathlib import Path
     out_dir = Path(out_dir); out_dir.mkdir(parents=True, exist_ok=True)
+    for msg in text_box_overflows(fig):
+        print(f"TEXT-BOX OVERFLOW {name}: {msg}")
     fig.savefig(out_dir / f"{name}.pdf"); fig.savefig(out_dir / f"{name}.png")
     plt.close(fig)
+
+
+def text_box_overflows(fig, tol_pt: float = 0.3) -> list[str]:
+    """Texts drawn inside a box (FancyBboxPatch / Rectangle of the same axes whose extent contains the text anchor)
+    whose rendered extent leaves that box; overflow reported in printed pt (figure scaled to TEXTWIDTH_IN)."""
+    from matplotlib.patches import FancyBboxPatch, Rectangle
+    fig.canvas.draw()
+    r = fig.canvas.get_renderer()
+    px_per_pt = fig.dpi / 72 * fig.get_size_inches()[0] / TEXTWIDTH_IN   # display px per printed pt
+    out = []
+    for ax in fig.axes:
+        def is_box(p):   # a drawn box: visible fill or visible edge (drop-shadows and empty frames excluded)
+            if not isinstance(p, (FancyBboxPatch, Rectangle)) or not p.get_visible():
+                return False
+            fill = p.get_fill() and p.get_facecolor()[3] >= 0.2
+            edge = p.get_edgecolor()[3] > 0 and p.get_linewidth() > 0
+            return fill or edge
+        boxes = [(p, p.get_window_extent(r)) for p in ax.patches if is_box(p)]
+        for t in ax.texts:
+            if not t.get_visible() or not t.get_text().strip():
+                continue
+            x, y = t.get_transform().transform(t.get_position())
+            inside = [(p, bb) for p, bb in boxes if bb.x0 <= x <= bb.x1 and bb.y0 <= y <= bb.y1]
+            if not inside:
+                continue
+            p, bb = min(inside, key=lambda pb: pb[1].width * pb[1].height)   # innermost box
+            tb = t.get_window_extent(r)
+            over = max(bb.x0 - tb.x0, tb.x1 - bb.x1, bb.y0 - tb.y0, tb.y1 - bb.y1) / px_per_pt
+            if over > tol_pt:
+                side = [n for n, v in (("left", bb.x0 - tb.x0), ("right", tb.x1 - bb.x1), ("bottom", bb.y0 - tb.y0),
+                                       ("top", tb.y1 - bb.y1)) if v / px_per_pt > tol_pt]
+                out.append(f"{t.get_text()!r} leaves its box by {over:.1f} pt ({', '.join(side)})")
+    return out

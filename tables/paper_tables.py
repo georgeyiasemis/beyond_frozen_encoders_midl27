@@ -79,7 +79,7 @@ CIS_EXTRA_ROWS = [("cls_attn_lin", "cls", "Attn $-$ Lin"), ("cls_attnft_lin", "c
 # "Cohorts and datasets" (paper/sections/appendix.tex) and report/code_map_classification.md section 1.
 # AMOS train = distinct case ids over the 15 per-label CSVs. Selection / held-out = manifest counts (same source).
 COHORT_SPLITS = {  # key: (name, labels, train, selection, held-out)
-    "amos": ("AMOS (disease labels)", 15, 1463, 178, 178),
+    "amos": ("AMOS (disease labels)", 15, 1107, 178, 178),
     "covid": ("COVID-CTset", 1, 308, 32, 32),
     "luna": ("LUNA25 (nodule malignancy)", 1, 1000, 100, 100),
     "fdg": ("FDG-PET/CT (CT only)", 4, 776, 116, 122),
@@ -249,7 +249,9 @@ def legacy_key(D: dict) -> None:
         if (key, bb) not in ll.index:
             return "-- & "
         r = ll.loc[(key, bb)]
-        return f"\\mci{{${_f3s(r['mean'])}$}}{{${_f3s(r.lo3)}$}}{{${_f3s(r.hi3)}$}} & {int(r.clusters_pos)}/{int(r.clusters_n)}"
+        # dagger: the first method of the row did not train on this backbone (spread.csv; caption of Table 1)
+        dag = "^{\\dagger}" if key.startswith("cls_") and (bb, key.split("_")[1]) in D["dnt"] else ""
+        return f"\\mci{{${_f3s(r['mean'])}{dag}$}}{{${_f3s(r.lo3)}$}}{{${_f3s(r.hi3)}$}} & {int(r.clusters_pos)}/{int(r.clusters_n)}"
 
     body = []
     for task, head in (("cls", "\\textit{Classification} (AUROC)"), ("seg", "\\textit{Segmentation} (Dice)")):
@@ -633,6 +635,34 @@ def legacy_cohorts() -> None:
     _write("tab_cohorts.tex", lines + ["\\bottomrule", "\\end{tabular}"])
 
 
+LABEL_TEX = {"covid_ct:covid": "COVID-19 (COVID-CTset)", "luna25:lung_nodule_malignancy": "nodule malignancy (LUNA25)",
+             "patient_overall": "any fracture (patient)"}
+
+
+def legacy_label_counts() -> None:
+    """tab_label_counts: selection and held-out cases and positives per classification label (metrics_cls.csv; the counts
+    are the same in every run)."""
+    import pandas as pd
+    m = pd.read_csv(OUT_CSV / "metrics_cls.csv")
+    m = m[(m.backbone != "voco") & (m.cohort != "breastdivider") & (m.seed == 42)]
+    g = m.groupby(["cohort", "label", "split"])[["n", "n_pos"]]
+    assert (g.nunique() == 1).all().all(), "case counts differ between runs"
+    c = g.first().unstack("split")
+    rows = []
+    for ds in ("amos_covid_luna", "fdg", "rsna2022", "rsna2023", "rsna2019_ich"):
+        rows.append(f"\\multicolumn{{5}}{{@{{}}l}}{{\\textit{{{DATASET_TEX[ds]}}}}} \\\\")
+        for lab in c.loc[ds].index:
+            raw = lab.split(":")[-1]
+            name = LABEL_TEX.get(lab, raw if raw[:1] == "C" and raw[1:].isdigit() else raw.replace("_", " ").lower())
+            r = c.loc[(ds, lab)]
+            rows.append(f"{_esc(name)} & {int(r[('n', 'val')])} & {int(r[('n_pos', 'val')])} & {int(r[('n', 'test')])} & {int(r[('n_pos', 'test')])} \\\\")
+    _write("tab_label_counts.tex", ["\\begin{tabular}{@{}lrrrr@{}}", "\\toprule",
+                                    " & \\multicolumn{2}{c}{Selection} & \\multicolumn{2}{c}{Held-out} \\\\",
+                                    "\\cmidrule(lr){2-3}\\cmidrule(lr){4-5}",
+                                    "Label & Cases & Positives & Cases & Positives \\\\", "\\midrule", *rows,
+                                    "\\bottomrule", "\\end{tabular}"])
+
+
 # ----------------------------------------------------------------------------------------------- main
 def legacy_spread(D: dict) -> None:
     """tab_spread: median over label-mode pairs of the SD of the held-out probabilities (spread.csv); bold + dagger = the
@@ -673,6 +703,7 @@ def write_all() -> list[str]:
     legacy_app_cls(D)
     legacy_app_seg(D)
     legacy_cohorts()
+    legacy_label_counts()
     legacy_spread(D)
     return list(WRITTEN)
 

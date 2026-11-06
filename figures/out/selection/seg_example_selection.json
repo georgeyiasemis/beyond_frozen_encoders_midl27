@@ -52,5 +52,32 @@
       "spectre/lora/joint": 0.784,
       "spectre/fullft/joint": 0.6694
     }
+  },
+  "lits_joint": {
+    "dataset": "lits",
+    "structure": null,
+    "case": "liver_110",
+    "n_cases": 17,
+    "n_match": 5,
+    "case_dice": {
+      "tapct/lin/joint": 0.7585,
+      "tapct/dec/joint": 0.8321,
+      "tapct/lora/joint": 0.8474,
+      "tapct/fullft/joint": 0.8183,
+      "spectre/lin/joint": 0.7617,
+      "spectre/dec/joint": 0.8253,
+      "spectre/lora/joint": 0.8589,
+      "spectre/fullft/joint": 0.8266
+    },
+    "mean_dice": {
+      "tapct/lin/joint": 0.6559,
+      "tapct/dec/joint": 0.6993,
+      "tapct/lora/joint": 0.7149,
+      "tapct/fullft/joint": 0.7148,
+      "spectre/lin/joint": 0.6964,
+      "spectre/dec/joint": 0.7424,
+      "spectre/lora/joint": 0.7534,
+      "spectre/fullft/joint": 0.7125
+    }
   }
 }

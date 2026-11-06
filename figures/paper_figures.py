@@ -349,11 +349,11 @@ def fig_overview() -> None:
         _, tot[bb], cls_name[bb] = logged_params("cls", bb, "lin")
     print("  logged encoder sizes:", {b: f"{v:,} ({cls_name[b]})" for b, v in tot.items()})
 
-    fig = plt.figure(figsize=(W, 4.75))
-    gs = fig.add_gridspec(2, 3, width_ratios=[1.5, 1.5, 0.86], height_ratios=[1.0, 0.85], wspace=0.42, hspace=0.62,
-                          left=0.005, right=0.985, top=0.915, bottom=0.09)
+    fig = plt.figure(figsize=(W, 4.2))
+    gs = fig.add_gridspec(2, 3, width_ratios=[1.5, 1.5, 0.86], height_ratios=[1.0, 0.85], wspace=0.42, hspace=0.5,
+                          left=0.005, right=0.985, top=0.905, bottom=0.10)
     # (a) design: three stacked cards, equal gaps, identical arrows
-    ax = fig.add_subplot(gs[:, 0]); ax.axis("off"); ax.set_xlim(0, 10); ax.set_ylim(-1.44, 10)
+    ax = fig.add_subplot(gs[:, 0]); ax.axis("off"); ax.set_xlim(0, 10); ax.set_ylim(-1.62, 10)
     # family tints: greys and purples (blue, orange and green are reserved for the backbones)
     FAM = {"frozen": ("#eceef1", "#a4abb4"), "low": ("#efedf5", style.METHOD_COL["lorag"]), "full": ("#f7e8f1", style.METHOD_COL["attnft"])}
     GAP = 0.42                                              # vertical gap between cards (holds one arrow)
@@ -368,14 +368,14 @@ def fig_overview() -> None:
         ax.annotate("", xy=(5, y_upper_bottom - GAP + 0.08), xytext=(5, y_upper_bottom - 0.1),
                     arrowprops=dict(arrowstyle="-|>", color=INK2, lw=0.8, shrinkA=0, shrinkB=0, mutation_scale=7))
 
-    h1, h2, h3 = (2.4, 5.8, 2.3) if NO_VOCO else (2.8, 5.8, 2.3)
+    h1, h2, h3 = (2.05, 6.27, 2.3) if NO_VOCO else (2.45, 6.27, 2.3)
     row1, row3 = 0.42, 0.40                                 # line spacing in the backbone and task cards
     y1 = 9.95 - h1; y2 = y1 - GAP - h2; y3 = y2 - GAP - h3
     cardbox(y1, h1, "3D CT backbones")
-    ax.text(9.55, y1 + h1 - 0.82, "encoder size (all parameters)", ha="right", va="center", fontsize=7.0, color=INK2)
+    ax.text(9.55, y1 + h1 - 0.41, "parameters", ha="right", va="center", fontsize=6.2, color=INK2)
     arch = {"tapct": "ViT-B", "spectre": "ViT-L", "pillar0": "multi-scale", "voco": "Swin"}
     for k, bb in enumerate(["tapct", "spectre", "pillar0"] + VOCO):
-        yy = y1 + h1 - 1.24 - k * row1
+        yy = y1 + h1 - 0.88 - k * row1
         ax.scatter([0.6], [yy], s=13, color=BACKBONE_COL[bb], marker=BACKBONE_MARK[bb], linewidths=0)
         ax.text(1.0, yy, BACKBONE_TEX[bb], ha="left", va="center", fontsize=6.2, color=INK)
         ax.text(4.2, yy, arch[bb], ha="left", va="center", fontsize=6.2, color=INK2)
@@ -388,17 +388,17 @@ def fig_overview() -> None:
     fam_cls = sum(len(c[2]) for c in cols); fam_seg = sum(len(c[3]) for c in cols)
     check("fig_overview", "(a) classification methods listed", str(fam_cls), ref=str(n_cls_m))
     check("fig_overview", "(a) segmentation methods listed", str(fam_seg), ref=str(n_seg_m))
-    step = 0.36
+    step = 0.40
     top2 = y2 + h2
-    ax.text(0.35, top2 - 0.78, f"classification, {n_cls_m} methods", ha="left", va="center", fontsize=7.0, color=INK2)
-    ax.text(0.35, top2 - 4.05, f"segmentation, {n_seg_m} methods", ha="left", va="center", fontsize=7.0, color=INK2)
+    ax.text(0.35, top2 - 0.85, f"classification, {n_cls_m} methods", ha="left", va="center", fontsize=7.0, color=INK2)
+    ax.text(0.35, top2 - 4.37, f"segmentation, {n_seg_m} methods", ha="left", va="center", fontsize=7.0, color=INK2)
     for (fam, head, cls_m, seg_m), x0, wc in zip(cols, [0.2, 2.4, 6.25], [2.0, 3.95, 3.75]):
         fc, ec = FAM[fam]
-        ax.text(x0 + 0.05, top2 - 1.13, head, ha="left", va="center", fontsize=7.0, color=INK, fontweight="bold")
-        for items, ytop in ((cls_m, top2 - 1.50), (seg_m, top2 - 4.42)):
+        ax.text(x0 + 0.05, top2 - 1.22, head, ha="left", va="center", fontsize=7.0, color=INK, fontweight="bold")
+        for items, ytop in ((cls_m, top2 - 1.60), (seg_m, top2 - 4.76)):
             for j, it in enumerate(items):
                 y = ytop - j * step
-                ax.add_patch(FancyBboxPatch((x0, y - 0.15), wc - 0.2, 0.30, boxstyle="round,pad=0,rounding_size=0.1", fc=fc, ec=ec, lw=0.6))
+                ax.add_patch(FancyBboxPatch((x0, y - 0.17), wc - 0.2, 0.34, boxstyle="round,pad=0,rounding_size=0.1", fc=fc, ec=ec, lw=0.6))
                 ax.text(x0 + 0.12, y, MTEX[it], ha="left", va="center", fontsize=6.0, color=INK)
     cardbox(y3, h3, "Two tasks, per label and joint")
     for k, t in enumerate((f"classification: {n_labels} binary labels", f"in {n_cohorts} cohorts, AUROC",
@@ -695,8 +695,8 @@ def fig_gain_vs_probe() -> None:
         return g.dropna(subset=["x"])
     d, dp = gains("lora", MAIN), gains("attn", MAIN)
     dv = gains("lora", ["voco"]) if not NO_VOCO else None
-    fig = plt.figure(figsize=(W, 2.3))
-    ax = fig.add_axes([0.085, 0.17, 0.66, 0.8])
+    fig = plt.figure(figsize=(W, 1.95))
+    ax = fig.add_axes([0.095, 0.2, 0.65, 0.77])
     ax.axhline(0, color=INK2, lw=0.8, zorder=1)
     for bb in MAIN + VOCO:
         g = dv if bb == "voco" else d[d.backbone == bb]
@@ -712,8 +712,11 @@ def fig_gain_vs_probe() -> None:
         xa, xb = max(lo, 0.35), min(hi, 1.0)
         ax.plot([xa, xb], [g["diff"].mean()] * 2, color=INK, lw=2.0, zorder=4, solid_capstyle="butt")
         ax.plot([xa, xb], [gp["diff"].mean()] * 2, color=style.CONTROL_COL, lw=1.4, ls=(0, (1, 1)), zorder=4)
-        ax.text((xa + xb) / 2, 0.40, f"{um(fmt_signed(g['diff'].mean()))}\nn = {len(g)}", ha="center", va="center", fontsize=7.0, color=INK,
-                bbox=dict(facecolor="white", edgecolor="none", pad=0.3), zorder=5, linespacing=1.1)
+        # per bin, top to bottom: LoRA - Lin mean, Attn - Lin mean (control colour), number of pairs
+        for yt, s_, c_ in ((0.55, um(fmt_signed(g["diff"].mean())), INK),
+                           (0.478, um(fmt_signed(gp["diff"].mean())), style.CONTROL_COL), (0.406, f"n = {len(g)}", INK)):
+            ax.text((xa + xb) / 2, yt, s_, ha="center", va="center", fontsize=7.0, color=c_,
+                    bbox=dict(facecolor="white", edgecolor="none", pad=0.3), zorder=5)
         if hi < 1.0:   # bin edge
             ax.axvline(hi, color="#c4c4c4", lw=0.7, zorder=1)
         check("fig_gain_vs_probe", f"LoRA-Lin bin {tag} mean", fmt_signed(g["diff"].mean()), mname("gainbin", tag, "meandiff"))
@@ -721,8 +724,8 @@ def fig_gain_vs_probe() -> None:
         check("fig_gain_vs_probe", f"Attn-Lin bin {tag} mean (line)", fmt_signed(gp["diff"].mean()), mname("gainbinattn", tag, "meandiff"))
         check("fig_gain_vs_probe", f"Attn-Lin bin {tag} n", str(len(gp)), mname("gainbinattn", tag, "n"))
     ax.set_xlabel("linear-probe AUROC on the selection split", fontsize=6.5)
-    ax.set_ylabel("Δ held-out AUROC vs. linear probe", fontsize=6.5)
-    ax.set_xlim(0.35, 1.0); ax.set_ylim(-0.36, 0.46); ax.set_xticks([0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
+    ax.set_ylabel("Δ held-out AUROC\nvs. linear probe", fontsize=6.5, linespacing=1.0)
+    ax.set_xlim(0.35, 1.0); ax.set_ylim(-0.36, 0.60); ax.set_xticks([0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0])
     ax.grid(axis="y", color=GRID, lw=0.6, zorder=0); ax.tick_params(length=2, labelsize=7.0)   # x: bin edges only
     hs = [Line2D([], [], color=BACKBONE_COL[bb], marker=BACKBONE_MARK[bb], ls="", ms=4, label=BACKBONE_TEX[bb])
           for bb in MAIN + VOCO]
@@ -794,8 +797,8 @@ def _joint_rows(task: str):
 
 
 def fig_joint_main() -> None:
-    fig = plt.figure(figsize=(W, 2.1))
-    axes = [fig.add_axes([0.105, 0.19, 0.37, 0.6]), fig.add_axes([0.615, 0.19, 0.37, 0.6])]
+    fig = plt.figure(figsize=(W, 1.85))
+    axes = [fig.add_axes([0.105, 0.215, 0.37, 0.545]), fig.add_axes([0.615, 0.215, 0.37, 0.545])]
     specs = [("cls", CLS_COHORTS, COHORT_SHORT, MAIN + VOCO, "(a) classification: joint − per-task", "held-out AUROC", (-0.18, 0.12)),
              ("seg", SEG_DATASETS, DS_SHORT, ["tapct", "spectre"] + VOCO, "(b) segmentation: joint − per-structure", "held-out Dice", (-0.16, 0.04))]
     ll_ci = load("label_level")
@@ -849,7 +852,7 @@ def fig_seg() -> None:
     meths = ["lin", "lora", "lorag", "dora", "fullft", "dec_then_lora"]
     bbs = ["tapct", "spectre"] + VOCO
     fig = plt.figure(figsize=(W, 2.0))
-    gs = fig.add_gridspec(1, len(bbs), wspace=0.3 if NO_VOCO else 0.42, left=0.115, right=0.93 if NO_VOCO else 0.925, top=0.88, bottom=0.2)
+    gs = fig.add_gridspec(1, len(bbs), wspace=0.36 if NO_VOCO else 0.42, left=0.115, right=0.915 if NO_VOCO else 0.925, top=0.88, bottom=0.2)
     xl = (-0.3, 0.3)   # clipped: pairs beyond it are open triangles at the edge they exceed
     for gi, bb in enumerate(bbs):
         ax = fig.add_subplot(gs[0, gi])
@@ -870,7 +873,7 @@ def fig_seg() -> None:
             else:
                 ax.scatter([x.mean()], [y], s=28, color=BACKBONE_COL[bb], marker=BACKBONE_MARK[bb], edgecolor="white", linewidths=0.9, zorder=3)
             ms = fmt_signed(x.mean())
-            ax.text(1.03, y, um(ms), va="center", ha="left", fontsize=7.0, color=INK2, zorder=4, transform=ax.get_yaxis_transform(), clip_on=False)
+            ax.text(1.07, y, um(ms), va="center", ha="left", fontsize=7.0, color=INK2, zorder=4, transform=ax.get_yaxis_transform(), clip_on=False)   # clear of the edge triangles
             if bb in ("tapct", "spectre"):
                 check("fig_seg", f"({'ab'[gi]}) {bb} {mt} - Dec mean", ms, mname("segdelta", bb, "dec", mt, "meandiff"))
                 check("fig_seg", f"({'ab'[gi]}) {bb} {mt} - Dec n", str(len(x)), mname("segdelta", bb, "dec", mt, "n"))
@@ -1060,13 +1063,14 @@ def fig_methods() -> None:
 # ============================================================================ fig_cls (main text)
 def fig_cls() -> None:
     """Main-text counterpart of fig_seg: per-label change in held-out AUROC relative to the linear probe for the frozen
-    attentive probe, LoRA, attention-only and full fine-tuning; same data and checks as the matching fig_methods panels."""
+    attentive probe, LoRA and attention-only fine-tuning (full fine-tuning, which did not train on SPECTRE, is shown with
+    all methods in fig_methods); same data and checks as the matching fig_methods panels."""
     d = paired_cls("lin")
     bbs = MAIN + VOCO
     d = d[d.backbone.isin(bbs)]
     bad = dnt()
-    meths = ["attn", "lora", "attnft", "fullft"]
-    fig, axes = plt.subplots(1, len(meths), figsize=(W, 2.05), sharex=True, sharey=True)
+    meths = ["attn", "lora", "attnft"]
+    fig, axes = plt.subplots(1, len(meths), figsize=(W, 1.8), sharex=True, sharey=True)
     for pi, (ax, mt) in enumerate(zip(axes, meths)):
         sub = d[d.method == mt]
         for j, ds in enumerate(CLS_COHORTS):
@@ -1099,9 +1103,10 @@ def fig_cls() -> None:
     for ax in axes:
         ax.set_xlabel("\u0394 held-out AUROC", fontsize=6.4)
     hs = [Line2D([], [], color=BACKBONE_COL[bb], marker=BACKBONE_MARK[bb], ls="", ms=4.2, label=BACKBONE_TEX[bb]) for bb in bbs]
-    hs.append(Line2D([], [], color=BACKBONE_COL["spectre"], marker=BACKBONE_MARK["spectre"], mfc="white", ls="", ms=4.2, label="did not train"))
+    if any(mt in meths for _, mt in bad):
+        hs.append(Line2D([], [], color=BACKBONE_COL["spectre"], marker=BACKBONE_MARK["spectre"], mfc="white", ls="", ms=4.2, label="did not train"))
     fig.legend(handles=hs, frameon=False, fontsize=6.3, loc="lower center", ncol=len(hs), bbox_to_anchor=(0.5, -0.02))
-    fig.tight_layout(w_pad=0.6, rect=(0, 0.07, 1, 1))
+    fig.tight_layout(w_pad=0.6, rect=(0, 0.08, 1, 1))
     save(fig, "fig_cls")
 
 

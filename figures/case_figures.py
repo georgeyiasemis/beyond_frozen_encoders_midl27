@@ -294,7 +294,7 @@ def fig_seg_cases(sel: dict, out: Path, ds: str) -> None:
     root = RES / "examples" / "seg_cases"
     names = names_of(run_row("seg", ds, "tapct", "joint", "lora"))
     cols = _struct_cols(ds, names)
-    rows = [(role, bb) for role in ("success", "failure") for bb in SEG_BACKBONES]
+    rows = [(role, bb) for role in sel["seg"][ds]["cases"] for bb in SEG_BACKBONES]
     fig, axes = plt.subplots(len(rows), 5, figsize=(style.TEXTWIDTH_IN, 1.32 * len(rows) + 0.55))
     maxd = 0.0
     shown = set()
@@ -362,6 +362,8 @@ def main() -> None:
     a = ap.parse_args()
     style.setup()
     sel = json.loads((OUT_SEL / "case_selection.json").read_text())
+    # LiTS: one representative case with a reference tumor instead of success / failure (select_seg_examples.py)
+    sel["seg"]["lits"]["cases"] = {"representative": json.loads((OUT_SEL / "seg_example_selection.json").read_text())["lits_joint"]["case"]}
     todo = a.only.split(",")
     names = []
     if "cohorts" in todo:

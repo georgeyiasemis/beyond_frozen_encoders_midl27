@@ -1,0 +1,95 @@
+fig_cases_seg_amos22 success amos_0409 tapct: pixel aspect 1.000
+fig_cases_seg_amos22 success amos_0409 tapct/lin: title 'Lin Dice 0.67'; max |saved prediction - per-case file| 2.8e-17
+fig_cases_seg_amos22 success amos_0409 tapct/dec: title 'Dec Dice 0.74, 2 at 0'; max |saved prediction - per-case file| 4.6e-04; Dice 0: right_adrenal, left_adrenal
+fig_cases_seg_amos22 success amos_0409 tapct/lora: title 'LoRA Dice 0.78, 1 at 0'; max |saved prediction - per-case file| 1.1e-16; Dice 0: left_adrenal
+fig_cases_seg_amos22 success amos_0409 tapct/fullft: title 'Full FT Dice 0.71, 3 at 0'; max |saved prediction - per-case file| 1.1e-16; Dice 0: esophagus, right_adrenal, left_adrenal
+fig_cases_seg_amos22 success amos_0409 spectre: pixel aspect 1.000
+fig_cases_seg_amos22 success amos_0409 spectre/lin: title 'Lin Dice 0.74'; max |saved prediction - per-case file| 8.4e-04
+fig_cases_seg_amos22 success amos_0409 spectre/dec: title 'Dec Dice 0.70, 3 at 0'; max |saved prediction - per-case file| 2.3e-04; Dice 0: esophagus, right_adrenal, left_adrenal
+fig_cases_seg_amos22 success amos_0409 spectre/lora: title 'LoRA Dice 0.84'; max |saved prediction - per-case file| 1.1e-16
+fig_cases_seg_amos22 success amos_0409 spectre/fullft: title 'Full FT Dice 0.70, 3 at 0'; max |saved prediction - per-case file| 2.7e-04; Dice 0: esophagus, right_adrenal, left_adrenal
+fig_cases_seg_amos22 failure amos_0356 tapct: pixel aspect 1.000
+fig_cases_seg_amos22 failure amos_0356 tapct/lin: title 'Lin Dice 0.55, 1 at 0'; max |saved prediction - per-case file| 4.2e-02; Dice 0: gallbladder
+fig_cases_seg_amos22 failure amos_0356 tapct/dec: title 'Dec Dice 0.61, 3 at 0'; max |saved prediction - per-case file| 1.1e-02; Dice 0: gallbladder, right_adrenal, left_adrenal
+fig_cases_seg_amos22 failure amos_0356 tapct/lora: title 'LoRA Dice 0.60, 2 at 0'; max |saved prediction - per-case file| 1.3e-02; Dice 0: gallbladder, left_adrenal
+fig_cases_seg_amos22 failure amos_0356 tapct/fullft: title 'Full FT Dice 0.58, 4 at 0'; max |saved prediction - per-case file| 1.6e-02  (2-decimal title differs from the saved prediction's); Dice 0: gallbladder, esophagus, right_adrenal, left_adrenal
+fig_cases_seg_amos22 failure amos_0356 spectre: pixel aspect 1.000
+fig_cases_seg_amos22 failure amos_0356 spectre/lin: title 'Lin Dice 0.48, 2 at 0'; max |saved prediction - per-case file| 5.7e-03; Dice 0: gallbladder, right_adrenal
+fig_cases_seg_amos22 failure amos_0356 spectre/dec: title 'Dec Dice 0.53, 4 at 0'; max |saved prediction - per-case file| 3.8e-03; Dice 0: gallbladder, esophagus, right_adrenal, left_adrenal
+fig_cases_seg_amos22 failure amos_0356 spectre/lora: title 'LoRA Dice 0.70, 1 at 0'; max |saved prediction - per-case file| 9.2e-03; Dice 0: right_adrenal
+fig_cases_seg_amos22 failure amos_0356 spectre/fullft: title 'Full FT Dice 0.52, 3 at 0'; max |saved prediction - per-case file| 1.2e-02; Dice 0: esophagus, right_adrenal, left_adrenal
+fig_cases_seg_amos22: max |saved prediction - per-case file| over shown Dice = 4.25e-02; structures shown: spleen, left_kidney, liver, stomach, aorta, postcava, pancreas, right_adrenal, left_adrenal, prostate_uterus
+fig_cases_seg_kits23 success case_00109 tapct: pixel aspect 1.000
+fig_cases_seg_kits23 success case_00109 tapct/lin: title 'Lin 0.91, 0.81, –'; max |saved prediction - per-case file| 0.0e+00
+fig_cases_seg_kits23 success case_00109 tapct/dec: title 'Dec 0.92, 0.79, 0.00'; max |saved prediction - per-case file| 1.9e-04; Dice 0: cyst
+fig_cases_seg_kits23 success case_00109 tapct/lora: title 'LoRA 0.95, 0.88, 0.00'; max |saved prediction - per-case file| 0.0e+00; Dice 0: cyst
+fig_cases_seg_kits23 success case_00109 tapct/fullft: title 'Full FT 0.93, 0.81, 0.00'; max |saved prediction - per-case file| 1.3e-05; Dice 0: cyst
+fig_cases_seg_kits23 success case_00109 spectre: pixel aspect 1.000
+fig_cases_seg_kits23 success case_00109 spectre/lin: title 'Lin 0.89, 0.81, –'; max |saved prediction - per-case file| 0.0e+00
+fig_cases_seg_kits23 success case_00109 spectre/dec: title 'Dec 0.93, 0.87, –'; max |saved prediction - per-case file| 5.5e-05
+fig_cases_seg_kits23 success case_00109 spectre/lora: title 'LoRA 0.94, 0.90, –'; max |saved prediction - per-case file| 2.1e-05
+fig_cases_seg_kits23 success case_00109 spectre/fullft: title 'Full FT 0.92, 0.78, 0.00'; max |saved prediction - per-case file| 8.1e-05; Dice 0: cyst
+fig_cases_seg_kits23 failure case_00165 tapct: pixel aspect 1.000
+fig_cases_seg_kits23 failure case_00165 tapct/lin: title 'Lin 0.92, 0.00, 0.00'; max |saved prediction - per-case file| 1.1e-16; Dice 0: tumor, cyst
+fig_cases_seg_kits23 failure case_00165 tapct/dec: title 'Dec 0.89, 0.02, 0.00'; max |saved prediction - per-case file| 3.3e-04; Dice 0: cyst
+fig_cases_seg_kits23 failure case_00165 tapct/lora: title 'LoRA 0.95, 0.04, 0.34'; max |saved prediction - per-case file| 1.1e-16
+fig_cases_seg_kits23 failure case_00165 tapct/fullft: title 'Full FT 0.80, 0.01, 0.00'; max |saved prediction - per-case file| 2.3e-06
+fig_cases_seg_kits23 failure case_00165 spectre: pixel aspect 1.000
+fig_cases_seg_kits23 failure case_00165 spectre/lin: title 'Lin 0.93, 0.12, 0.00'; max |saved prediction - per-case file| 1.1e-16; Dice 0: cyst
+fig_cases_seg_kits23 failure case_00165 spectre/dec: title 'Dec 0.93, 0.05, 0.00'; max |saved prediction - per-case file| 1.2e-04; Dice 0: cyst
+fig_cases_seg_kits23 failure case_00165 spectre/lora: title 'LoRA 0.88, 0.04, 0.00'; max |saved prediction - per-case file| 4.8e-05; Dice 0: cyst
+fig_cases_seg_kits23 failure case_00165 spectre/fullft: title 'Full FT 0.81, 0.01, 0.11'; max |saved prediction - per-case file| 1.2e-04
+fig_cases_seg_kits23: max |saved prediction - per-case file| over shown Dice = 3.26e-04; structures shown: kidney, tumor, cyst
+fig_cases_seg_lits representative liver_110 tapct: pixel aspect 1.000
+fig_cases_seg_lits representative liver_110 tapct/lin: title 'Lin 0.94, 0.58'; max |saved prediction - per-case file| 0.0e+00
+fig_cases_seg_lits representative liver_110 tapct/dec: title 'Dec 0.97, 0.70'; max |saved prediction - per-case file| 6.2e-05
+fig_cases_seg_lits representative liver_110 tapct/lora: title 'LoRA 0.97, 0.72'; max |saved prediction - per-case file| 9.2e-04
+fig_cases_seg_lits representative liver_110 tapct/fullft: title 'Full FT 0.97, 0.67'; max |saved prediction - per-case file| 1.5e-04
+fig_cases_seg_lits representative liver_110 spectre: pixel aspect 1.000
+fig_cases_seg_lits representative liver_110 spectre/lin: title 'Lin 0.94, 0.58'; max |saved prediction - per-case file| 0.0e+00
+fig_cases_seg_lits representative liver_110 spectre/dec: title 'Dec 0.97, 0.68'; max |saved prediction - per-case file| 2.7e-05
+fig_cases_seg_lits representative liver_110 spectre/lora: title 'LoRA 0.97, 0.75'; max |saved prediction - per-case file| 4.2e-04
+fig_cases_seg_lits representative liver_110 spectre/fullft: title 'Full FT 0.97, 0.68'; max |saved prediction - per-case file| 3.4e-04
+fig_cases_seg_lits: max |saved prediction - per-case file| over shown Dice = 9.18e-04; structures shown: liver, tumor
+fig_cases_seg_msd_pancreas success pancreas_149 tapct: pixel aspect 1.000
+fig_cases_seg_msd_pancreas success pancreas_149 tapct/lin: title 'Lin 0.60, 0.00'; max |saved prediction - per-case file| 0.0e+00; Dice 0: tumor
+fig_cases_seg_msd_pancreas success pancreas_149 tapct/dec: title 'Dec 0.82, 0.35'; max |saved prediction - per-case file| 5.6e-17
+fig_cases_seg_msd_pancreas success pancreas_149 tapct/lora: title 'LoRA 0.82, 0.31'; max |saved prediction - per-case file| 2.1e-03  (2-decimal title differs from the saved prediction's)
+fig_cases_seg_msd_pancreas success pancreas_149 tapct/fullft: title 'Full FT 0.80, 0.46'; max |saved prediction - per-case file| 0.0e+00
+fig_cases_seg_msd_pancreas success pancreas_149 spectre: pixel aspect 1.000
+fig_cases_seg_msd_pancreas success pancreas_149 spectre/lin: title 'Lin 0.76, 0.58'; max |saved prediction - per-case file| 0.0e+00
+fig_cases_seg_msd_pancreas success pancreas_149 spectre/dec: title 'Dec 0.81, 0.81'; max |saved prediction - per-case file| 0.0e+00
+fig_cases_seg_msd_pancreas success pancreas_149 spectre/lora: title 'LoRA 0.82, 0.72'; max |saved prediction - per-case file| 0.0e+00
+fig_cases_seg_msd_pancreas success pancreas_149 spectre/fullft: title 'Full FT 0.83, 0.59'; max |saved prediction - per-case file| 1.7e-04
+fig_cases_seg_msd_pancreas failure pancreas_126 tapct: pixel aspect 1.000
+fig_cases_seg_msd_pancreas failure pancreas_126 tapct/lin: title 'Lin 0.15, 0.00'; max |saved prediction - per-case file| 0.0e+00; Dice 0: tumor
+fig_cases_seg_msd_pancreas failure pancreas_126 tapct/dec: title 'Dec 0.19, 0.01'; max |saved prediction - per-case file| 6.8e-17
+fig_cases_seg_msd_pancreas failure pancreas_126 tapct/lora: title 'LoRA 0.28, 0.27'; max |saved prediction - per-case file| 7.4e-03  (2-decimal title differs from the saved prediction's)
+fig_cases_seg_msd_pancreas failure pancreas_126 tapct/fullft: title 'Full FT 0.27, 0.60'; max |saved prediction - per-case file| 5.6e-17
+fig_cases_seg_msd_pancreas failure pancreas_126 spectre: pixel aspect 1.000
+fig_cases_seg_msd_pancreas failure pancreas_126 spectre/lin: title 'Lin 0.21, 0.12'; max |saved prediction - per-case file| 5.6e-17
+fig_cases_seg_msd_pancreas failure pancreas_126 spectre/dec: title 'Dec 0.23, 0.54'; max |saved prediction - per-case file| 0.0e+00
+fig_cases_seg_msd_pancreas failure pancreas_126 spectre/lora: title 'LoRA 0.41, 0.62'; max |saved prediction - per-case file| 0.0e+00
+fig_cases_seg_msd_pancreas failure pancreas_126 spectre/fullft: title 'Full FT 0.31, 0.16'; max |saved prediction - per-case file| 1.3e-03  (2-decimal title differs from the saved prediction's)
+fig_cases_seg_msd_pancreas: max |saved prediction - per-case file| over shown Dice = 7.38e-03; structures shown: pancreas, tumor
+fig_cases_seg_totalseg success s0236 tapct: pixel aspect 0.786
+fig_cases_seg_totalseg success s0236 tapct/lin: title 'Lin Dice 0.82'; max |saved prediction - per-case file| 0.0e+00
+fig_cases_seg_totalseg success s0236 tapct/dec: title 'Dec Dice 0.84, 1 at 0'; max |saved prediction - per-case file| 1.1e-16; Dice 0: glands
+fig_cases_seg_totalseg success s0236 tapct/lora: title 'LoRA Dice 0.84, 1 at 0'; max |saved prediction - per-case file| 1.1e-16; Dice 0: glands
+fig_cases_seg_totalseg success s0236 tapct/fullft: title 'Full FT Dice 0.86, 1 at 0'; max |saved prediction - per-case file| 1.1e-16; Dice 0: glands
+fig_cases_seg_totalseg success s0236 spectre: pixel aspect 1.000
+fig_cases_seg_totalseg success s0236 spectre/lin: title 'Lin Dice 0.78'; max |saved prediction - per-case file| 3.8e-04
+fig_cases_seg_totalseg success s0236 spectre/dec: title 'Dec Dice 0.82, 1 at 0'; max |saved prediction - per-case file| 1.6e-04; Dice 0: glands
+fig_cases_seg_totalseg success s0236 spectre/lora: title 'LoRA Dice 0.81, 1 at 0'; max |saved prediction - per-case file| 1.1e-16; Dice 0: glands
+fig_cases_seg_totalseg success s0236 spectre/fullft: title 'Full FT Dice 0.84, 1 at 0'; max |saved prediction - per-case file| 1.0e-04; Dice 0: glands
+fig_cases_seg_totalseg failure s1728 tapct: pixel aspect 1.000
+fig_cases_seg_totalseg failure s1728 tapct/lin: title 'Lin Dice 0.47, 2 at 0'; max |saved prediction - per-case file| 2.1e-02; Dice 0: lungs_airway, gi_tract
+fig_cases_seg_totalseg failure s1728 tapct/dec: title 'Dec Dice 0.55, 2 at 0'; max |saved prediction - per-case file| 1.2e-02; Dice 0: arteries, glands
+fig_cases_seg_totalseg failure s1728 tapct/lora: title 'LoRA Dice 0.51, 2 at 0'; max |saved prediction - per-case file| 1.1e-02; Dice 0: liver, glands
+fig_cases_seg_totalseg failure s1728 tapct/fullft: title 'Full FT Dice 0.57, 2 at 0'; max |saved prediction - per-case file| 1.6e-03; Dice 0: arteries, glands
+fig_cases_seg_totalseg failure s1728 spectre: pixel aspect 1.000
+fig_cases_seg_totalseg failure s1728 spectre/lin: title 'Lin Dice 0.29, 3 at 0'; max |saved prediction - per-case file| 9.2e-03; Dice 0: lungs_airway, gi_tract, glands
+fig_cases_seg_totalseg failure s1728 spectre/dec: title 'Dec Dice 0.43, 3 at 0'; max |saved prediction - per-case file| 4.2e-04; Dice 0: lungs_airway, gi_tract, glands
+fig_cases_seg_totalseg failure s1728 spectre/lora: title 'LoRA Dice 0.46, 3 at 0'; max |saved prediction - per-case file| 4.3e-04; Dice 0: arteries, liver, glands
+fig_cases_seg_totalseg failure s1728 spectre/fullft: title 'Full FT Dice 0.56, 2 at 0'; max |saved prediction - per-case file| 2.4e-03; Dice 0: arteries, glands
+fig_cases_seg_totalseg: max |saved prediction - per-case file| over shown Dice = 2.08e-02; structures shown: lungs_airway, heart, arteries, veins, gi_tract, brain_spinal_cord, spine, other_bones, muscles
