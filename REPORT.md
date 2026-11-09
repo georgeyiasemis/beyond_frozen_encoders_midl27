@@ -395,3 +395,13 @@ The "possibly" rows of tab:overlap came from two aggregate datasets in SPECTRE's
 - Fixed: repo URL restored (\repourl was a red TODO; contribution 4 link restored); "Fig./Tab." abbreviations and
   \figurename/\tablename override reverted to Figure/Table; guideline 3 skip-connection speculation removed.
   Kept: its cuts, Table 1 layout, main-text float spacing (user to decide). Main text 10.67 pp, build clean.
+
+### 2026-11-09 Style fixes requested by the author
+- References: "Fig./Figs./Tab./Tabs." mid-sentence, "Figure/Table" at sentence start (4 places); caption labels unchanged.
+- Repository link only in contribution 4, as \repourl = github.com/NKI-AI/beyond_frozen_encoders (repo still to move).
+- Caption spacing: \@makecaption override (5pt above, 3pt below, no list topsep); figure trailing vspace -5pt,
+  Table 1 caption gap -1pt. No overlaps (pages 2-11, 22-51 checked).
+- Acronyms defined once, in running text, none in captions: LoRA and AUROC (with ROC) in the abstract; ViT, CLS,
+  MRI, MLP, LN, ABMIL, FT, DoRA/rsLoRA expansions in Section 2; HU in App. A; LR spelled out in Table 2; caption
+  definitions removed from Figs. 1, 2 and Table 1. Dataset and model names left as names.
+- Contribution 1: "(~2k runs)". Main text 10.55 pp, build clean.

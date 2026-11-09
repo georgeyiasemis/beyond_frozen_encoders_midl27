@@ -15,7 +15,7 @@
 \definecolor{modebest}{HTML}{E8F1FA}
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
 % Code repository (one place to change it)
-\newcommand{\repourl}{\url{https://github.com/georgeyiasemis/beyond_frozen_encoders}}
+\newcommand{\repourl}{\url{https://github.com/NKI-AI/beyond_frozen_encoders}}
 % \magn{\numX}: magnitude of a signed number macro (+0.034 or -0.050 -> 0.034, 0.050), for prose where the verb gives the direction
 \def\stripsign#1#2\relax{\ifx+#1#2\else\ifx-#1#2\else#1#2\fi\fi}
 \newcommand{\magn}[1]{\expandafter\stripsign#1\relax}
@@ -48,6 +48,16 @@
 \setlength{\emergencystretch}{2em}
 % tighter float spacing in the main text (figure/table to text and between floats)
 \setlength{\textfloatsep}{10pt plus 2pt minus 4pt}
+% captions: the class adds a fixed 10pt plus list \topsep above and below every multi-line caption; use a 5pt gap
+% to the float, 3pt after the caption (to a table below it) and no list spacing, keeping the class's hanging-label layout
+\makeatletter
+\setlength{\abovecaptionskip}{5pt}\setlength{\belowcaptionskip}{3pt}
+\renewcommand{\@makecaption}[2]{\vskip\abovecaptionskip\setbox\@tempboxa\hbox{#1: #2}%
+  \ifdim\wd\@tempboxa>\hsize
+    \begin{list}{#1:}{\settowidth{\labelwidth}{#1:}\setlength{\leftmargin}{\labelwidth}\addtolength{\leftmargin}{\labelsep}%
+      \setlength{\topsep}{0pt}\setlength{\partopsep}{0pt}\setlength{\parsep}{0pt}\setlength{\itemsep}{0pt}}\item #2\end{list}\par
+  \else\hbox to\hsize{\hfil\box\@tempboxa\hfil}\fi\vskip\belowcaptionskip}
+\makeatother
 \setlength{\floatsep}{8pt plus 2pt minus 2pt}
 \setlength{\intextsep}{8pt plus 2pt minus 2pt}
 \begin{document}
