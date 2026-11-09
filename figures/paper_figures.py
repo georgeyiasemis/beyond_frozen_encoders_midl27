@@ -449,7 +449,8 @@ def fig_overview() -> None:
     rank_panel(ax, rcls, MAIN + VOCO, "rank" if NO_VOCO else "rankall", 11, "c")
     ax.set_title("(c) classification rank", fontsize=7, color=INK, loc="left")
 
-    # (d) segmentation: mean Dice per method over the structure-mode pairs with all seven methods
+    # (d) segmentation: mean Dice per method minus that of Lin, over the structure-mode pairs with all seven methods
+    #     (a difference, as in (b), because absolute Dice is computed on each backbone's own grid)
     smeth = ["lin", "dec", "lorag", "lora", "dora", "dec_then_lora", "fullft"]
     sbbs = ["tapct", "spectre"] + VOCO
     sp = sg[sg.backbone.isin(sbbs)].pivot_table(index=["backbone", "cohort", "label", "mode"], columns="method", values="dice")[smeth].dropna()
@@ -457,7 +458,7 @@ def fig_overview() -> None:
     lci = lci[(lci.task == "seg") & lci["mode"].isin(["pertask", "joint"]) & lci.method.isin(smeth)].pivot_table(
         index=["backbone", "cohort", "label", "mode"], columns="method", values="value")[smeth].dropna()
     ax = fig.add_subplot(gs[1, 1])
-    ylo, yhi = 0.62, 0.75
+    dmax = 0.0
     for k, bb in enumerate(sbbs):
         g = sp.xs(bb, level="backbone")
         nslot = len(g)
@@ -467,17 +468,17 @@ def fig_overview() -> None:
         ys = np.array([g[mt].mean() for mt in smeth])
         for mt, v in zip(smeth, ys):   # cross-file check: label_ci.csv holds the same per-structure held-out values
             check("fig_overview", f"(d) mean Dice {bb} {mt} vs label_ci.csv", f"{v:.3f}", ref=f"{lci.xs(bb, level='backbone')[mt].mean():.3f}")
-        inside = ys >= ylo                     # markers only: the methods are unordered, so no connecting line
-        ax.scatter(xs[inside], ys[inside], s=18, color=BACKBONE_COL[bb], marker=BACKBONE_MARK[bb], edgecolor="white", linewidths=0.7, zorder=3)
-        for x_, v in zip(xs[~inside], ys[~inside]):   # below the axis: marker on the edge with the value printed
-            ax.scatter([x_], [ylo], s=22, color=BACKBONE_COL[bb], marker="v", edgecolor="white", linewidths=0.5, zorder=5, clip_on=False)
-            ax.text(x_ + 0.13, ylo + 0.0015, f"{v:.3f}", ha="left", va="bottom", fontsize=6.0, color=BACKBONE_COL[bb], zorder=5)
-            CHECKS.append(f"INFO    fig_overview         (d) {bb} mean Dice {v:.3f} below the axis ({ylo}); drawn as a triangle on the edge with the value")
+        ys = ys - ys[smeth.index("lin")]
+        dmax = max(dmax, float(ys.max()))
+        # markers only: the methods are unordered, so no connecting line
+        ax.scatter(xs, ys, s=18, color=BACKBONE_COL[bb], marker=BACKBONE_MARK[bb], edgecolor="white", linewidths=0.7, zorder=3)
+        CHECKS.append(f"INFO    fig_overview         (d) {bb} mean Dice minus Lin: " + ", ".join(f"{mt} {v:+.3f}" for mt, v in zip(smeth, ys)))
     ax.axvspan(-0.5, 1.5, color=BAND, zorder=0)
     ax.text(0.5, 0.965, "frozen\nencoder", transform=ax.get_xaxis_transform(), ha="center", va="top", fontsize=6.2, color=INK2, linespacing=1.0)
     ax.set_xticks(range(len(smeth))); ax.set_xticklabels([MTEX[mt] for mt in smeth], fontsize=6.0, rotation=35, ha="right", rotation_mode="anchor")
-    ax.set_xlim(-0.5, len(smeth) - 0.5); ax.set_ylim(ylo, yhi)
-    ax.set_ylabel("mean held-out Dice", fontsize=6.4)
+    ax.axhline(0, color=INK2, lw=0.7, zorder=1)
+    ax.set_xlim(-0.5, len(smeth) - 0.5); ax.set_ylim(-0.012, dmax + 0.03)
+    ax.set_ylabel("\u0394 mean Dice vs. Lin", fontsize=6.4)
     tidy(ax, "y")
     ax.set_title("(d) segmentation: what is trained", fontsize=7, color=INK, loc="left")
 

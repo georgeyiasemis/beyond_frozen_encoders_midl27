@@ -315,7 +315,7 @@ def legacy_cls_paired(D: dict) -> None:
                 rows.append(f"{lead} & {METHOD_TEX[mt]} & {n} & {md:+.3f} & {bt:.0f} & {sb:.0f} & {sw:.0f} \\\\")
             rows.append("\\addlinespace[2pt]")
     _write("tab_cls_paired.tex", ["\\begin{tabular}{lllrrrrr}", "\\toprule",
-                                  "Backbone & Baseline & Method & Labels & Mean $\\Delta$AUROC & Better (\\%) & Sig.\\ better (\\%) & Sig.\\ worse (\\%) \\\\",
+                                  "Backbone & Baseline & Method & Label--mode pairs & Mean $\\Delta$AUROC & Better (\\%) & Sig.\\ better (\\%) & Sig.\\ worse (\\%) \\\\",
                                   "\\midrule", *rows, "\\bottomrule", "\\end{tabular}"])
 
 
@@ -357,8 +357,10 @@ def legacy_headline(D: dict) -> None:
         sig = float(((vs_lin["diff"] > 0) & (vs_lin.p_bh < 0.05)).mean() * 100)
         ft_better = float(((vs_ft["diff"] < 0) & (vs_ft.p_bh < 0.05)).mean() * 100)
         lora_better_ft = float((vs_ft["diff"] > 0).mean() * 100)
+        dag = "$^{\\dagger}$" if (bb, "fullft") in D["dnt"] else ""   # Full FT did not train (as in Table 1)
+        cells[-1] += dag
         rows.append(f"{BACKBONE_TEX[bb]} & {n_cmp} & " + " & ".join(cells)
-                    + f" & {vs_lin['diff'].mean():+.3f} & {better:.0f} & {sig:.0f} & {vs_ft['diff'].mean():+.3f} & {lora_better_ft:.0f} & {ft_better:.0f} \\\\")
+                    + f" & {vs_lin['diff'].mean():+.3f} & {better:.0f} & {sig:.0f} & {vs_ft['diff'].mean():+.3f}{dag} & {lora_better_ft:.0f} & {ft_better:.0f} \\\\")
     _write("tab_headline.tex", [
         "\\begin{tabular}{lrccccrrrrrr}", "\\toprule",
         " & & \\multicolumn{4}{c}{Pooled AUROC} & \\multicolumn{3}{c}{LoRA vs.\\ linear probe} & \\multicolumn{3}{c}{LoRA vs.\\ full fine-tuning} \\\\",
@@ -371,6 +373,9 @@ def legacy_methods(D: dict) -> None:
     rk = D["ranks"]
     rk = rk[rk.task == "cls"].set_index(["backbone", "method"])
     prm = D["params"].set_index(["backbone", "method"])
+    # parameters that receive a gradient, as in Figure 6c: drop the Pillar-0 per-scale blocks that never run
+    ng = pd.read_csv(V2 / "figures" / "data" / "no_grad_cls.csv").set_index(["backbone", "method"])["no_grad_backbone"]
+    prm = prm.assign(trainable=[t - int(ng.get(k, 0)) for k, t in zip(prm.index, prm.trainable)])
     partial = {mt for _, mt in D["dnt"]}  # pooled values over fewer slots: shown, not marked
     full = [mt for mt in METHODS if mt not in partial]
     rows = []

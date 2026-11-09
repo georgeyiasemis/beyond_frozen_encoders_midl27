@@ -1,4 +1,4 @@
-paper_figures.py number check: 161 comparisons, 156 equal, 0 different, 0 without a reference
+paper_figures.py number check: 163 comparisons, 156 equal, 0 different, 0 without a reference
 OK      fig_overview         (b) pooled AUROC pillar0 attn                           figure=    0.886  \pooledpillarZattn=0.886
 OK      fig_overview         (b) pooled AUROC pillar0 attn_then_lorag                figure=    0.900  \pooledpillarZattnthenlorag=0.900
 OK      fig_overview         (b) pooled AUROC pillar0 attnft                         figure=    0.922  \pooledpillarZattnft=0.922
@@ -130,6 +130,7 @@ OK      fig_overview         (d) mean Dice tapct lora vs label_ci.csv           
 OK      fig_overview         (d) mean Dice tapct dora vs label_ci.csv                figure=    0.709  metrics/out=0.709
 OK      fig_overview         (d) mean Dice tapct dec_then_lora vs label_ci.csv       figure=    0.705  metrics/out=0.705
 OK      fig_overview         (d) mean Dice tapct fullft vs label_ci.csv              figure=    0.724  metrics/out=0.724
+INFO    fig_overview         (d) tapct mean Dice minus Lin: lin +0.000, dec +0.082, lorag +0.069, lora +0.082, dora +0.070, dec_then_lora +0.066, fullft +0.085
 OK      fig_overview         (d) slots with all seven methods, spectre               figure=       59  metrics/out=59
 OK      fig_overview         (d) mean Dice spectre lin vs label_ci.csv               figure=    0.666  metrics/out=0.666
 OK      fig_overview         (d) mean Dice spectre dec vs label_ci.csv               figure=    0.713  metrics/out=0.713
@@ -138,6 +139,7 @@ OK      fig_overview         (d) mean Dice spectre lora vs label_ci.csv         
 OK      fig_overview         (d) mean Dice spectre dora vs label_ci.csv              figure=    0.741  metrics/out=0.741
 OK      fig_overview         (d) mean Dice spectre dec_then_lora vs label_ci.csv     figure=    0.717  metrics/out=0.717
 OK      fig_overview         (d) mean Dice spectre fullft vs label_ci.csv            figure=    0.711  metrics/out=0.711
+INFO    fig_overview         (d) spectre mean Dice minus Lin: lin +0.000, dec +0.047, lorag +0.071, lora +0.076, dora +0.076, dec_then_lora +0.051, fullft +0.046
 OK      fig_overview         (e) slots pooled over tapct+spectre                     figure=      118  \numSegrankSlotsN=118
 OK      fig_overview         (e) mean rank tapct fullft                              figure=     2.05  \numSegrankTapctFullftMean=2.05
 OK      fig_overview         (e) mean rank spectre fullft                            figure=     3.84  \numSegrankSpectreFullftMean=3.84
