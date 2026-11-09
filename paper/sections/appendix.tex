@@ -289,6 +289,13 @@ Tables~\ref{tab:seedscls} and~\ref{tab:seedsseg} give the seed repeats of the jo
 
 \begin{table}[H]
 \centering
+\caption{LoRA against frozen probes whose learning rate is selected on the selection data, for the joint classification models. Lin was trained at $10^{-4}$, $10^{-3}$ (default) and $10^{-2}$, and Attn at $3\times10^{-5}$, $10^{-4}$ (default), $3\times10^{-4}$ and $10^{-3}$; per cohort and backbone, the rate with the best mean selection-split AUROC over the cohort's labels was kept. It was the default for Lin in \numProbelrLinKeptN{} of the \numProbelrPairsN{} cohort--backbone pairs and $3\times10^{-5}$ for Attn in \numProbelrAttnLowN{}. Entries are differences in held-out AUROC with the 95\% interval over cohorts, labels and cases (Appendix~\ref{app:stats}); unlike Table~\ref{tab:key}, they cover the joint models only.}
+\label{tab:probelr}
+\adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\footnotesize\input{tables/tab_probe_lr.tex}}
+\end{table}
+
+\begin{table}[H]
+\centering
 \caption{Joint against compute-matched per-structure segmentation. The table gives held-out Dice, averaged over the 15 structures, of per-structure models trained for 1600 steps (matched) or 8000 steps and of the 24\,000-step joint model on the same structures, together with the difference joint $-$ matched and the number of structures in which it is positive.}
 \label{tab:segcm}
 \adjustbox{max width=\textwidth,max totalheight=0.8\textheight}{\footnotesize\input{tables/tab_seg_cm.tex}}
