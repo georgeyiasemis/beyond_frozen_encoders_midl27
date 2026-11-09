@@ -386,3 +386,12 @@ The "possibly" rows of tab:overlap came from two aggregate datasets in SPECTRE's
   Discussion headroom clause, rank-16 QKV scope, guideline 2 and 4 wording; captions of Tables 4, 5, 6, 13 and
   Figures 6, 15, 23. Not done: guidelines 1/3 "at our budget" (lead-in already scopes them), F2 equivalence test,
   D2 (source of defaults) and D3 (SPECTRE on ICH) need the author. Build clean; main text 11.37 pp (was 10.89).
+
+### 2026-11-09 Audit of the accidental parallel session (commit 7526c8a + uncommitted edits)
+- Checked: Table 1 relayout keeps all 108 numbers; MoLRE wording (pooled embedding of fully fine-tuned Pillar-0)
+  confirmed against arXiv 2603.00675; Figure 1d caption pair count correct; discussion moved to App. "Extended
+  discussion" with every sentence kept. Figures: all 24 regenerated from data in scratch, pixel-identical to
+  paper/figures; paper_figures.py 533/533 number checks equal; macro files identical.
+- Fixed: repo URL restored (\repourl was a red TODO; contribution 4 link restored); "Fig./Tab." abbreviations and
+  \figurename/\tablename override reverted to Figure/Table; guideline 3 skip-connection speculation removed.
+  Kept: its cuts, Table 1 layout, main-text float spacing (user to decide). Main text 10.67 pp, build clean.

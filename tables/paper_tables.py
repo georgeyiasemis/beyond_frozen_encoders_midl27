@@ -243,7 +243,12 @@ def legacy_seg_ladder(D: dict) -> None:
 
 # ----------------------------------------------------------------------------------------------- tab_key, tab_cis
 def legacy_key(D: dict) -> None:
+    """Table 1: classification (left block) and segmentation (right block) side by side, one column pair per backbone.
+
+    Each estimate is a stacked \\mci cell (mean over its interval); the joint-minus-per-task rows of both blocks share
+    the last row, below a rule."""
     ll = D["label_level"].set_index(["key", "backbone"])
+    short = {"seg_lora_dec_pertask": "\\quad per-structure", "seg_lora_dec_joint": "\\quad joint"}
 
     def cells(key: str, bb: str) -> str:
         if (key, bb) not in ll.index:
@@ -253,20 +258,38 @@ def legacy_key(D: dict) -> None:
         dag = "^{\\dagger}" if key.startswith("cls_") and (bb, key.split("_")[1]) in D["dnt"] else ""
         return f"\\mci{{${_f3s(r['mean'])}{dag}$}}{{${_f3s(r.lo3)}$}}{{${_f3s(r.hi3)}$}} & {int(r.clusters_pos)}/{int(r.clusters_n)}"
 
+    blocks = {}
+    for task in ("cls", "seg"):
+        bbs = [bb for bb in PER_BB if any((k, bb) in ll.index for k, t, _ in KEY_ROWS if t == task)]
+        rows = [(key, short.get(key, label)) for key, t, label in KEY_ROWS if t == task]
+        blocks[task] = (bbs, [r for r in rows if not r[1].startswith("Joint")], [r for r in rows if r[1].startswith("Joint")])
+
+    def line(task: str, row) -> str:
+        bbs = blocks[task][0]
+        if row is None:
+            return " & " + " & ".join(" & " for _ in bbs)
+        key, label = row
+        return f"{label} & " + " & ".join(cells(key, bb) for bb in bbs)
+
+    (cb, cm, cj), (sb, sm, sj) = blocks["cls"], blocks["seg"]
+    nc, ns = 1 + 2 * len(cb), 1 + 2 * len(sb)
     body = []
-    for task, head in (("cls", "\\textit{Classification} (AUROC)"), ("seg", "\\textit{Segmentation} (Dice)")):
-        body.append(f"\\multicolumn{{{1 + 2 * len(PER_BB)}}}{{@{{}}l}}{{{head}}} \\\\")
-        for key, t, label in KEY_ROWS:
-            if t == task:
-                if label.startswith("Joint"):  # joint minus per-task is a different question: set it apart
-                    body.append(f"\\cmidrule(lr){{1-{1 + 2 * len(PER_BB)}}}")
-                body.append(f"{label} & " + " & ".join(cells(key, bb) for bb in PER_BB) + " \\\\")
-        body.append("\\addlinespace[3pt]")
-    head = " & " + " & ".join(f"\\multicolumn{{2}}{{c}}{{{BACKBONE_TEX[bb]}}}" for bb in PER_BB) + " \\\\"
-    rule = "".join(f"\\cmidrule({'l' if i == len(PER_BB) - 1 else 'lr'}){{{2 + 2 * i}-{3 + 2 * i}}}" for i in range(len(PER_BB)))
-    sub = "Comparison" + " & Mean [95\\% interval] & $>0$" * len(PER_BB) + " \\\\"
-    _write("tab_key.tex", ["\\setlength{\\tabcolsep}{4pt}", "\\begin{tabular}{@{}l" + "cc" * len(PER_BB) + "@{}}", "\\toprule", head, rule,
-                           sub, "\\midrule", *body[:-1], "\\bottomrule", "\\end{tabular}"])
+    for i in range(max(len(cm), len(sm))):
+        body.append(line("cls", cm[i] if i < len(cm) else None) + " & " + line("seg", sm[i] if i < len(sm) else None) + " \\\\")
+    body.append(f"\\cmidrule(r){{1-{nc}}}\\cmidrule(l){{{nc + 1}-{nc + ns}}}")
+    for i in range(max(len(cj), len(sj))):
+        body.append(line("cls", cj[i] if i < len(cj) else None) + " & " + line("seg", sj[i] if i < len(sj) else None) + " \\\\")
+    top = (f"\\multicolumn{{{nc}}}{{c}}{{\\textit{{Classification}} (AUROC)}} & "
+           f"\\multicolumn{{{ns}}}{{c}}{{\\textit{{Segmentation}} (Dice)}} \\\\")
+    toprule = f"\\cmidrule(r){{1-{nc}}}\\cmidrule(l){{{nc + 1}-{nc + ns}}}"
+    head = (" & " + " & ".join(f"\\multicolumn{{2}}{{c}}{{{BACKBONE_TEX[bb]}}}" for bb in cb) + " & & "
+            + " & ".join(f"\\multicolumn{{2}}{{c}}{{{BACKBONE_TEX[bb]}}}" for bb in sb) + " \\\\")
+    rule = "".join(f"\\cmidrule(lr){{{2 + 2 * i}-{3 + 2 * i}}}" for i in range(len(cb))) + \
+        "".join(f"\\cmidrule(lr){{{nc + 2 + 2 * i}-{nc + 3 + 2 * i}}}" for i in range(len(sb)))
+    sub = "Comparison" + " & Mean & $>0$" * len(cb) + " & Comparison" + " & Mean & $>0$" * len(sb) + " \\\\"
+    spec = "@{}l" + "cc" * len(cb) + "@{\\hspace{10pt}}l" + "cc" * len(sb) + "@{}"
+    _write("tab_key.tex", ["\\setlength{\\tabcolsep}{3.5pt}", "\\begin{tabular}{" + spec + "}", "\\toprule", top, toprule, head, rule,
+                           sub, "\\midrule", *body, "\\bottomrule", "\\end{tabular}"])
 
 
 def legacy_cis(D: dict) -> None:

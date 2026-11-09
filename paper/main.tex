@@ -14,6 +14,8 @@
 \sisetup{detect-all}
 \definecolor{modebest}{HTML}{E8F1FA}
 \newcommand{\todo}[1]{\textcolor{red}{[TODO: #1]}}
+% Code repository (one place to change it)
+\newcommand{\repourl}{\url{https://github.com/georgeyiasemis/beyond_frozen_encoders}}
 % \magn{\numX}: magnitude of a signed number macro (+0.034 or -0.050 -> 0.034, 0.050), for prose where the verb gives the direction
 \def\stripsign#1#2\relax{\ifx+#1#2\else\ifx-#1#2\else#1#2\fi\fi}
 \newcommand{\magn}[1]{\expandafter\stripsign#1\relax}
@@ -60,6 +62,8 @@
 Foundation models, computed tomography, parameter-efficient fine-tuning, low-rank adaptation, multi-task learning, segmentation
 \end{keywords}
 
+% main text only: tighter float spacing (restored before the references and appendix)
+\setlength{\textfloatsep}{6pt plus 2pt minus 2pt}\setlength{\floatsep}{6pt plus 2pt minus 2pt}\setlength{\intextsep}{6pt plus 2pt minus 2pt}
 \section{Introduction}
 \label{sec:intro}
 \input{sections/intro.tex}
@@ -81,6 +85,7 @@ Foundation models, computed tomography, parameter-efficient fine-tuning, low-ran
 \input{sections/discussion.tex}
 
 \clearpage
+\setlength{\textfloatsep}{10pt plus 2pt minus 4pt}\setlength{\floatsep}{8pt plus 2pt minus 2pt}\setlength{\intextsep}{8pt plus 2pt minus 2pt}
 \bibliography{refs}
 
 \appendix
