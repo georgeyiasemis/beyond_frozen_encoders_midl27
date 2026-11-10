@@ -8,7 +8,7 @@ paper figures); the font is LM Roman 12 (fonts/lmroman12-*.otf; install it to se
 
 Canvas 700 px wide (placed at the 6.0 in text width: 12 px = 7.4 pt printed).
 
-    python drawio_build.py   -> drawio/<name>.drawio and drawio/<name>_preview.png (a redraw of the cells, for checking)
+    python drawio_build.py   -> ../paper/figures/drawio/<name>.drawio and <name>_preview.png (a redraw of the cells, for checking)
 """
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ import diagrams as D  # noqa: E402  (registers the LM Roman fonts through style.
 import matplotlib.pyplot as plt  # noqa: E402
 
 HERE = Path(__file__).resolve().parent
-OUT = HERE / "drawio"
+OUT = HERE.parent / "paper" / "figures" / "drawio"   # next to the paper figures
 W = 700
 FONT = "LM Roman 12"
 FS, FS_T = 12, 14                       # body text, panel titles (px)

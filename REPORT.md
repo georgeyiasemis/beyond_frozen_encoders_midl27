@@ -415,7 +415,7 @@ The "possibly" rows of tab:overlap came from two aggregate datasets in SPECTRE's
   (its panels b-e use blue/vermillion/green for the backbones).
 - Figure 2: (a) no token strip (patches go straight into ViT-B; only the W CLS tokens are drawn), no "z" outputs
   (caption: "one logit per label"); (b) one route per tap (blocks 3, 6, 9, 12) to its own 1x1x1 conv, none crossing.
-- draw.io versions (figures/drawio/, drawio_export.py) take the same colours from diagrams.py.
+- draw.io versions (now paper/figures/drawio/, drawio_export.py) take the same colours from diagrams.py.
 - Figs 6c and 7b: no asterisks on the parameter counts; the captions already state the excluded never-run Pillar-0
   blocks and SPECTRE combiner.
 - Removed 13 unused PDFs from paper/figures (fig_convergence, fig_methods_cls(_rank), fig_methods_seg(_rank),
