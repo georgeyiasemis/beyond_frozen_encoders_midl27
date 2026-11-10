@@ -82,8 +82,8 @@ class Doc:
                            "", ("circle", cx, cy, r, fill, stroke, plus, lw))
 
     def cube(self, x, y, w, h, depth, fill, stroke) -> str:
-        """Front face w x h at (x, y + depth*0.75), depth drawn up and to the right; (x, y) is the top-left of the bounding box."""
-        return self.vertex(x, y, w + depth, h + 0.75 * depth,
+        """Front face w x h at (x, y + depth), depth drawn up and to the right at 45° (as draw.io draws its cube); (x, y) is the top-left of the bounding box."""
+        return self.vertex(x, y, w + depth, h + depth,
                            f"shape=cube;whiteSpace=wrap;html=1;flipH=1;size={depth:g};darkOpacity=0.06;darkOpacity2=0.14;"
                            f"fillColor={fill};strokeColor={stroke};strokeWidth=1;",
                            "", ("cube", x, y, w, h, depth, fill, stroke))
@@ -378,7 +378,7 @@ def fig_pipeline(vol, vpred, seg) -> Doc:
         w_ = round(6 + 10 * np.log2(ch / 8) / 4)
         h_ = round(17 + 46 * np.log2(hw_ / 28) / 3)
         d_ = round(7 + dd * 1.4)
-        doc.cube(x, yc - (h_ + 0.75 * d_) / 2, w_, h_, d_, *TRAIN)
+        doc.cube(x, yc - (h_ + d_) / 2, w_, h_, d_, *TRAIN)
         lab(x + (w_ + d_) / 2, yc + 40, 60, f"{c_}<br>{g_}")
         x += w_ + d_
         if k < 3:
@@ -483,8 +483,8 @@ def fig_arms(vol, head_ct, cls) -> Doc:
     gx = x
     for k, sz in enumerate([40, 26, 14]):               # schematic sizes: scale k = stem grid max-pooled by 4^k per axis
         d_ = round(sz * 0.5)
-        doc.cube(gx, yc - (sz + 0.75 * d_) / 2, sz, sz, d_, D.PATCH_C if k == 0 else D.PATCH2_C, NAVY)
-        doc.text(gx, yc + (sz + 0.75 * d_) / 2 + 2, sz, 14, ["32³", "8³", "2³"][k], valign="middle")
+        doc.cube(gx, yc - (sz + d_) / 2, sz, sz, d_, D.PATCH_C if k == 0 else D.PATCH2_C, NAVY)
+        doc.text(gx, yc + (sz + d_) / 2 + 2, sz, 14, ["32³", "8³", "2³"][k], valign="middle")
         gx += sz + d_ + 8
     lab((x + gx - 8) / 2, yc + 44, 130, "tokens at 3 scales<br>(max-pool by 4<br>per axis), attention<br>within and across")
     x = gx - 8
@@ -548,7 +548,7 @@ def fig_arms_seg(seg) -> Doc:
         cx = x0 + k * slot + slot / 2
         bx = cx - (w_ + d_) / 2
         fill, stroke = (D.PATCH_C, NAVY) if k == 0 else TRAIN
-        doc.cube(bx, yc - (h_ + 0.75 * d_) / 2, w_, h_, d_, fill, stroke)
+        doc.cube(bx, yc - (h_ + d_) / 2, w_, h_, d_, fill, stroke)
         if prev_r is not None:
             doc.arrow(prev_r + 6, yc, bx - 6)
         prev_r = bx + w_ + d_
@@ -611,7 +611,7 @@ def preview(doc: Doc, path: Path) -> list[str]:
                 ax.plot([cx - r, cx + r], [cy, cy], color=ec, lw=lw * pt, zorder=5); ax.plot([cx, cx], [cy - r, cy + r], color=ec, lw=lw * pt, zorder=5)
         elif k == "cube":
             _, x, y, w, h, d, fc, ec = p
-            dx, dy = d, 0.75 * d
+            dx, dy = d, d
             ax.add_patch(Polygon([(x, y + dy), (x + dx, y), (x + w + dx, y), (x + w, y + dy)], fc=D._mix(fc, ec, 0.15), ec=ec, lw=pt, zorder=3))
             ax.add_patch(Polygon([(x + w, y + dy), (x + w + dx, y), (x + w + dx, y + h), (x + w, y + h + dy)], fc=D._mix(fc, ec, 0.35), ec=ec, lw=pt, zorder=3))
             ax.add_patch(Rectangle((x, y + dy), w, h, fc=fc, ec=ec, lw=pt, zorder=3))
