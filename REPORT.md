@@ -422,3 +422,6 @@ The "possibly" rows of tab:overlap came from two aggregate datasets in SPECTRE's
   fig_modes, fig_perlabel_cls, fig_perstructure_seg, fig_pipeline_cls/_seg, fig_revision, fig_seeds, fig_voco): none is
   included by the paper, several showed VoCo, and their scripts (results_figures.py, method_figures.py) no longer run
   without the quarantined VoCo data. Number tables unchanged; 533/533 figure number checks equal; main text 10.59 pp.
+- draw.io files rebuilt natively (figures/drawio_build.py replaces drawio_export.py): labels inside their shapes,
+  arrows attached to the shapes they connect (heads, tap routes, LoRA branch, output dots), one image per slice stack,
+  whole-pixel geometry, LM Roman 12, colours and every number from diagrams.py. 700 px wide (12 px = 7.4 pt at 6 in).
