@@ -398,7 +398,7 @@ def fig_overview() -> None:
         for items, ytop in ((cls_m, top2 - 1.60), (seg_m, top2 - 4.76)):
             for j, it in enumerate(items):
                 y = ytop - j * step
-                ax.add_patch(FancyBboxPatch((x0, y - 0.17), wc - 0.2, 0.34, boxstyle="round,pad=0,rounding_size=0.1", fc=fc, ec=ec, lw=0.6))
+                ax.add_patch(FancyBboxPatch((x0, y - 0.18), wc - 0.2, 0.36, boxstyle="round,pad=0,rounding_size=0.1", fc=fc, ec=ec, lw=0.6))
                 ax.text(x0 + 0.12, y, MTEX[it], ha="left", va="center", fontsize=6.0, color=INK)
     cardbox(y3, h3, "Two tasks, per label and joint")
     for k, t in enumerate((f"classification: {n_labels} binary labels", f"in {n_cohorts} cohorts, AUROC",

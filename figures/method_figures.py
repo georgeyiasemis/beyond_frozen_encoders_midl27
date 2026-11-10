@@ -36,7 +36,7 @@ def canvas(w: float, h: float):
 
 
 def wrap(text: str, width_in: float, fs: float) -> str:
-    cpi = 72.0 / (0.58 * fs)                      # DejaVu Sans average glyph width ~ 0.58 em
+    cpi = 72.0 / (0.58 * fs)                      # average glyph width ~ 0.58 em (DejaVu Sans; conservative for LM Roman)
     n = max(6, int(width_in * cpi))
     out = []
     for para in text.split("\n"):

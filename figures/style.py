@@ -1,7 +1,8 @@
 """Shared figure style for the paper (import this in every figure script).
 
 Colour-blind-safe Okabe-Ito palette; one colour and one marker per backbone, one colour per method family, one
-colour per method where methods are distinguished; DejaVu Sans, 7 pt base; figures sized for the MIDL text width.
+colour per method where methods are distinguished; LM Roman 12 (the paper's font, fonts/), 7 pt base; figures sized
+for the MIDL text width.
 """
 from __future__ import annotations
 
@@ -18,6 +19,47 @@ NO_VOCO = _os.environ.get("WITH_VOCO", "") in ("", "0")
 _V2 = _Path(__file__).resolve().parents[1]
 PAPER_DIR = _Path(_os.environ.get("PAPER_DIR") or (_V2 / "paper"))
 FIG_OUT = _Path(_os.environ.get("FIG_OUT") or (_Path(__file__).resolve().parent / "out"))
+
+# LM Roman 12 (GUST Font License) ships in fonts/, so that every machine draws the same text. Glyphs it lacks (a few
+# Greek letters and relations in plain text) fall back to DejaVu Serif; math ($...$) uses Computer Modern.
+# Matplotlib embeds CFF-outline (.otf) fonts in a form that PDF checkers flag, so each .otf is converted once to
+# TrueType outlines in fonts/_ttf/ (not in git; the original files stay unchanged) and the converted files are used.
+from matplotlib import font_manager as _fm
+
+
+def _otf_to_ttf(src: _Path, dst: _Path) -> None:
+    from fontTools.pens.cu2quPen import Cu2QuPen
+    from fontTools.pens.ttGlyphPen import TTGlyphPen
+    from fontTools.ttLib import TTFont, newTable
+    f = TTFont(str(src))
+    order, gs = f.getGlyphOrder(), f.getGlyphSet()
+    glyf = newTable("glyf"); glyf.glyphOrder, glyf.glyphs = order, {}
+    for g in order:
+        pen = TTGlyphPen(gs)
+        gs[g].draw(Cu2QuPen(pen, 1.0, reverse_direction=True))
+        glyf[g] = pen.glyph()
+    f["loca"], f["glyf"] = newTable("loca"), glyf
+    maxp = newTable("maxp"); maxp.tableVersion = 0x00010000
+    for k in ("maxZones", "maxTwilightPoints", "maxStorage", "maxFunctionDefs", "maxInstructionDefs", "maxStackElements",
+              "maxSizeOfInstructions", "maxComponentElements", "maxComponentDepth"):
+        setattr(maxp, k, 1 if k == "maxZones" else 0)
+    f["maxp"] = maxp
+    for t in ("CFF ", "VORG"):
+        if t in f:
+            del f[t]
+    post = f["post"]; post.formatType, post.extraNames, post.mapping, post.glyphOrder = 2.0, [], {}, order
+    f.sfntVersion = "\x00\x01\x00\x00"
+    dst.parent.mkdir(exist_ok=True)
+    f.save(str(dst))
+
+
+for _f in sorted((_Path(__file__).resolve().parent / "fonts").glob("lmroman12-*.otf")):
+    _t = _f.parent / "_ttf" / (_f.stem + ".ttf")
+    if not _t.exists() or _t.stat().st_mtime < _f.stat().st_mtime:
+        _otf_to_ttf(_f, _t)
+    _fm.fontManager.addfont(str(_t))
+FONT = ["Latin Modern Roman", "DejaVu Serif"]
+FONT_RC = {"font.family": FONT, "mathtext.fontset": "cm", "axes.unicode_minus": True}
 
 TEXTWIDTH_IN = 6.0   # MIDL (jmlr) text width is ~ 6.0 in; figures are saved at this width or at half of it
 HALFWIDTH_IN = 2.95
@@ -71,7 +113,7 @@ COHORT_MARK = {"amos_covid_luna": "o", "fdg": "s", "rsna2019_ich": "^", "rsna202
 
 def setup() -> None:
     plt.rcParams.update({
-        "font.family": "DejaVu Sans", "font.size": 7, "axes.titlesize": 7.5, "axes.labelsize": 7, "xtick.labelsize": 6.5,
+        **FONT_RC, "font.size": 7, "axes.titlesize": 7.5, "axes.labelsize": 7, "xtick.labelsize": 6.5,
         "ytick.labelsize": 6.5, "legend.fontsize": 6.5, "axes.edgecolor": INK2, "axes.linewidth": 0.6, "xtick.major.width": 0.6,
         "ytick.major.width": 0.6, "axes.spines.top": False, "axes.spines.right": False, "legend.frameon": False,
         "figure.dpi": 150, "savefig.dpi": 300, "pdf.fonttype": 42, "savefig.bbox": "tight", "savefig.pad_inches": 0.02,

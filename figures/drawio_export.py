@@ -58,13 +58,14 @@ D.save = _save
 
 
 # ------------------------------------------------------------------ mathtext -> HTML
-GREEK = {r"\alpha": "α", r"\beta": "β", r"\sqrt": "√"}
+GREEK = {r"\alpha": "α", r"\beta": "β", r"\sqrt ": "√", r"\sqrt": "√"}
 
 
 def _math(s: str) -> str:
     """Small mathtext subset used in the diagrams: sub/superscripts, \\mathrm, \\frac, Greek letters."""
     s = re.sub(r"\\frac\{([^}]*)\}\{([^}]*)\}", r"(\1/\2)", s)
     s = re.sub(r"\\mathrm\{([^}]*)\}", r"\\up{\1}", s)
+    s = re.sub(r"\\sqrt\{([^}]*)\}", r"\\sqrt \1", s)
     for k, v in GREEK.items():
         s = s.replace(k, v)
     out, i = [], 0
@@ -130,6 +131,11 @@ class Doc:
                 ).format(n=self.name, w=int(self.w + 1), h=int(self.h + 1), b=body)
 
 
+# Colours come from diagrams.py (the paper figures); only the font and a minimum outline width are set here.
+FONT = "LM Roman 12"     # as in the paper figures (fonts/lmroman12-*.otf; install them to see it in draw.io)
+MIN_LW = 1.0             # draw.io px; thinner outlines look faint on screen
+
+
 def col(c):
     return "none" if c is None or (len(c) == 4 and c[3] == 0) else to_hex(c, keep_alpha=False)
 
@@ -151,11 +157,13 @@ def convert(name: str, fig) -> Doc:
     for p in main.patches:
         z = p.get_zorder()
         fc, ec, lw = col(p.get_facecolor()), col(p.get_edgecolor()), p.get_linewidth() * DPI / 72
+        if ec not in ("none", "#ffffff"):
+            lw = max(lw, MIN_LW)
         if isinstance(p, FancyBboxPatch):
             x, y, w, h = rect_px(p.get_x(), p.get_y(), p.get_width(), p.get_height())
-            r = p.get_boxstyle().rounding_size or 0
-            rpx = abs(T.transform((r, 0))[0] - T.transform((0, 0))[0])
-            style = (f"rounded=1;absoluteArcSize=1;arcSize={2 * rpx:.1f};fillColor={fc};strokeColor={ec};strokeWidth={lw:.2f};"
+            r = getattr(p.get_boxstyle(), "rounding_size", 0) or 0
+            rpx = 0.0 * abs(T.transform((r, 0))[0] - T.transform((0, 0))[0])   # square corners
+            style = (f"rounded=0;fillColor={fc};strokeColor={ec};strokeWidth={lw:.2f};"
                      + ("dashed=1;" if p.get_linestyle() not in ("-", "solid") else ""))
             doc.vertex(z, x, y, w, h, style)
             doc.preview.append(("rect", x, y, w, h, fc, ec, lw, rpx))
@@ -213,10 +221,10 @@ def convert(name: str, fig) -> Doc:
         pad = 2.0
         x, y, w, h = bb.x0 - pad, H - bb.y1 - pad, bb.width + 2 * pad, bb.height + 2 * pad
         style = (f"text;html=1;whiteSpace=nowrap;align={ {'left': 'left', 'right': 'right'}.get(ha, 'center') };"
-                 f"verticalAlign=middle;spacing=0;fontFamily=DejaVu Sans;fontSize={fs:.1f};fontColor={c};"
+                 f"verticalAlign=middle;spacing=0;fontFamily={FONT};fontSize={fs:.1f};fontColor={c};"
                  f"fontStyle={(1 if bold else 0) + (2 if italic else 0)};")
         doc.vertex(t.get_zorder() + 10, x, y, w, h, style, to_html(t.get_text()))
-        doc.preview.append(("text", x, y, w, h, t.get_text(), fs, c, ha, bold))
+        doc.preview.append(("text", x, y, w, h, t.get_text(), fs, c, ha, bold, italic))
     # CT thumbnails: each inset axes rendered on its own and embedded as a PNG (drawn above the main axes, as in matplotlib)
     others = fig.axes[1:]
     vis = {a: a.get_visible() for a in fig.axes}
@@ -278,10 +286,11 @@ def preview(doc: Doc, path: Path) -> None:
             _, x, y, w, h, img = p
             ax.imshow(img, extent=(x, x + w, y + h, y), zorder=5, aspect="auto")
         elif k == "text":
-            _, x, y, w, h, s, fs, c, ha, bold = p
+            _, x, y, w, h, s, fs, c, ha, bold, italic = p
             xx = {"left": x, "right": x + w}.get(ha, x + w / 2)
             ax.text(xx, y + h / 2, s, fontsize=fs * 72 / DPI, color=c, ha=ha, va="center", fontweight="bold" if bold else "normal",
-                    linespacing=1.15, zorder=10)
+                    style="italic" if italic else "normal",
+                    linespacing=1.15, zorder=10, family=D.style.FONT)
     ax.set_xlim(0, doc.w); ax.set_ylim(doc.h, 0)
     fig.savefig(path, dpi=130)
     plt.close(fig)

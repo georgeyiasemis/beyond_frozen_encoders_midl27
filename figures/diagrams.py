@@ -50,22 +50,26 @@ PAPER_FIG = style.PAPER_DIR / "figures"
 PAPER_TAB = style.PAPER_DIR / "tables"
 NO_VOCO = style.NO_VOCO                                    # fig_arms / fig_arms_seg without VoCo unless WITH_VOCO=1
 
-# ------------------------------------------------------------------ palette. Blue, orange and green are reserved for the backbones
-# in every figure (style.BACKBONE_COL), so the diagrams use the method family colours of style.METHOD_COL: trained in full =
-# pink (Attn-only FT / Full FT), low-rank adapter = purple (LoRA). BLUE / ORANGE keep their names as the trained / adapter edges.
-BLUE, ORANGE = "#B0558F", "#5E3C99"
-INK, INK2, MUTED = "#0b0b0b", "#52514e", "#7a7976"
-FROZEN_FC, FROZEN_EC = "#eceef1", "#a4abb4"               # frozen pretrained weights
-TRAIN_FC, TRAIN_EC = "#f7e8f1", BLUE                      # trained in full
-ADP_FC = "#e8e3f2"                                        # low-rank adapter (edge ORANGE)
-DATA_EC = "#b9b4a8"
-CARD_FC, CARD_EC = "#ffffff", "#d9d7d2"
-CLS_C = "#7b5ea7"      # class token
-REG_C = "#c9c6bf"      # register tokens
-PATCH_C = "#d3d3df"    # patch tokens
-PATCH2_C = "#a9a9bf"   # pooled / combined tokens
+# ------------------------------------------------------------------ palette. No greys: frozen weights are cold blue,
+# weights trained in full warm orange, low-rank adapters green; tokens are shades of the frozen blue; all text is black
+# (secondary labels in italic). BLUE / ORANGE keep their names as the trained / adapter edges.
+NAVY = "#2f5f8a"
+BLUE, ORANGE = "#c2571a", "#3b8a2e"
+INK, INK2, MUTED = "#000000", "#000000", "#000000"
+RAIL_C = NAVY                                             # residual rail of a block
+FROZEN_FC, FROZEN_EC = "#dceaf7", NAVY                    # frozen pretrained weights
+TRAIN_FC, TRAIN_EC = "#fbd9b8", BLUE                      # trained in full
+ADP_FC = "#d8eecf"                                        # low-rank adapter (edge ORANGE)
+DATA_EC = NAVY                                            # frames of the CT thumbnails
+CARD_FC, CARD_EC = "#ffffff", "#7fa7cf"
+BAND_C, EMPTY_EC = "#eef5fb", "#c6dcf0"                   # table row bands, edges of empty table cells
+LABEL_C = ["#000000", "#7b3fa0", "#d4a017"]               # three labels in panel (d)
+CLS_C = NAVY           # class token
+REG_C = "#9dbfe0"      # register tokens
+PATCH_C = "#c6dcf0"    # patch tokens
+PATCH2_C = "#7fa7cf"   # pooled / combined tokens
 GEO_C = "#ffffff"      # data geometry (crop grids), drawn on the CT thumbnails
-WIN_C = "#8C510A"      # slices of one window / crop in a slice stack (brown: not a backbone or method colour)
+WIN_C = "#8C510A"      # slices of one window / crop in a slice stack (brown: not a method colour)
 HEAD_C = TRAIN_FC
 
 # ------------------------------------------------------------------ fonts. Figures are drawn 7.0 in wide and placed at
@@ -76,7 +80,7 @@ FSCALE = 1.28
 FS_MIN = 8.2
 PRINT_MIN = 7.0
 assert abs(TEXTWIDTH_IN - 6.0) < 1e-6 and FS_MIN * TEXTWIDTH_IN / DRAW_W >= PRINT_MIN - 0.01
-plt.rcParams.update({"font.size": 7, "pdf.fonttype": 42, "font.family": "DejaVu Sans", "mathtext.fontset": "dejavusans"})
+plt.rcParams.update({"font.size": 7, "pdf.fonttype": 42, **style.FONT_RC})
 
 LATE = r"LoRA$_\mathrm{late}$"
 
@@ -236,11 +240,11 @@ def cls_bb(cls: pd.DataFrame, bb: str, m: str, grad_only: bool = True) -> tuple[
 
 # ================================================================== drawing primitives
 def box(ax, x, y, w, h, fc, ec, lw=0.7, r=0.4, z=3, ls="-"):
-    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle=f"round,pad=0,rounding_size={r}", fc=fc, ec=ec, lw=lw, zorder=z, ls=ls))
+    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="square,pad=0", fc=fc, ec=ec, lw=lw, zorder=z, ls=ls))   # r: unused
 
 
 def card(ax, x, y, w, h, fc=CARD_FC, ec=CARD_EC, lw=0.7, r=0.6, z=1):
-    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle=f"round,pad=0,rounding_size={r}", fc=fc, ec=ec, lw=lw, zorder=z))
+    ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="square,pad=0", fc=fc, ec=ec, lw=lw, zorder=z))   # r: unused
 
 
 def arrow(ax, x0, y0, x1, y1, color=INK2, lw=0.9, z=2):
@@ -266,12 +270,18 @@ def _shade(c, f):
     return tuple(np.clip(np.array(matplotlib.colors.to_rgb(c)) * f, 0, 1))
 
 
+def _mix(c, e, f):
+    """c moved a fraction f towards e (cuboid faces are shaded towards their own edge colour, not towards black)."""
+    a, b = np.array(matplotlib.colors.to_rgb(c)), np.array(matplotlib.colors.to_rgb(e))
+    return tuple(a + (b - a) * f)
+
+
 def cuboid(ax, x, y, w, h, d, fc, ec, lw=0.6, z=3):
     """Oblique cuboid: front face w x h at (x, y), depth d drawn up and to the right."""
     dx, dy = d * 0.6, d * 0.45
     front = Rectangle((x, y), w, h, fc=fc, ec=ec, lw=lw, zorder=z)
-    top = Polygon([(x, y + h), (x + dx, y + h + dy), (x + w + dx, y + h + dy), (x + w, y + h)], closed=True, fc=_shade(fc, 0.92), ec=ec, lw=lw, zorder=z)
-    side = Polygon([(x + w, y), (x + w + dx, y + dy), (x + w + dx, y + h + dy), (x + w, y + h)], closed=True, fc=_shade(fc, 0.82), ec=ec, lw=lw, zorder=z)
+    top = Polygon([(x, y + h), (x + dx, y + h + dy), (x + w + dx, y + h + dy), (x + w, y + h)], closed=True, fc=_mix(fc, ec, 0.15), ec=ec, lw=lw, zorder=z)
+    side = Polygon([(x + w, y), (x + w + dx, y + dy), (x + w + dx, y + h + dy), (x + w, y + h)], closed=True, fc=_mix(fc, ec, 0.35), ec=ec, lw=lw, zorder=z)
     for p in (side, top, front):
         ax.add_patch(p)
     return dx, dy
@@ -351,16 +361,16 @@ def mini_block(ax, x, ytop, w, qkv="frozen", proj="frozen", mlp="frozen", norm="
     pad_b = 0.7
     h = pad_b + sum(r[2] + r[3] for r in rows)
     y = ytop - h
-    box(ax, x, y, w, h, "#fbfbfa", CARD_EC, lw=0.6, r=0.6, z=2)
+    box(ax, x, y, w, h, CARD_FC, CARD_EC, lw=0.6, r=0.6, z=2)
     if title:
         txt(ax, x + w / 2, ytop + 1.1, title, fs=5.8, c=INK, bold=True)
-    ax.plot([sx, sx], [y + 0.35, ytop - 0.35], color=MUTED, lw=0.5, zorder=2)
+    ax.plot([sx, sx], [y + 0.35, ytop - 0.35], color=RAIL_C, lw=0.5, zorder=2)
     yy = y + pad_b
     centres = {}
     for k, (name, st, hh, gap) in enumerate(rows):
         yc = yy + hh / 2
         if st is None:
-            txt(ax, cx, yc, name, fs=4.4, c=MUTED)
+            txt(ax, cx, yc, name, fs=4.4, c=MUTED, style="italic")
         else:
             fc, ec = col[st]
             box(ax, bx, yy, bw, hh, fc, ec, lw=0.9 if st == "train" else 0.5, r=0.25, z=3)
@@ -415,7 +425,7 @@ def fig_pipeline(vol, vpred, seg) -> None:
     fig, ax = canvas(H, top - 100 * H / DRAW_W)
     s_in, ar = 0.5, 2.4
 
-    def go(x, y):
+    def go(x, y, ar=ar):
         arrow(ax, x + 0.5, y, x + 0.5 + ar, y)
         return x + 1.0 + ar
 
@@ -425,40 +435,27 @@ def fig_pipeline(vol, vpred, seg) -> None:
     head(ax, 0.8, y0 + dy + 2.6, "(a) Classification")
     ym, lab_y = y0 + dy / 2, y0 - 1.3
     txt(ax, 0.8, lab_y, "CT volume,\n224² in-plane", va="top", ha="left")
-    x = go(1.0 + dx, ym)
+    AR = 4.0                                   # (a) has no token strip: longer arrows spread it over the width
+    x = go(1.0 + dx, ym, AR)
     stack(fig, ax, x, y0, s_in, vol, mark=(2, 4))
     txt(ax, x + dx / 2 + 0.8, lab_y, "W windows of 12\nslices, stride 3", va="top")
-    x = go(x + dx, ym)
+    x = go(x + dx, ym, AR)
     ps = patch_slabs(fig, ax, x, y0, s_in, vol[2:5])[0]
-    txt(ax, x + ps / 2, lab_y, "4×8×8\npatches", va="top")
-    x = go(x + ps, ym)
-    ts = 1.45
-    ty = ym - ts / 2
-    token(ax, x, ty, ts, "cls")
-    for k in range(4):
-        token(ax, x + (k + 1) * ts, ty, ts, "reg")
-    for k in range(4):
-        token(ax, x + (k + 5) * ts, ty, ts, "patch")
-    txt(ax, x + 9.5 * ts, ym, "…", fs=6)
-    token(ax, x + 10 * ts, ty, ts, "patch")
-    txt(ax, x + ts / 2, ty + ts + 1.0, "CLS", fs=4.6, c=CLS_C)
-    txt(ax, x + 3.0 * ts, ty - 1.0, "4 registers", fs=4.4, c=INK2)
-    txt(ax, x + 7.5 * ts, ty + ts + 1.9, "2352 patch\ntokens", fs=4.4, c=INK2)
-    txt(ax, x + 5.5 * ts, lab_y, "2357 tokens\nper window", va="top")
-    x = go(x + 11 * ts, ym)
-    ew = 8.5
+    txt(ax, x + ps / 2, lab_y, "2352 patches of\n4×8×8 per window", va="top")
+    x = go(x + ps + 1.0, ym, AR)
+    ew = 12.0
     box(ax, x, y0 + 0.6, ew, dy - 1.2, FROZEN_FC, FROZEN_EC, lw=0.7, r=0.5)
     for k in range(12):
         ax.plot([x + 0.7 + k * (ew - 1.4) / 11] * 2, [y0 + 1.4, y0 + dy - 2.6], color=FROZEN_EC, lw=0.6, zorder=4)
     txt(ax, x + ew / 2, y0 + dy - 1.4, "ViT-B", fs=4.8, c=INK)
     txt(ax, x + ew / 2, lab_y, "12 blocks\n(panel c)", va="top")
-    x = go(x + ew, ym)
+    x = go(x + ew, ym, AR)
     for k in range(5):
         token(ax, x, y0 + 0.7 + k * 1.65, 1.4, "cls")
     txt(ax, x + 0.7, lab_y, "W CLS\ntokens", va="top")
     x += 1.4
     hx = x + 2.6
-    hw = 99.0 - 2.4 - hx
+    hw = 99.0 - hx
     arrow(ax, x + 0.4, ym, hx - 0.2, y0 + dy * 0.83)
     arrow(ax, x + 0.4, ym, hx - 0.2, y0 + dy * 0.33)
     box(ax, hx, y0 + dy * 0.70, hw, dy * 0.26, HEAD_C, BLUE, lw=0.9, r=0.8)
@@ -466,9 +463,6 @@ def fig_pipeline(vol, vpred, seg) -> None:
     box(ax, hx, y0 + dy * 0.02, hw, dy * 0.62, HEAD_C, BLUE, lw=0.9, r=0.8)
     txt(ax, hx + hw / 2, y0 + dy * 0.33, "Attn: two attention\nblocks → linear", fs=4.6, c=INK)
     txt(ax, hx + hw / 2, lab_y, "head: one logit\nper label", va="top")
-    for yy in (0.83, 0.33):
-        arrow(ax, hx + hw + 0.2, y0 + dy * yy, hx + hw + 1.4, y0 + dy * yy)
-        txt(ax, hx + hw + 1.7, y0 + dy * yy, "z", fs=5.6, c=INK, ha="left", style="italic")
 
     # ---------------- (b) segmentation, TAP-CT (backbones.py TapCTDenseBackbone, heads.py MultiTapSegDecoder)
     y1 = 42.6 + LINE + A
@@ -489,15 +483,11 @@ def fig_pipeline(vol, vpred, seg) -> None:
             txt(ax, bx + bw / 2, by + bh / 2, str(k + 1), fs=4.6, c=BLUE, bold=True)
     txt(ax, x + ew2 / 2 + 0.8, lab_y, "blocks 3, 6, 9, 12\n(Lin: block 12)", va="top")
     dx0 = x + ew2 + 4.0
-    ytop = by + bh + 2.0
-    for tx_ in tap_x:
-        ax.plot([tx_, tx_], [by + bh, ytop], color=BLUE, lw=0.6, zorder=2)
-        ax.add_patch(plt.Circle((tx_, ytop), 0.32, color=BLUE, zorder=3))
-    ax.plot([tap_x[0], dx0 - 0.8], [ytop, ytop], color=BLUE, lw=0.6, zorder=2)
-    ax.plot([dx0 - 0.8, dx0 - 0.8], [ytop, by + 0.4], color=BLUE, lw=0.6, zorder=2)
-    for i in range(4):
-        yy = by + 0.4 + i * (bh - 0.8) / 4
-        ax.plot([dx0 - 0.8, dx0], [yy + 0.8, yy + 0.8], color=BLUE, lw=0.6, zorder=2)
+    for j, tx_ in enumerate(reversed(tap_x)):     # j = 0: block 12, lowest route, nearest column, bottom conv
+        lev, cx_ = by + bh + 0.8 + j * 0.6, x + ew2 + 0.7 + j * 0.8
+        yy = by + 0.4 + j * (bh - 0.8) / 4
+        ax.plot([tx_, tx_, cx_, cx_, dx0], [by + bh, lev, lev, yy + 0.8, yy + 0.8], color=BLUE, lw=0.6, zorder=2)
+        ax.add_patch(plt.Circle((tx_, by + bh), 0.32, color=BLUE, zorder=3))
         box(ax, dx0, yy, 2.6, 1.6, HEAD_C, BLUE, lw=0.6, r=0.2)
     txt(ax, dx0 + 0.3, lab_y + 0.4, "1×1×1\nconv", va="top")
     # TAP-CT stride (4, 8, 8): 3 stages with scales (2,2,2), (2,2,2), (1,2,2); channels 128 -> 64 -> 32 -> 16
@@ -545,7 +535,7 @@ def fig_pipeline(vol, vpred, seg) -> None:
     x3 = 64.5
     head(ax, x3, 29.4 + U, "(d) Two training modes")
     card(ax, x3, 2.5 + L, 34.5, 25.3 - (L - U))
-    labs = ["#000000", "#999999", "#CC79A7"]   # three labels (not backbone colours)
+    labs = LABEL_C
 
     def model(xm, ym_, outs, w=5.4, h=2.4):
         box(ax, xm, ym_, w, h, FROZEN_FC, FROZEN_EC, lw=0.6, r=0.3)
@@ -569,7 +559,7 @@ def fig_pipeline(vol, vpred, seg) -> None:
 
 
 # ================================================================== method x component matrices
-CELL = {"f": (FROZEN_FC, FROZEN_EC), "a": (ADP_FC, ORANGE), "t": (TRAIN_FC, TRAIN_EC), "-": ("white", "#e3e1dc")}
+CELL = {"f": (FROZEN_FC, FROZEN_EC), "a": (ADP_FC, ORANGE), "t": (TRAIN_FC, TRAIN_EC), "-": ("white", EMPTY_EC)}
 
 
 def cell(ax, x, y, w, h, st, mark=None):
@@ -598,10 +588,10 @@ def matrix(ax, x0, ytop, rows, cols, row_h=2.25, name_w=17.0, groups=()):
     for i, (name, sub, vals) in enumerate(rows):
         y = ytop - (i + 1) * row_h
         if i % 2 == 0:
-            ax.add_patch(Rectangle((x0, y - 0.15), x - x0, row_h, fc="#f7f6f3", ec="none", zorder=0))
+            ax.add_patch(Rectangle((x0, y - 0.15), x - x0, row_h, fc=BAND_C, ec="none", zorder=0))
         txt(ax, x0 + 0.4, y + row_h / 2 + 0.05, name, fs=5.0, c=INK, ha="left", bold=True)
         if sub:
-            txt(ax, x0 + 9.0, y + row_h / 2, sub, fs=4.1, c=MUTED, ha="left")
+            txt(ax, x0 + 9.0, y + row_h / 2, sub, fs=4.1, c=MUTED, ha="left", style="italic")
         for key, (cx, w, kind) in pos.items():
             v = vals.get(key, "-" if kind == "cell" else "")
             if kind == "cell":
@@ -633,7 +623,7 @@ CELLS = {  # which encoder components each method trains (code map CLS 3.1-3.4, 
 NAME = {"lin": "Lin", "attn": "Attn", "dec": "Dec", "lora": "LoRA", "lorag": LATE, "babmil": "LoRA+ABMIL", "dora": "DoRA",
         "rslora": "rsLoRA", "lin_then_lorag": "Lin→LoRA", "attn_then_lorag": "Attn→LoRA", "dec_then_lora": "Dec→LoRA",
         "attnft": "Attn-only FT", "fullft": "Full FT"}
-SUB = {"dora": "(+ m)", "rslora": "(α/√r)"}
+SUB = {"dora": "(+ m)", "rslora": r"($\alpha/\sqrt{r}$)"}
 
 
 def _cells(m):
@@ -719,7 +709,7 @@ def fig_arms(vol, head_ct, cls) -> None:
     x = go(x + 6.0, ym)
     gx = x + 0.3
     for k, sz in enumerate([6.6, 4.2, 2.2]):   # sizes are schematic: scale k = stem grid max-pooled by 4^k per axis
-        ddx, _ = cuboid(ax, gx, ym - sz / 2, sz, sz, d=sz * 0.5, fc=PATCH_C if k == 0 else PATCH2_C, ec=INK2, lw=0.5)
+        ddx, _ = cuboid(ax, gx, ym - sz / 2, sz, sz, d=sz * 0.5, fc=PATCH_C if k == 0 else PATCH2_C, ec=NAVY, lw=0.5)
         txt(ax, gx + sz / 2, ym - 4.6, ["32³", "8³", "2³"][k], fs=4.6, c=INK)
         gx += sz + ddx + 0.8
     txt(ax, x + 9.0, lab_y - 0.6, "tokens at 3 scales\n(max-pool by 4\nper axis), attention\nwithin and across", va="top", fs=4.6)
@@ -794,8 +784,7 @@ def fig_arms(vol, head_ct, cls) -> None:
         vals["sc"] = "4000 + 4000" if m.endswith("_then_lorag") else "8000"
         for key, bb in zip(pkeys, bbs):
             n, derived = cls_bb(cls, bb, m)
-            ng = int(cls.loc[(bb, CLS_SAME_AS.get(m, m)) if (bb, m) not in cls.index else (bb, m), "no_grad_backbone"])
-            vals[key] = fmt_m(n) + ("*" if ng else "") + ("†" if derived else "")
+            vals[key] = fmt_m(n) + ("†" if derived else "")   # never-run blocks: stated in the caption, no mark
         rows.append((NAME[m], SUB.get(m, ""), vals))
     matrix(ax, 0.8, 41.5, rows, cols, row_h=2.95, name_w=15.0,
            groups=[("early blocks", "eq", "em"), ("late blocks", "lq", "lm"), ("encoder parameters updated", "p1", pkeys[-1], "right")])
@@ -901,7 +890,7 @@ def fig_arms_seg(seg) -> None:
         for key, bb in zip(("p1", "p2", "p3"), sbbs):
             r = seg.loc[(bb, m)]
             n = int(r["backbone_trainable"]) - int(r["no_grad_backbone"])
-            vals[key] = fmt_m(n) + ("*" if int(r["no_grad_backbone"]) else "")
+            vals[key] = fmt_m(n)   # combiner without gradient: stated in the caption, no mark
         rows.append((NAME[m], SUB.get(m, ""), vals))
     matrix(ax, 0.8, 19.8, rows, cols, row_h=2.45, name_w=15.0,
            groups=[("early blocks", "eq", "em"), ("late blocks", "lq", "lm"), ("encoder parameters updated", "p1", ("p1", "p2", "p3")[len(sbbs) - 1], "right")])

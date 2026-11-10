@@ -1,4 +1,4 @@
-paper_figures.py number check: 163 comparisons, 156 equal, 0 different, 0 without a reference
+paper_figures.py number check: 646 comparisons, 533 equal, 0 different, 0 without a reference
 OK      fig_overview         (b) pooled AUROC pillar0 attn                           figure=    0.886  \pooledpillarZattn=0.886
 OK      fig_overview         (b) pooled AUROC pillar0 attn_then_lorag                figure=    0.900  \pooledpillarZattnthenlorag=0.900
 OK      fig_overview         (b) pooled AUROC pillar0 attnft                         figure=    0.922  \pooledpillarZattnft=0.922
@@ -162,3 +162,486 @@ OK      fig_overview         (e) mean rank dec_then_lora, all backbones         
 OK      fig_overview         (e) mean rank tapct lin                                 figure=     6.49  \numSegrankTapctLinMean=6.49
 OK      fig_overview         (e) mean rank spectre lin                               figure=     6.25  \numSegrankSpectreLinMean=6.25
 OK      fig_overview         (e) mean rank lin, all backbones                        figure=     6.37  \numSegrankLinMean=6.37
+OK      fig_key              cls_lora_lin tapct mean                                 figure=   +0.032  \numCiClsloralinTapctMeandiff=+0.032
+OK      fig_key              cls_lora_lin tapct lo3                                  figure=   +0.007  \numCiClsloralinTapctLodiff=+0.007
+OK      fig_key              cls_lora_lin tapct hi3                                  figure=   +0.053  \numCiClsloralinTapctHidiff=+0.053
+OK      fig_key              cls_lora_lin spectre mean                               figure=   +0.037  \numCiClsloralinSpectreMeandiff=+0.037
+OK      fig_key              cls_lora_lin spectre lo3                                figure=   +0.009  \numCiClsloralinSpectreLodiff=+0.009
+OK      fig_key              cls_lora_lin spectre hi3                                figure=   +0.075  \numCiClsloralinSpectreHidiff=+0.075
+OK      fig_key              cls_lora_lin pillar0 mean                               figure=   +0.033  \numCiClsloralinPillarZMeandiff=+0.033
+OK      fig_key              cls_lora_lin pillar0 lo3                                figure=   +0.021  \numCiClsloralinPillarZLodiff=+0.021
+OK      fig_key              cls_lora_lin pillar0 hi3                                figure=   +0.044  \numCiClsloralinPillarZHidiff=+0.044
+OK      fig_key              cls_lora_attn tapct mean                                figure=   +0.022  \numCiClsloraattnTapctMeandiff=+0.022
+OK      fig_key              cls_lora_attn tapct lo3                                 figure=   +0.006  \numCiClsloraattnTapctLodiff=+0.006
+OK      fig_key              cls_lora_attn tapct hi3                                 figure=   +0.042  \numCiClsloraattnTapctHidiff=+0.042
+OK      fig_key              cls_lora_attn spectre mean                              figure=   +0.033  \numCiClsloraattnSpectreMeandiff=+0.033
+OK      fig_key              cls_lora_attn spectre lo3                               figure=   +0.003  \numCiClsloraattnSpectreLodiff=+0.003
+OK      fig_key              cls_lora_attn spectre hi3                               figure=   +0.078  \numCiClsloraattnSpectreHidiff=+0.078
+OK      fig_key              cls_lora_attn pillar0 mean                              figure=   +0.034  \numCiClsloraattnPillarZMeandiff=+0.034
+OK      fig_key              cls_lora_attn pillar0 lo3                               figure=   +0.021  \numCiClsloraattnPillarZLodiff=+0.021
+OK      fig_key              cls_lora_attn pillar0 hi3                               figure=   +0.052  \numCiClsloraattnPillarZHidiff=+0.052
+OK      fig_key              cls_attnft_lora tapct mean                              figure=   +0.019  \numCiClsattnftloraTapctMeandiff=+0.019
+OK      fig_key              cls_attnft_lora tapct lo3                               figure=   -0.001  \numCiClsattnftloraTapctLodiff=-0.001
+OK      fig_key              cls_attnft_lora tapct hi3                               figure=   +0.054  \numCiClsattnftloraTapctHidiff=+0.054
+OK      fig_key              cls_attnft_lora spectre mean                            figure=   +0.002  \numCiClsattnftloraSpectreMeandiff=+0.002
+OK      fig_key              cls_attnft_lora spectre lo3                             figure=   -0.037  \numCiClsattnftloraSpectreLodiff=-0.037
+OK      fig_key              cls_attnft_lora spectre hi3                             figure=   +0.026  \numCiClsattnftloraSpectreHidiff=+0.026
+OK      fig_key              cls_attnft_lora pillar0 mean                            figure=   +0.001  \numCiClsattnftloraPillarZMeandiff=+0.001
+OK      fig_key              cls_attnft_lora pillar0 lo3                             figure=   -0.002  \numCiClsattnftloraPillarZLodiff=-0.002
+OK      fig_key              cls_attnft_lora pillar0 hi3                             figure=   +0.004  \numCiClsattnftloraPillarZHidiff=+0.004
+OK      fig_key              cls_fullft_lin tapct mean                               figure=   +0.022  \numCiClsfullftlinTapctMeandiff=+0.022
+OK      fig_key              cls_fullft_lin tapct lo3                                figure=   -0.061  \numCiClsfullftlinTapctLodiff=-0.061
+OK      fig_key              cls_fullft_lin tapct hi3                                figure=   +0.068  \numCiClsfullftlinTapctHidiff=+0.068
+OK      fig_key              cls_fullft_lin spectre mean                             figure=   -0.117  \numCiClsfullftlinSpectreMeandiff=-0.117
+OK      fig_key              cls_fullft_lin spectre lo3                              figure=   -0.195  \numCiClsfullftlinSpectreLodiff=-0.195
+OK      fig_key              cls_fullft_lin spectre hi3                              figure=   -0.059  \numCiClsfullftlinSpectreHidiff=-0.059
+OK      fig_key              cls_fullft_lin pillar0 mean                             figure=   +0.004  \numCiClsfullftlinPillarZMeandiff=+0.004
+OK      fig_key              cls_fullft_lin pillar0 lo3                              figure=   -0.013  \numCiClsfullftlinPillarZLodiff=-0.013
+OK      fig_key              cls_fullft_lin pillar0 hi3                              figure=   +0.021  \numCiClsfullftlinPillarZHidiff=+0.021
+OK      fig_key              cls_joint_pertask tapct mean                            figure=   +0.012  \numCiClsjointTapctMeandiff=+0.012
+OK      fig_key              cls_joint_pertask tapct lo3                             figure=   -0.014  \numCiClsjointTapctLodiff=-0.014
+OK      fig_key              cls_joint_pertask tapct hi3                             figure=   +0.038  \numCiClsjointTapctHidiff=+0.038
+OK      fig_key              cls_joint_pertask spectre mean                          figure=   -0.003  \numCiClsjointSpectreMeandiff=-0.003
+OK      fig_key              cls_joint_pertask spectre lo3                           figure=   -0.044  \numCiClsjointSpectreLodiff=-0.044
+OK      fig_key              cls_joint_pertask spectre hi3                           figure=   +0.051  \numCiClsjointSpectreHidiff=+0.051
+OK      fig_key              cls_joint_pertask pillar0 mean                          figure=   -0.008  \numCiClsjointPillarZMeandiff=-0.008
+OK      fig_key              cls_joint_pertask pillar0 lo3                           figure=   -0.013  \numCiClsjointPillarZLodiff=-0.013
+OK      fig_key              cls_joint_pertask pillar0 hi3                           figure=   -0.001  \numCiClsjointPillarZHidiff=-0.001
+OK      fig_key              seg_dec_lin tapct mean                                  figure=   +0.085  \numCiSegdeclinTapctMeandiff=+0.085
+OK      fig_key              seg_dec_lin tapct lo3                                   figure=   +0.055  \numCiSegdeclinTapctLodiff=+0.055
+OK      fig_key              seg_dec_lin tapct hi3                                   figure=   +0.109  \numCiSegdeclinTapctHidiff=+0.109
+OK      fig_key              seg_dec_lin spectre mean                                figure=   +0.061  \numCiSegdeclinSpectreMeandiff=+0.061
+OK      fig_key              seg_dec_lin spectre lo3                                 figure=   +0.027  \numCiSegdeclinSpectreLodiff=+0.027
+OK      fig_key              seg_dec_lin spectre hi3                                 figure=   +0.088  \numCiSegdeclinSpectreHidiff=+0.088
+OK      fig_key              seg_lora_dec tapct mean                                 figure=   -0.005  \numCiSegloradecTapctMeandiff=-0.005
+OK      fig_key              seg_lora_dec tapct lo3                                  figure=   -0.021  \numCiSegloradecTapctLodiff=-0.021
+OK      fig_key              seg_lora_dec tapct hi3                                  figure=   +0.024  \numCiSegloradecTapctHidiff=+0.024
+OK      fig_key              seg_lora_dec spectre mean                               figure=   +0.023  \numCiSegloradecSpectreMeandiff=+0.023
+OK      fig_key              seg_lora_dec spectre lo3                                figure=   -0.018  \numCiSegloradecSpectreLodiff=-0.018
+OK      fig_key              seg_lora_dec spectre hi3                                figure=   +0.076  \numCiSegloradecSpectreHidiff=+0.076
+OK      fig_key              seg_lora_dec_pertask tapct mean                         figure=   -0.021  \numCiSegloradecptTapctMeandiff=-0.021
+OK      fig_key              seg_lora_dec_pertask tapct lo3                          figure=   -0.036  \numCiSegloradecptTapctLodiff=-0.036
+OK      fig_key              seg_lora_dec_pertask tapct hi3                          figure=   +0.002  \numCiSegloradecptTapctHidiff=+0.002
+OK      fig_key              seg_lora_dec_pertask spectre mean                       figure=   +0.006  \numCiSegloradecptSpectreMeandiff=+0.006
+OK      fig_key              seg_lora_dec_pertask spectre lo3                        figure=   -0.003  \numCiSegloradecptSpectreLodiff=-0.003
+OK      fig_key              seg_lora_dec_pertask spectre hi3                        figure=   +0.031  \numCiSegloradecptSpectreHidiff=+0.031
+OK      fig_key              seg_lora_dec_joint tapct mean                           figure=   +0.011  \numCiSegloradecjtTapctMeandiff=+0.011
+OK      fig_key              seg_lora_dec_joint tapct lo3                            figure=   -0.021  \numCiSegloradecjtTapctLodiff=-0.021
+OK      fig_key              seg_lora_dec_joint tapct hi3                            figure=   +0.066  \numCiSegloradecjtTapctHidiff=+0.066
+OK      fig_key              seg_lora_dec_joint spectre mean                         figure=   +0.040  \numCiSegloradecjtSpectreMeandiff=+0.040
+OK      fig_key              seg_lora_dec_joint spectre lo3                          figure=   -0.039  \numCiSegloradecjtSpectreLodiff=-0.039
+OK      fig_key              seg_lora_dec_joint spectre hi3                          figure=   +0.147  \numCiSegloradecjtSpectreHidiff=+0.147
+OK      fig_key              seg_fullft_dec tapct mean                               figure=    0.000  \numCiSegfullftdecTapctMeandiff=0.000
+OK      fig_key              seg_fullft_dec tapct lo3                                figure=   -0.024  \numCiSegfullftdecTapctLodiff=-0.024
+OK      fig_key              seg_fullft_dec tapct hi3                                figure=   +0.016  \numCiSegfullftdecTapctHidiff=+0.016
+OK      fig_key              seg_fullft_dec spectre mean                             figure=   -0.003  \numCiSegfullftdecSpectreMeandiff=-0.003
+OK      fig_key              seg_fullft_dec spectre lo3                              figure=   -0.035  \numCiSegfullftdecSpectreLodiff=-0.035
+OK      fig_key              seg_fullft_dec spectre hi3                              figure=   +0.009  \numCiSegfullftdecSpectreHidiff=+0.009
+OK      fig_key              seg_joint_pertask tapct mean                            figure=   -0.046  \numCiSegjointTapctMeandiff=-0.046
+OK      fig_key              seg_joint_pertask tapct lo3                             figure=   -0.090  \numCiSegjointTapctLodiff=-0.090
+OK      fig_key              seg_joint_pertask tapct hi3                             figure=   -0.008  \numCiSegjointTapctHidiff=-0.008
+OK      fig_key              seg_joint_pertask spectre mean                          figure=   -0.058  \numCiSegjointSpectreMeandiff=-0.058
+OK      fig_key              seg_joint_pertask spectre lo3                           figure=   -0.093  \numCiSegjointSpectreLodiff=-0.093
+OK      fig_key              seg_joint_pertask spectre hi3                           figure=   -0.009  \numCiSegjointSpectreHidiff=-0.009
+INFO    fig_gain_vs_probe    tapct: 78 label-mode pairs drawn (paired_cls.csv, LoRA vs Lin)
+INFO    fig_gain_vs_probe    spectre: 66 label-mode pairs drawn (paired_cls.csv, LoRA vs Lin)
+INFO    fig_gain_vs_probe    pillar0: 12 label-mode pairs drawn (paired_cls.csv, LoRA vs Lin)
+OK      fig_gain_vs_probe    LoRA-Lin bin low mean                                   figure=   +0.054  \numGainbinLowMeandiff=+0.054
+OK      fig_gain_vs_probe    LoRA-Lin bin low n                                      figure=       18  \numGainbinLowN=18
+OK      fig_gain_vs_probe    Attn-Lin bin low mean (line)                            figure=   +0.002  \numGainbinattnLowMeandiff=+0.002
+OK      fig_gain_vs_probe    Attn-Lin bin low n                                      figure=       18  \numGainbinattnLowN=18
+OK      fig_gain_vs_probe    LoRA-Lin bin mid mean                                   figure=   +0.046  \numGainbinMidMeandiff=+0.046
+OK      fig_gain_vs_probe    LoRA-Lin bin mid n                                      figure=       38  \numGainbinMidN=38
+OK      fig_gain_vs_probe    Attn-Lin bin mid mean (line)                            figure=   +0.026  \numGainbinattnMidMeandiff=+0.026
+OK      fig_gain_vs_probe    Attn-Lin bin mid n                                      figure=       38  \numGainbinattnMidN=38
+OK      fig_gain_vs_probe    LoRA-Lin bin high mean                                  figure=   +0.028  \numGainbinHighMeandiff=+0.028
+OK      fig_gain_vs_probe    LoRA-Lin bin high n                                     figure=       45  \numGainbinHighN=45
+OK      fig_gain_vs_probe    Attn-Lin bin high mean (line)                           figure=   +0.002  \numGainbinattnHighMeandiff=+0.002
+OK      fig_gain_vs_probe    Attn-Lin bin high n                                     figure=       45  \numGainbinattnHighN=45
+OK      fig_gain_vs_probe    LoRA-Lin bin top mean                                   figure=   +0.025  \numGainbinTopMeandiff=+0.025
+OK      fig_gain_vs_probe    LoRA-Lin bin top n                                      figure=       55  \numGainbinTopN=55
+OK      fig_gain_vs_probe    Attn-Lin bin top mean (line)                            figure=   -0.001  \numGainbinattnTopMeandiff=-0.001
+OK      fig_gain_vs_probe    Attn-Lin bin top n                                      figure=       55  \numGainbinattnTopN=55
+INFO    fig_fullft_spectre   (a) tapct lin: median over 44 runs, first 0.714 last 0.738
+INFO    fig_fullft_spectre   (a) tapct lora: median over 44 runs, first 0.712 last 0.745
+INFO    fig_fullft_spectre   (a) tapct attnft: median over 44 runs, first 0.712 last 0.785
+INFO    fig_fullft_spectre   (a) tapct fullft: median over 44 runs, first 0.695 last 0.694
+INFO    fig_fullft_spectre   (a) spectre lin: median over 37 runs, first 0.605 last 0.693
+INFO    fig_fullft_spectre   (a) spectre lora: median over 37 runs, first 0.687 last 0.756
+INFO    fig_fullft_spectre   (a) spectre attnft: median over 37 runs, first 0.686 last 0.743
+INFO    fig_fullft_spectre   (a) spectre fullft: median over 37 runs, first 0.540 last 0.529
+INFO    fig_seg              (a) tapct lin: 0 pairs below -0.3, 3 above 0.3 (edge triangles)
+OK      fig_seg              (a) tapct lin - Dec mean                                figure=   -0.085  \numSegdeltaTapctDecLinMeandiff=-0.085
+OK      fig_seg              (a) tapct lin - Dec n                                   figure=       74  \numSegdeltaTapctDecLinN=74
+INFO    fig_seg              (a) tapct lora: 0 pairs below -0.3, 1 above 0.3 (edge triangles)
+OK      fig_seg              (a) tapct lora - Dec mean                               figure=   -0.005  \numSegdeltaTapctDecLoraMeandiff=-0.005
+OK      fig_seg              (a) tapct lora - Dec n                                  figure=       74  \numSegdeltaTapctDecLoraN=74
+INFO    fig_seg              (a) tapct lorag: 0 pairs below -0.3, 0 above 0.3 (edge triangles)
+OK      fig_seg              (a) tapct lorag - Dec mean                              figure=   -0.013  \numSegdeltaTapctDecLoragMeandiff=-0.013
+OK      fig_seg              (a) tapct lorag - Dec n                                 figure=       59  \numSegdeltaTapctDecLoragN=59
+INFO    fig_seg              (a) tapct dora: 0 pairs below -0.3, 0 above 0.3 (edge triangles)
+OK      fig_seg              (a) tapct dora - Dec mean                               figure=   -0.012  \numSegdeltaTapctDecDoraMeandiff=-0.012
+OK      fig_seg              (a) tapct dora - Dec n                                  figure=       59  \numSegdeltaTapctDecDoraN=59
+INFO    fig_seg              (a) tapct fullft: 1 pairs below -0.3, 0 above 0.3 (edge triangles)
+OK      fig_seg              (a) tapct fullft - Dec mean                             figure=    0.000  \numSegdeltaTapctDecFullftMeandiff=0.000
+OK      fig_seg              (a) tapct fullft - Dec n                                figure=       74  \numSegdeltaTapctDecFullftN=74
+INFO    fig_seg              (a) tapct dec_then_lora: 1 pairs below -0.3, 0 above 0.3 (edge triangles)
+OK      fig_seg              (a) tapct dec_then_lora - Dec mean                      figure=   -0.016  \numSegdeltaTapctDecDecThenLoraMeandiff=-0.016
+OK      fig_seg              (a) tapct dec_then_lora - Dec n                         figure=       59  \numSegdeltaTapctDecDecThenLoraN=59
+INFO    fig_seg              (b) spectre lin: 0 pairs below -0.3, 4 above 0.3 (edge triangles)
+OK      fig_seg              (b) spectre lin - Dec mean                              figure=   -0.061  \numSegdeltaSpectreDecLinMeandiff=-0.061
+OK      fig_seg              (b) spectre lin - Dec n                                 figure=       74  \numSegdeltaSpectreDecLinN=74
+INFO    fig_seg              (b) spectre lora: 0 pairs below -0.3, 3 above 0.3 (edge triangles)
+OK      fig_seg              (b) spectre lora - Dec mean                             figure=   +0.023  \numSegdeltaSpectreDecLoraMeandiff=+0.023
+OK      fig_seg              (b) spectre lora - Dec n                                figure=       74  \numSegdeltaSpectreDecLoraN=74
+INFO    fig_seg              (b) spectre lorag: 0 pairs below -0.3, 3 above 0.3 (edge triangles)
+OK      fig_seg              (b) spectre lorag - Dec mean                            figure=   +0.024  \numSegdeltaSpectreDecLoragMeandiff=+0.024
+OK      fig_seg              (b) spectre lorag - Dec n                               figure=       59  \numSegdeltaSpectreDecLoragN=59
+INFO    fig_seg              (b) spectre dora: 0 pairs below -0.3, 3 above 0.3 (edge triangles)
+OK      fig_seg              (b) spectre dora - Dec mean                             figure=   +0.028  \numSegdeltaSpectreDecDoraMeandiff=+0.028
+OK      fig_seg              (b) spectre dora - Dec n                                figure=       59  \numSegdeltaSpectreDecDoraN=59
+INFO    fig_seg              (b) spectre fullft: 0 pairs below -0.3, 0 above 0.3 (edge triangles)
+OK      fig_seg              (b) spectre fullft - Dec mean                           figure=   -0.003  \numSegdeltaSpectreDecFullftMeandiff=-0.003
+OK      fig_seg              (b) spectre fullft - Dec n                              figure=       74  \numSegdeltaSpectreDecFullftN=74
+INFO    fig_seg              (b) spectre dec_then_lora: 0 pairs below -0.3, 0 above 0.3 (edge triangles)
+OK      fig_seg              (b) spectre dec_then_lora - Dec mean                    figure=   +0.003  \numSegdeltaSpectreDecDecThenLoraMeandiff=+0.003
+OK      fig_seg              (b) spectre dec_then_lora - Dec n                       figure=       59  \numSegdeltaSpectreDecDecThenLoraN=59
+OK      fig_cls              attn tapct mean                                         figure=   +0.011  \numPairedTapctLinAttnMeandiff=+0.011
+OK      fig_cls              attn tapct n                                            figure=       78  \numPairedTapctLinAttnN=78
+OK      fig_cls              attn spectre mean                                       figure=   +0.004  \numPairedSpectreLinAttnMeandiff=+0.004
+OK      fig_cls              attn spectre n                                          figure=       66  \numPairedSpectreLinAttnN=66
+OK      fig_cls              attn pillar0 mean                                       figure=   -0.001  \numPairedPillarZLinAttnMeandiff=-0.001
+OK      fig_cls              attn pillar0 n                                          figure=       12  \numPairedPillarZLinAttnN=12
+INFO    fig_cls              attn title: mean +0.007, 54% > 0 over 156 label-mode pairs of paired_cls.csv
+OK      fig_cls              lora tapct mean                                         figure=   +0.032  \numPairedTapctLinLoraMeandiff=+0.032
+OK      fig_cls              lora tapct n                                            figure=       78  \numPairedTapctLinLoraN=78
+OK      fig_cls              lora spectre mean                                       figure=   +0.037  \numPairedSpectreLinLoraMeandiff=+0.037
+OK      fig_cls              lora spectre n                                          figure=       66  \numPairedSpectreLinLoraN=66
+OK      fig_cls              lora pillar0 mean                                       figure=   +0.033  \numPairedPillarZLinLoraMeandiff=+0.033
+OK      fig_cls              lora pillar0 n                                          figure=       12  \numPairedPillarZLinLoraN=12
+INFO    fig_cls              lora title: mean +0.034, 78% > 0 over 156 label-mode pairs of paired_cls.csv
+OK      fig_cls              attnft tapct mean                                       figure=   +0.051  \numPairedTapctLinAttnftMeandiff=+0.051
+OK      fig_cls              attnft tapct n                                          figure=       78  \numPairedTapctLinAttnftN=78
+OK      fig_cls              attnft spectre mean                                     figure=   +0.039  \numPairedSpectreLinAttnftMeandiff=+0.039
+OK      fig_cls              attnft spectre n                                        figure=       66  \numPairedSpectreLinAttnftN=66
+OK      fig_cls              attnft pillar0 mean                                     figure=   +0.034  \numPairedPillarZLinAttnftMeandiff=+0.034
+OK      fig_cls              attnft pillar0 n                                        figure=       12  \numPairedPillarZLinAttnftN=12
+INFO    fig_cls              attnft title: mean +0.045, 78% > 0 over 156 label-mode pairs of paired_cls.csv
+OK      fig_joint_main       (a) tapct amos_covid_luna mean over labels vs mean over method dots figure=   +0.008  metrics/out=+0.008
+INFO    fig_joint_main       (a) tapct amos_covid_luna: +0.008 over 17 labels, 11 methods (attn, attn_then_lorag, attnft, babmil, dora, fullft, lin, lin_then_lorag, lora, lorag, rslora), method range -0.005 to +0.029
+OK      fig_joint_main       (a) spectre amos_covid_luna mean over labels vs mean over method dots figure=   -0.035  metrics/out=-0.035
+INFO    fig_joint_main       (a) spectre amos_covid_luna: -0.035 over 17 labels, 10 methods (attn, attn_then_lorag, attnft, babmil, dora, lin, lin_then_lorag, lora, lorag, rslora), method range -0.078 to +0.013
+OK      fig_joint_main       (a) tapct fdg mean over labels vs mean over method dots figure=   -0.010  metrics/out=-0.010
+INFO    fig_joint_main       (a) tapct fdg: -0.010 over 4 labels, 11 methods (attn, attn_then_lorag, attnft, babmil, dora, fullft, lin, lin_then_lorag, lora, lorag, rslora), method range -0.161 to +0.038
+OK      fig_joint_main       (a) spectre fdg mean over labels vs mean over method dots figure=   +0.020  metrics/out=+0.020
+INFO    fig_joint_main       (a) spectre fdg: +0.020 over 4 labels, 10 methods (attn, attn_then_lorag, attnft, babmil, dora, lin, lin_then_lorag, lora, lorag, rslora), method range -0.002 to +0.058
+OK      fig_joint_main       (a) tapct rsna2022 mean over labels vs mean over method dots figure=   +0.042  metrics/out=+0.042
+INFO    fig_joint_main       (a) tapct rsna2022: +0.042 over 8 labels, 11 methods (attn, attn_then_lorag, attnft, babmil, dora, fullft, lin, lin_then_lorag, lora, lorag, rslora), method range -0.034 to +0.099
+OK      fig_joint_main       (a) spectre rsna2022 mean over labels vs mean over method dots figure=   +0.049  metrics/out=+0.049
+INFO    fig_joint_main       (a) spectre rsna2022: +0.049 over 8 labels, 10 methods (attn, attn_then_lorag, attnft, babmil, dora, lin, lin_then_lorag, lora, lorag, rslora), method range -0.010 to +0.086
+OK      fig_joint_main       (a) tapct rsna2023 mean over labels vs mean over method dots figure=   +0.017  metrics/out=+0.017
+INFO    fig_joint_main       (a) tapct rsna2023: +0.017 over 4 labels, 11 methods (attn, attn_then_lorag, attnft, babmil, dora, fullft, lin, lin_then_lorag, lora, lorag, rslora), method range -0.041 to +0.106
+OK      fig_joint_main       (a) spectre rsna2023 mean over labels vs mean over method dots figure=   +0.009  metrics/out=+0.009
+INFO    fig_joint_main       (a) spectre rsna2023: +0.009 over 4 labels, 10 methods (attn, attn_then_lorag, attnft, babmil, dora, lin, lin_then_lorag, lora, lorag, rslora), method range -0.003 to +0.031
+OK      fig_joint_main       (a) tapct rsna2019_ich mean over labels vs mean over method dots figure=   -0.003  metrics/out=-0.003
+INFO    fig_joint_main       (a) tapct rsna2019_ich: -0.003 over 6 labels, 11 methods (attn, attn_then_lorag, attnft, babmil, dora, fullft, lin, lin_then_lorag, lora, lorag, rslora), method range -0.034 to +0.012
+OK      fig_joint_main       (a) pillar0 rsna2019_ich mean over labels vs mean over method dots figure=   -0.008  metrics/out=-0.008
+INFO    fig_joint_main       (a) pillar0 rsna2019_ich: -0.008 over 6 labels, 11 methods (attn, attn_then_lorag, attnft, babmil, dora, fullft, lin, lin_then_lorag, lora, lorag, rslora), method range -0.026 to +0.023
+OK      fig_joint_main       (a) tapct mean over all labels                          figure=   +0.012  \numCiClsjointTapctMeandiff=+0.012
+OK      fig_joint_main       (a) spectre mean over all labels                        figure=   -0.003  \numCiClsjointSpectreMeandiff=-0.003
+OK      fig_joint_main       (a) pillar0 mean over all labels                        figure=   -0.008  \numCiClsjointPillarZMeandiff=-0.008
+OK      fig_joint_main       (b) tapct amos22 mean over labels vs mean over method dots figure=   -0.072  metrics/out=-0.072
+INFO    fig_joint_main       (b) tapct amos22: -0.072 over 15 labels, 7 methods (dec, dec_then_lora, dora, fullft, lin, lora, lorag), method range -0.135 to -0.012
+OK      fig_joint_main       (b) spectre amos22 mean over labels vs mean over method dots figure=   -0.076  metrics/out=-0.076
+INFO    fig_joint_main       (b) spectre amos22: -0.076 over 15 labels, 7 methods (dec, dec_then_lora, dora, fullft, lin, lora, lorag), method range -0.150 to 0.000
+OK      fig_joint_main       (b) tapct kits23 mean over labels vs mean over method dots figure=   -0.046  metrics/out=-0.046
+INFO    fig_joint_main       (b) tapct kits23: -0.046 over 3 labels, 7 methods (dec, dec_then_lora, dora, fullft, lin, lora, lorag), method range -0.102 to +0.019
+OK      fig_joint_main       (b) spectre kits23 mean over labels vs mean over method dots figure=   -0.029  metrics/out=-0.029
+INFO    fig_joint_main       (b) spectre kits23: -0.029 over 3 labels, 7 methods (dec, dec_then_lora, dora, fullft, lin, lora, lorag), method range -0.052 to -0.008
+OK      fig_joint_main       (b) tapct lits mean over labels vs mean over method dots figure=   -0.004  metrics/out=-0.004
+INFO    fig_joint_main       (b) tapct lits: -0.004 over 2 labels, 7 methods (dec, dec_then_lora, dora, fullft, lin, lora, lorag), method range -0.022 to +0.012
+OK      fig_joint_main       (b) spectre lits mean over labels vs mean over method dots figure=    0.000  metrics/out=0.000
+INFO    fig_joint_main       (b) spectre lits: 0.000 over 2 labels, 7 methods (dec, dec_then_lora, dora, fullft, lin, lora, lorag), method range -0.026 to +0.014
+OK      fig_joint_main       (b) tapct msd_pancreas mean over labels vs mean over method dots figure=   -0.024  metrics/out=-0.024
+INFO    fig_joint_main       (b) tapct msd_pancreas: -0.024 over 2 labels, 7 methods (dec, dec_then_lora, dora, fullft, lin, lora, lorag), method range -0.093 to +0.001
+OK      fig_joint_main       (b) spectre msd_pancreas mean over labels vs mean over method dots figure=   -0.005  metrics/out=-0.005
+INFO    fig_joint_main       (b) spectre msd_pancreas: -0.005 over 2 labels, 7 methods (dec, dec_then_lora, dora, fullft, lin, lora, lorag), method range -0.016 to +0.013
+OK      fig_joint_main       (b) tapct totalseg mean over labels vs mean over method dots figure=   -0.028  metrics/out=-0.028
+INFO    fig_joint_main       (b) tapct totalseg: -0.028 over 15 labels, 4 methods (dec, fullft, lin, lora), method range -0.045 to -0.007
+OK      fig_joint_main       (b) spectre totalseg mean over labels vs mean over method dots figure=   -0.061  metrics/out=-0.061
+INFO    fig_joint_main       (b) spectre totalseg: -0.061 over 15 labels, 4 methods (dec, fullft, lin, lora), method range -0.115 to -0.009
+OK      fig_joint_main       (b) tapct mean over all labels                          figure=   -0.046  \numCiSegjointTapctMeandiff=-0.046
+OK      fig_joint_main       (b) spectre mean over all labels                        figure=   -0.058  \numCiSegjointSpectreMeandiff=-0.058
+OK      fig_bbgap            (a) SPECTRE-TAP-CT amos_covid_luna lin                  figure=   +0.027  \numBbdiffAmosCovidLunaLinMeandiff=+0.027
+OK      fig_bbgap            (a) SPECTRE-TAP-CT amos_covid_luna lora                 figure=   +0.011  \numBbdiffAmosCovidLunaLoraMeandiff=+0.011
+OK      fig_bbgap            (a) SPECTRE-TAP-CT amos_covid_luna babmil               figure=   +0.033  \numBbdiffAmosCovidLunaBabmilMeandiff=+0.033
+OK      fig_bbgap            (a) SPECTRE-TAP-CT amos_covid_luna attnft               figure=   +0.018  \numBbdiffAmosCovidLunaAttnftMeandiff=+0.018
+OK      fig_bbgap            (a) SPECTRE-TAP-CT fdg lin                              figure=   +0.010  \numBbdiffFdgLinMeandiff=+0.010
+OK      fig_bbgap            (a) SPECTRE-TAP-CT fdg lora                             figure=   +0.033  \numBbdiffFdgLoraMeandiff=+0.033
+OK      fig_bbgap            (a) SPECTRE-TAP-CT fdg babmil                           figure=   +0.038  \numBbdiffFdgBabmilMeandiff=+0.038
+OK      fig_bbgap            (a) SPECTRE-TAP-CT fdg attnft                           figure=   +0.026  \numBbdiffFdgAttnftMeandiff=+0.026
+OK      fig_bbgap            (a) SPECTRE-TAP-CT rsna2022 lin                         figure=   -0.019  \numBbdiffRsnaBZBBLinMeandiff=-0.019
+OK      fig_bbgap            (a) SPECTRE-TAP-CT rsna2022 lora                        figure=   +0.002  \numBbdiffRsnaBZBBLoraMeandiff=+0.002
+OK      fig_bbgap            (a) SPECTRE-TAP-CT rsna2022 babmil                      figure=   +0.024  \numBbdiffRsnaBZBBBabmilMeandiff=+0.024
+OK      fig_bbgap            (a) SPECTRE-TAP-CT rsna2022 attnft                      figure=   -0.010  \numBbdiffRsnaBZBBAttnftMeandiff=-0.010
+OK      fig_bbgap            (a) SPECTRE-TAP-CT rsna2023 lin                         figure=   +0.052  \numBbdiffRsnaBZBCLinMeandiff=+0.052
+OK      fig_bbgap            (a) SPECTRE-TAP-CT rsna2023 lora                        figure=   +0.087  \numBbdiffRsnaBZBCLoraMeandiff=+0.087
+OK      fig_bbgap            (a) SPECTRE-TAP-CT rsna2023 babmil                      figure=   +0.125  \numBbdiffRsnaBZBCBabmilMeandiff=+0.125
+OK      fig_bbgap            (a) SPECTRE-TAP-CT rsna2023 attnft                      figure=   -0.059  \numBbdiffRsnaBZBCAttnftMeandiff=-0.059
+OK      fig_bbgap            (b) gap lin mean over structure-mode pairs              figure=   +0.018  \numSeggapLinMeandiff=+0.018
+OK      fig_bbgap            (b) gap lin max over datasets                           figure=   +0.087  \numSeggapLinMaxMeandiff=+0.087
+OK      fig_bbgap            (b) gap lin min over datasets                           figure=   -0.017  \numSeggapLinMinMeandiff=-0.017
+OK      fig_bbgap            (b) gap dec mean over structure-mode pairs              figure=   -0.005  \numSeggapDecMeandiff=-0.005
+OK      fig_bbgap            (b) gap dec max over datasets                           figure=   +0.037  \numSeggapDecMaxMeandiff=+0.037
+OK      fig_bbgap            (b) gap dec min over datasets                           figure=   -0.017  \numSeggapDecMinMeandiff=-0.017
+OK      fig_bbgap            (b) gap lora mean over structure-mode pairs             figure=   +0.023  \numSeggapLoraMeandiff=+0.023
+OK      fig_bbgap            (b) gap lora max over datasets                          figure=   +0.052  \numSeggapLoraMaxMeandiff=+0.052
+OK      fig_bbgap            (b) gap lora min over datasets                          figure=   -0.007  \numSeggapLoraMinMeandiff=-0.007
+OK      fig_bbgap            (b) gap dora mean over structure-mode pairs             figure=   +0.032  \numSeggapDoraMeandiff=+0.032
+OK      fig_bbgap            (b) gap dora max over datasets                          figure=   +0.060  \numSeggapDoraMaxMeandiff=+0.060
+OK      fig_bbgap            (b) gap dora min over datasets                          figure=   -0.040  \numSeggapDoraMinMeandiff=-0.040
+OK      fig_bbgap            (b) gap fullft mean over structure-mode pairs           figure=   -0.009  \numSeggapFullftMeandiff=-0.009
+OK      fig_bbgap            (b) gap fullft max over datasets                        figure=   +0.023  \numSeggapFullftMaxMeandiff=+0.023
+OK      fig_bbgap            (b) gap fullft min over datasets                        figure=   -0.030  \numSeggapFullftMinMeandiff=-0.030
+OK      fig_joint            pillar0 rsna2019_ich attnft joint-pertask               figure=   -0.018  metrics/out=-0.018
+OK      fig_joint            pillar0 rsna2019_ich babmil joint-pertask               figure=   +0.023  metrics/out=+0.023
+OK      fig_joint            pillar0 rsna2019_ich fullft joint-pertask               figure=   -0.026  metrics/out=-0.026
+OK      fig_joint            pillar0 rsna2019_ich lin joint-pertask                  figure=   +0.002  metrics/out=+0.002
+OK      fig_joint            pillar0 rsna2019_ich lora joint-pertask                 figure=   -0.017  metrics/out=-0.017
+OK      fig_joint            spectre amos_covid_luna attnft joint-pertask            figure=   -0.038  metrics/out=-0.038
+OK      fig_joint            spectre amos_covid_luna babmil joint-pertask            figure=   -0.028  metrics/out=-0.028
+OK      fig_joint            spectre amos_covid_luna lin joint-pertask               figure=   -0.034  metrics/out=-0.034
+OK      fig_joint            spectre amos_covid_luna lora joint-pertask              figure=   -0.053  metrics/out=-0.053
+OK      fig_joint            spectre fdg attnft joint-pertask                        figure=   +0.058  metrics/out=+0.058
+OK      fig_joint            spectre fdg babmil joint-pertask                        figure=   +0.016  metrics/out=+0.016
+OK      fig_joint            spectre fdg lin joint-pertask                           figure=   +0.027  metrics/out=+0.027
+OK      fig_joint            spectre fdg lora joint-pertask                          figure=   +0.018  metrics/out=+0.018
+OK      fig_joint            spectre rsna2022 attnft joint-pertask                   figure=   +0.083  metrics/out=+0.083
+OK      fig_joint            spectre rsna2022 babmil joint-pertask                   figure=   +0.086  metrics/out=+0.086
+OK      fig_joint            spectre rsna2022 lin joint-pertask                      figure=   +0.050  metrics/out=+0.050
+OK      fig_joint            spectre rsna2022 lora joint-pertask                     figure=   +0.071  metrics/out=+0.071
+OK      fig_joint            spectre rsna2023 attnft joint-pertask                   figure=   +0.031  metrics/out=+0.031
+OK      fig_joint            spectre rsna2023 babmil joint-pertask                   figure=   +0.007  metrics/out=+0.007
+OK      fig_joint            spectre rsna2023 lin joint-pertask                      figure=   -0.002  metrics/out=-0.002
+OK      fig_joint            spectre rsna2023 lora joint-pertask                     figure=   +0.021  metrics/out=+0.021
+OK      fig_joint            tapct amos_covid_luna attnft joint-pertask              figure=   -0.005  metrics/out=-0.005
+OK      fig_joint            tapct amos_covid_luna babmil joint-pertask              figure=   +0.001  metrics/out=+0.001
+OK      fig_joint            tapct amos_covid_luna fullft joint-pertask              figure=   +0.024  metrics/out=+0.024
+OK      fig_joint            tapct amos_covid_luna lin joint-pertask                 figure=   +0.029  metrics/out=+0.029
+OK      fig_joint            tapct amos_covid_luna lora joint-pertask                figure=   +0.001  metrics/out=+0.001
+OK      fig_joint            tapct fdg attnft joint-pertask                          figure=   +0.038  metrics/out=+0.038
+OK      fig_joint            tapct fdg babmil joint-pertask                          figure=   +0.010  metrics/out=+0.010
+OK      fig_joint            tapct fdg fullft joint-pertask                          figure=   -0.161  metrics/out=-0.161
+OK      fig_joint            tapct fdg lin joint-pertask                             figure=   -0.005  metrics/out=-0.005
+OK      fig_joint            tapct fdg lora joint-pertask                            figure=   +0.013  metrics/out=+0.013
+OK      fig_joint            tapct rsna2019_ich attnft joint-pertask                 figure=   +0.004  metrics/out=+0.004
+OK      fig_joint            tapct rsna2019_ich babmil joint-pertask                 figure=   -0.005  metrics/out=-0.005
+OK      fig_joint            tapct rsna2019_ich fullft joint-pertask                 figure=   -0.034  metrics/out=-0.034
+OK      fig_joint            tapct rsna2019_ich lin joint-pertask                    figure=    0.000  metrics/out=0.000
+OK      fig_joint            tapct rsna2019_ich lora joint-pertask                   figure=   +0.012  metrics/out=+0.012
+OK      fig_joint            tapct rsna2022 attnft joint-pertask                     figure=   +0.052  metrics/out=+0.052
+OK      fig_joint            tapct rsna2022 babmil joint-pertask                     figure=   +0.099  metrics/out=+0.099
+OK      fig_joint            tapct rsna2022 fullft joint-pertask                     figure=   +0.095  metrics/out=+0.095
+OK      fig_joint            tapct rsna2022 lin joint-pertask                        figure=   +0.007  metrics/out=+0.007
+OK      fig_joint            tapct rsna2022 lora joint-pertask                       figure=   +0.091  metrics/out=+0.091
+OK      fig_joint            tapct rsna2023 attnft joint-pertask                     figure=   -0.026  metrics/out=-0.026
+OK      fig_joint            tapct rsna2023 babmil joint-pertask                     figure=   +0.054  metrics/out=+0.054
+OK      fig_joint            tapct rsna2023 fullft joint-pertask                     figure=   +0.106  metrics/out=+0.106
+OK      fig_joint            tapct rsna2023 lin joint-pertask                        figure=   +0.001  metrics/out=+0.001
+OK      fig_joint            tapct rsna2023 lora joint-pertask                       figure=   +0.019  metrics/out=+0.019
+OK      fig_joint            rows behind the figure, pooled over backbones: amos_covid_luna attnft figure=   -0.021  \numJointcohortAmosCovidLunaAttnftMeandiff=-0.021
+OK      fig_joint            rows behind the figure, pooled over backbones: amos_covid_luna babmil figure=   -0.014  \numJointcohortAmosCovidLunaBabmilMeandiff=-0.014
+OK      fig_joint            rows behind the figure, pooled over backbones: amos_covid_luna fullft figure=   +0.024  \numJointcohortAmosCovidLunaFullftMeandiff=+0.024
+OK      fig_joint            rows behind the figure, pooled over backbones: amos_covid_luna lin figure=   -0.002  \numJointcohortAmosCovidLunaLinMeandiff=-0.002
+OK      fig_joint            rows behind the figure, pooled over backbones: amos_covid_luna lora figure=   -0.026  \numJointcohortAmosCovidLunaLoraMeandiff=-0.026
+OK      fig_joint            rows behind the figure, pooled over backbones: fdg attnft figure=   +0.048  \numJointcohortFdgAttnftMeandiff=+0.048
+OK      fig_joint            rows behind the figure, pooled over backbones: fdg babmil figure=   +0.013  \numJointcohortFdgBabmilMeandiff=+0.013
+OK      fig_joint            rows behind the figure, pooled over backbones: fdg fullft figure=   -0.161  \numJointcohortFdgFullftMeandiff=-0.161
+OK      fig_joint            rows behind the figure, pooled over backbones: fdg lin  figure=   +0.011  \numJointcohortFdgLinMeandiff=+0.011
+OK      fig_joint            rows behind the figure, pooled over backbones: fdg lora figure=   +0.016  \numJointcohortFdgLoraMeandiff=+0.016
+OK      fig_joint            rows behind the figure, pooled over backbones: rsna2019_ich attnft figure=   -0.007  \numJointcohortRsnaBZAIIchAttnftMeandiff=-0.007
+OK      fig_joint            rows behind the figure, pooled over backbones: rsna2019_ich babmil figure=   +0.009  \numJointcohortRsnaBZAIIchBabmilMeandiff=+0.009
+OK      fig_joint            rows behind the figure, pooled over backbones: rsna2019_ich fullft figure=   -0.030  \numJointcohortRsnaBZAIIchFullftMeandiff=-0.030
+OK      fig_joint            rows behind the figure, pooled over backbones: rsna2019_ich lin figure=   +0.001  \numJointcohortRsnaBZAIIchLinMeandiff=+0.001
+OK      fig_joint            rows behind the figure, pooled over backbones: rsna2019_ich lora figure=   -0.002  \numJointcohortRsnaBZAIIchLoraMeandiff=-0.002
+OK      fig_joint            rows behind the figure, pooled over backbones: rsna2022 attnft figure=   +0.068  \numJointcohortRsnaBZBBAttnftMeandiff=+0.068
+OK      fig_joint            rows behind the figure, pooled over backbones: rsna2022 babmil figure=   +0.093  \numJointcohortRsnaBZBBBabmilMeandiff=+0.093
+OK      fig_joint            rows behind the figure, pooled over backbones: rsna2022 fullft figure=   +0.095  \numJointcohortRsnaBZBBFullftMeandiff=+0.095
+OK      fig_joint            rows behind the figure, pooled over backbones: rsna2022 lin figure=   +0.029  \numJointcohortRsnaBZBBLinMeandiff=+0.029
+OK      fig_joint            rows behind the figure, pooled over backbones: rsna2022 lora figure=   +0.081  \numJointcohortRsnaBZBBLoraMeandiff=+0.081
+OK      fig_joint            rows behind the figure, pooled over backbones: rsna2023 attnft figure=   +0.003  \numJointcohortRsnaBZBCAttnftMeandiff=+0.003
+OK      fig_joint            rows behind the figure, pooled over backbones: rsna2023 babmil figure=   +0.031  \numJointcohortRsnaBZBCBabmilMeandiff=+0.031
+OK      fig_joint            rows behind the figure, pooled over backbones: rsna2023 fullft figure=   +0.106  \numJointcohortRsnaBZBCFullftMeandiff=+0.106
+OK      fig_joint            rows behind the figure, pooled over backbones: rsna2023 lin figure=    0.000  \numJointcohortRsnaBZBCLinMeandiff=0.000
+OK      fig_joint            rows behind the figure, pooled over backbones: rsna2023 lora figure=   +0.020  \numJointcohortRsnaBZBCLoraMeandiff=+0.020
+OK      fig_methods          attn tapct mean (part of title)                         figure=   +0.011  \numPairedTapctLinAttnMeandiff=+0.011
+OK      fig_methods          attn tapct % ahead (part of title)                      figure=       59  \numPairedTapctLinAttnBetter=59
+OK      fig_methods          attn tapct n                                            figure=       78  \numPairedTapctLinAttnN=78
+OK      fig_methods          attn spectre mean (part of title)                       figure=   +0.004  \numPairedSpectreLinAttnMeandiff=+0.004
+OK      fig_methods          attn spectre % ahead (part of title)                    figure=       50  \numPairedSpectreLinAttnBetter=50
+OK      fig_methods          attn spectre n                                          figure=       66  \numPairedSpectreLinAttnN=66
+OK      fig_methods          attn pillar0 mean (part of title)                       figure=   -0.001  \numPairedPillarZLinAttnMeandiff=-0.001
+OK      fig_methods          attn pillar0 % ahead (part of title)                    figure=       42  \numPairedPillarZLinAttnBetter=42
+OK      fig_methods          attn pillar0 n                                          figure=       12  \numPairedPillarZLinAttnN=12
+INFO    fig_methods          attn title: mean +0.007, 54% > 0 over 156 label-mode pairs of paired_cls.csv (no pooled macro)
+OK      fig_methods          lora tapct mean (part of title)                         figure=   +0.032  \numPairedTapctLinLoraMeandiff=+0.032
+OK      fig_methods          lora tapct % ahead (part of title)                      figure=       78  \numPairedTapctLinLoraBetter=78
+OK      fig_methods          lora tapct n                                            figure=       78  \numPairedTapctLinLoraN=78
+OK      fig_methods          lora spectre mean (part of title)                       figure=   +0.037  \numPairedSpectreLinLoraMeandiff=+0.037
+OK      fig_methods          lora spectre % ahead (part of title)                    figure=       74  \numPairedSpectreLinLoraBetter=74
+OK      fig_methods          lora spectre n                                          figure=       66  \numPairedSpectreLinLoraN=66
+OK      fig_methods          lora pillar0 mean (part of title)                       figure=   +0.033  \numPairedPillarZLinLoraMeandiff=+0.033
+OK      fig_methods          lora pillar0 % ahead (part of title)                    figure=       92  \numPairedPillarZLinLoraBetter=92
+OK      fig_methods          lora pillar0 n                                          figure=       12  \numPairedPillarZLinLoraN=12
+INFO    fig_methods          lora title: mean +0.034, 78% > 0 over 156 label-mode pairs of paired_cls.csv (no pooled macro)
+OK      fig_methods          lorag tapct mean (part of title)                        figure=   +0.023  \numPairedTapctLinLoragMeandiff=+0.023
+OK      fig_methods          lorag tapct % ahead (part of title)                     figure=       69  \numPairedTapctLinLoragBetter=69
+OK      fig_methods          lorag tapct n                                           figure=       78  \numPairedTapctLinLoragN=78
+OK      fig_methods          lorag spectre mean (part of title)                      figure=   +0.034  \numPairedSpectreLinLoragMeandiff=+0.034
+OK      fig_methods          lorag spectre % ahead (part of title)                   figure=       65  \numPairedSpectreLinLoragBetter=65
+OK      fig_methods          lorag spectre n                                         figure=       66  \numPairedSpectreLinLoragN=66
+OK      fig_methods          lorag pillar0 mean (part of title)                      figure=   +0.016  \numPairedPillarZLinLoragMeandiff=+0.016
+OK      fig_methods          lorag pillar0 % ahead (part of title)                   figure=       75  \numPairedPillarZLinLoragBetter=75
+OK      fig_methods          lorag pillar0 n                                         figure=       12  \numPairedPillarZLinLoragN=12
+INFO    fig_methods          lorag title: mean +0.027, 68% > 0 over 156 label-mode pairs of paired_cls.csv (no pooled macro)
+OK      fig_methods          babmil tapct mean (part of title)                       figure=   +0.024  \numPairedTapctLinBabmilMeandiff=+0.024
+OK      fig_methods          babmil tapct % ahead (part of title)                    figure=       68  \numPairedTapctLinBabmilBetter=68
+OK      fig_methods          babmil tapct n                                          figure=       78  \numPairedTapctLinBabmilN=78
+OK      fig_methods          babmil spectre mean (part of title)                     figure=   +0.052  \numPairedSpectreLinBabmilMeandiff=+0.052
+OK      fig_methods          babmil spectre % ahead (part of title)                  figure=       77  \numPairedSpectreLinBabmilBetter=77
+OK      fig_methods          babmil spectre n                                        figure=       66  \numPairedSpectreLinBabmilN=66
+OK      fig_methods          babmil pillar0 mean (part of title)                     figure=   +0.026  \numPairedPillarZLinBabmilMeandiff=+0.026
+OK      fig_methods          babmil pillar0 % ahead (part of title)                  figure=       83  \numPairedPillarZLinBabmilBetter=83
+OK      fig_methods          babmil pillar0 n                                        figure=       12  \numPairedPillarZLinBabmilN=12
+INFO    fig_methods          babmil title: mean +0.036, 73% > 0 over 156 label-mode pairs of paired_cls.csv (no pooled macro)
+OK      fig_methods          dora tapct mean (part of title)                         figure=   +0.028  \numPairedTapctLinDoraMeandiff=+0.028
+OK      fig_methods          dora tapct % ahead (part of title)                      figure=       68  \numPairedTapctLinDoraBetter=68
+OK      fig_methods          dora tapct n                                            figure=       78  \numPairedTapctLinDoraN=78
+OK      fig_methods          dora spectre mean (part of title)                       figure=   +0.037  \numPairedSpectreLinDoraMeandiff=+0.037
+OK      fig_methods          dora spectre % ahead (part of title)                    figure=       77  \numPairedSpectreLinDoraBetter=77
+OK      fig_methods          dora spectre n                                          figure=       66  \numPairedSpectreLinDoraN=66
+OK      fig_methods          dora pillar0 mean (part of title)                       figure=   +0.034  \numPairedPillarZLinDoraMeandiff=+0.034
+OK      fig_methods          dora pillar0 % ahead (part of title)                    figure=       92  \numPairedPillarZLinDoraBetter=92
+OK      fig_methods          dora pillar0 n                                          figure=       12  \numPairedPillarZLinDoraN=12
+INFO    fig_methods          dora title: mean +0.032, 74% > 0 over 156 label-mode pairs of paired_cls.csv (no pooled macro)
+OK      fig_methods          rslora tapct mean (part of title)                       figure=   +0.003  \numPairedTapctLinRsloraMeandiff=+0.003
+OK      fig_methods          rslora tapct % ahead (part of title)                    figure=       55  \numPairedTapctLinRsloraBetter=55
+OK      fig_methods          rslora tapct n                                          figure=       78  \numPairedTapctLinRsloraN=78
+OK      fig_methods          rslora spectre mean (part of title)                     figure=   +0.028  \numPairedSpectreLinRsloraMeandiff=+0.028
+OK      fig_methods          rslora spectre % ahead (part of title)                  figure=       70  \numPairedSpectreLinRsloraBetter=70
+OK      fig_methods          rslora spectre n                                        figure=       66  \numPairedSpectreLinRsloraN=66
+OK      fig_methods          rslora pillar0 mean (part of title)                     figure=   +0.032  \numPairedPillarZLinRsloraMeandiff=+0.032
+OK      fig_methods          rslora pillar0 % ahead (part of title)                  figure=      100  \numPairedPillarZLinRsloraBetter=100
+OK      fig_methods          rslora pillar0 n                                        figure=       12  \numPairedPillarZLinRsloraN=12
+INFO    fig_methods          rslora title: mean +0.016, 65% > 0 over 156 label-mode pairs of paired_cls.csv (no pooled macro)
+OK      fig_methods          lin_then_lorag tapct mean (part of title)               figure=   +0.001  \numPairedTapctLinLinThenLoragMeandiff=+0.001
+OK      fig_methods          lin_then_lorag tapct % ahead (part of title)            figure=       51  \numPairedTapctLinLinThenLoragBetter=51
+OK      fig_methods          lin_then_lorag tapct n                                  figure=       78  \numPairedTapctLinLinThenLoragN=78
+OK      fig_methods          lin_then_lorag spectre mean (part of title)             figure=   +0.035  \numPairedSpectreLinLinThenLoragMeandiff=+0.035
+OK      fig_methods          lin_then_lorag spectre % ahead (part of title)          figure=       71  \numPairedSpectreLinLinThenLoragBetter=71
+OK      fig_methods          lin_then_lorag spectre n                                figure=       66  \numPairedSpectreLinLinThenLoragN=66
+OK      fig_methods          lin_then_lorag pillar0 mean (part of title)             figure=   +0.022  \numPairedPillarZLinLinThenLoragMeandiff=+0.022
+OK      fig_methods          lin_then_lorag pillar0 % ahead (part of title)          figure=      100  \numPairedPillarZLinLinThenLoragBetter=100
+OK      fig_methods          lin_then_lorag pillar0 n                                figure=       12  \numPairedPillarZLinLinThenLoragN=12
+INFO    fig_methods          lin_then_lorag title: mean +0.017, 63% > 0 over 156 label-mode pairs of paired_cls.csv (no pooled macro)
+OK      fig_methods          attn_then_lorag tapct mean (part of title)              figure=   +0.008  \numPairedTapctLinAttnThenLoragMeandiff=+0.008
+OK      fig_methods          attn_then_lorag tapct % ahead (part of title)           figure=       56  \numPairedTapctLinAttnThenLoragBetter=56
+OK      fig_methods          attn_then_lorag tapct n                                 figure=       78  \numPairedTapctLinAttnThenLoragN=78
+OK      fig_methods          attn_then_lorag spectre mean (part of title)            figure=   +0.016  \numPairedSpectreLinAttnThenLoragMeandiff=+0.016
+OK      fig_methods          attn_then_lorag spectre % ahead (part of title)         figure=       59  \numPairedSpectreLinAttnThenLoragBetter=59
+OK      fig_methods          attn_then_lorag spectre n                               figure=       66  \numPairedSpectreLinAttnThenLoragN=66
+OK      fig_methods          attn_then_lorag pillar0 mean (part of title)            figure=   +0.013  \numPairedPillarZLinAttnThenLoragMeandiff=+0.013
+OK      fig_methods          attn_then_lorag pillar0 % ahead (part of title)         figure=       92  \numPairedPillarZLinAttnThenLoragBetter=92
+OK      fig_methods          attn_then_lorag pillar0 n                               figure=       12  \numPairedPillarZLinAttnThenLoragN=12
+INFO    fig_methods          attn_then_lorag title: mean +0.012, 60% > 0 over 156 label-mode pairs of paired_cls.csv (no pooled macro)
+OK      fig_methods          attnft tapct mean (part of title)                       figure=   +0.051  \numPairedTapctLinAttnftMeandiff=+0.051
+OK      fig_methods          attnft tapct % ahead (part of title)                    figure=       83  \numPairedTapctLinAttnftBetter=83
+OK      fig_methods          attnft tapct n                                          figure=       78  \numPairedTapctLinAttnftN=78
+OK      fig_methods          attnft spectre mean (part of title)                     figure=   +0.039  \numPairedSpectreLinAttnftMeandiff=+0.039
+OK      fig_methods          attnft spectre % ahead (part of title)                  figure=       70  \numPairedSpectreLinAttnftBetter=70
+OK      fig_methods          attnft spectre n                                        figure=       66  \numPairedSpectreLinAttnftN=66
+OK      fig_methods          attnft pillar0 mean (part of title)                     figure=   +0.034  \numPairedPillarZLinAttnftMeandiff=+0.034
+OK      fig_methods          attnft pillar0 % ahead (part of title)                  figure=       92  \numPairedPillarZLinAttnftBetter=92
+OK      fig_methods          attnft pillar0 n                                        figure=       12  \numPairedPillarZLinAttnftN=12
+INFO    fig_methods          attnft title: mean +0.045, 78% > 0 over 156 label-mode pairs of paired_cls.csv (no pooled macro)
+OK      fig_methods          fullft tapct mean (part of title)                       figure=   +0.022  \numPairedTapctLinFullftMeandiff=+0.022
+OK      fig_methods          fullft tapct % ahead (part of title)                    figure=       72  \numPairedTapctLinFullftBetter=72
+OK      fig_methods          fullft tapct n                                          figure=       78  \numPairedTapctLinFullftN=78
+OK      fig_methods          fullft pillar0 mean (part of title)                     figure=   +0.004  \numPairedPillarZLinFullftMeandiff=+0.004
+OK      fig_methods          fullft pillar0 % ahead (part of title)                  figure=       67  \numPairedPillarZLinFullftBetter=67
+OK      fig_methods          fullft pillar0 n                                        figure=       12  \numPairedPillarZLinFullftN=12
+INFO    fig_methods          fullft title: mean +0.020, 71% > 0 over 90 label-mode pairs of paired_cls.csv (no pooled macro)
+OK      fig_seg_methods      dec tapct - Lin mean (part of title)                    figure=   +0.085  \numSegdeltaTapctLinDecMeandiff=+0.085
+OK      fig_seg_methods      dec tapct - Lin % ahead (part of title)                 figure=       96  \numSegdeltaTapctLinDecBetter=96
+OK      fig_seg_methods      dec spectre - Lin mean (part of title)                  figure=   +0.061  \numSegdeltaSpectreLinDecMeandiff=+0.061
+OK      fig_seg_methods      dec spectre - Lin % ahead (part of title)               figure=       92  \numSegdeltaSpectreLinDecBetter=92
+INFO    fig_seg_methods      dec title: mean +0.073, 94% > 0 over 148 structure-mode pairs of metrics_seg.csv (TAP-CT and SPECTRE pooled; no pooled macro)
+OK      fig_seg_methods      lora tapct - Lin mean (part of title)                   figure=   +0.080  \numSegdeltaTapctLinLoraMeandiff=+0.080
+OK      fig_seg_methods      lora tapct - Lin % ahead (part of title)                figure=       92  \numSegdeltaTapctLinLoraBetter=92
+OK      fig_seg_methods      lora spectre - Lin mean (part of title)                 figure=   +0.085  \numSegdeltaSpectreLinLoraMeandiff=+0.085
+OK      fig_seg_methods      lora spectre - Lin % ahead (part of title)              figure=       89  \numSegdeltaSpectreLinLoraBetter=89
+INFO    fig_seg_methods      lora title: mean +0.082, 91% > 0 over 148 structure-mode pairs of metrics_seg.csv (TAP-CT and SPECTRE pooled; no pooled macro)
+OK      fig_seg_methods      lorag tapct - Lin mean (part of title)                  figure=   +0.069  \numSegdeltaTapctLinLoragMeandiff=+0.069
+OK      fig_seg_methods      lorag tapct - Lin % ahead (part of title)               figure=       90  \numSegdeltaTapctLinLoragBetter=90
+OK      fig_seg_methods      lorag spectre - Lin mean (part of title)                figure=   +0.071  \numSegdeltaSpectreLinLoragMeandiff=+0.071
+OK      fig_seg_methods      lorag spectre - Lin % ahead (part of title)             figure=       85  \numSegdeltaSpectreLinLoragBetter=85
+INFO    fig_seg_methods      lorag title: mean +0.070, 87% > 0 over 118 structure-mode pairs of metrics_seg.csv (TAP-CT and SPECTRE pooled; no pooled macro)
+OK      fig_seg_methods      dora tapct - Lin mean (part of title)                   figure=   +0.070  \numSegdeltaTapctLinDoraMeandiff=+0.070
+OK      fig_seg_methods      dora tapct - Lin % ahead (part of title)                figure=       90  \numSegdeltaTapctLinDoraBetter=90
+OK      fig_seg_methods      dora spectre - Lin mean (part of title)                 figure=   +0.076  \numSegdeltaSpectreLinDoraMeandiff=+0.076
+OK      fig_seg_methods      dora spectre - Lin % ahead (part of title)              figure=       88  \numSegdeltaSpectreLinDoraBetter=88
+INFO    fig_seg_methods      dora title: mean +0.073, 89% > 0 over 118 structure-mode pairs of metrics_seg.csv (TAP-CT and SPECTRE pooled; no pooled macro)
+OK      fig_seg_methods      fullft tapct - Lin mean (part of title)                 figure=   +0.085  \numSegdeltaTapctLinFullftMeandiff=+0.085
+OK      fig_seg_methods      fullft tapct - Lin % ahead (part of title)              figure=       93  \numSegdeltaTapctLinFullftBetter=93
+OK      fig_seg_methods      fullft spectre - Lin mean (part of title)               figure=   +0.058  \numSegdeltaSpectreLinFullftMeandiff=+0.058
+OK      fig_seg_methods      fullft spectre - Lin % ahead (part of title)            figure=       88  \numSegdeltaSpectreLinFullftBetter=88
+INFO    fig_seg_methods      fullft title: mean +0.071, 91% > 0 over 148 structure-mode pairs of metrics_seg.csv (TAP-CT and SPECTRE pooled; no pooled macro)
+OK      fig_seg_methods      dec_then_lora tapct - Lin mean (part of title)          figure=   +0.066  \numSegdeltaTapctLinDecThenLoraMeandiff=+0.066
+OK      fig_seg_methods      dec_then_lora tapct - Lin % ahead (part of title)       figure=       92  \numSegdeltaTapctLinDecThenLoraBetter=92
+OK      fig_seg_methods      dec_then_lora spectre - Lin mean (part of title)        figure=   +0.051  \numSegdeltaSpectreLinDecThenLoraMeandiff=+0.051
+OK      fig_seg_methods      dec_then_lora spectre - Lin % ahead (part of title)     figure=       90  \numSegdeltaSpectreLinDecThenLoraBetter=90
+INFO    fig_seg_methods      dec_then_lora title: mean +0.058, 91% > 0 over 118 structure-mode pairs of metrics_seg.csv (TAP-CT and SPECTRE pooled; no pooled macro)
+INFO    fig_seg_budget       amos22 tapct dec joint_8k: 8 evaluations, last at 8k steps
+INFO    fig_seg_budget       amos22 tapct dec joint: 24 evaluations, last at 24k steps
+INFO    fig_seg_budget       amos22 tapct lora joint_8k: 8 evaluations, last at 8k steps
+INFO    fig_seg_budget       amos22 tapct lora joint: 24 evaluations, last at 24k steps
+INFO    fig_seg_budget       amos22 tapct fullft joint_8k: 8 evaluations, last at 8k steps
+INFO    fig_seg_budget       amos22 tapct fullft joint: 24 evaluations, last at 24k steps
+INFO    fig_seg_budget       amos22 spectre dec joint_8k: 8 evaluations, last at 8k steps
+INFO    fig_seg_budget       amos22 spectre dec joint: 24 evaluations, last at 24k steps
+INFO    fig_seg_budget       amos22 spectre lora joint_8k: 8 evaluations, last at 8k steps
+INFO    fig_seg_budget       amos22 spectre lora joint: 24 evaluations, last at 24k steps
+INFO    fig_seg_budget       amos22 spectre fullft joint_8k: 8 evaluations, last at 8k steps
+INFO    fig_seg_budget       amos22 spectre fullft joint: 24 evaluations, last at 24k steps
+INFO    fig_seg_convergence  group 0 spectre dec: 37 runs
+INFO    fig_seg_convergence  group 0 spectre fullft: 37 runs
+INFO    fig_seg_convergence  group 0 spectre lin: 37 runs
+INFO    fig_seg_convergence  group 0 spectre lora: 37 runs
+INFO    fig_seg_convergence  group 0 tapct dec: 37 runs
+INFO    fig_seg_convergence  group 0 tapct fullft: 37 runs
+INFO    fig_seg_convergence  group 0 tapct lin: 37 runs
+INFO    fig_seg_convergence  group 0 tapct lora: 37 runs
+INFO    fig_seg_convergence  group 1 spectre dec: 3 runs
+INFO    fig_seg_convergence  group 1 spectre fullft: 3 runs
+INFO    fig_seg_convergence  group 1 spectre lin: 3 runs
+INFO    fig_seg_convergence  group 1 spectre lora: 3 runs
+INFO    fig_seg_convergence  group 1 tapct dec: 3 runs
+INFO    fig_seg_convergence  group 1 tapct fullft: 3 runs
+INFO    fig_seg_convergence  group 1 tapct lin: 3 runs
+INFO    fig_seg_convergence  group 1 tapct lora: 3 runs
+INFO    fig_seg_convergence  group 2 spectre dec: 2 runs
+INFO    fig_seg_convergence  group 2 spectre fullft: 2 runs
+INFO    fig_seg_convergence  group 2 spectre lin: 2 runs
+INFO    fig_seg_convergence  group 2 spectre lora: 2 runs
+INFO    fig_seg_convergence  group 2 tapct dec: 2 runs
+INFO    fig_seg_convergence  group 2 tapct fullft: 2 runs
+INFO    fig_seg_convergence  group 2 tapct lin: 2 runs
+INFO    fig_seg_convergence  group 2 tapct lora: 2 runs
+INFO    fig_seg_convergence  group 3 spectre dec: 2 runs
+INFO    fig_seg_convergence  group 3 spectre fullft: 2 runs
+INFO    fig_seg_convergence  group 3 spectre lin: 2 runs
+INFO    fig_seg_convergence  group 3 spectre lora: 2 runs
+INFO    fig_seg_convergence  group 3 tapct dec: 2 runs
+INFO    fig_seg_convergence  group 3 tapct fullft: 2 runs
+INFO    fig_seg_convergence  group 3 tapct lin: 2 runs
+INFO    fig_seg_convergence  group 3 tapct lora: 2 runs

@@ -405,3 +405,20 @@ The "possibly" rows of tab:overlap came from two aggregate datasets in SPECTRE's
   MRI, MLP, LN, ABMIL, FT, DoRA/rsLoRA expansions in Section 2; HU in App. A; LR spelled out in Table 2; caption
   definitions removed from Figs. 1, 2 and Table 1. Dataset and model names left as names.
 - Contribution 1: "(~2k runs)". Main text 10.55 pp, build clean.
+
+### 2026-11-10 Figure font, method-diagram colours, Figure 2 layout
+- Font: every figure uses LM Roman 12 (figures/fonts/, GUST Font License), math in Computer Modern. style.py converts
+  the .otf files once to TrueType outlines in figures/fonts/_ttf/ (gitignored), so the PDFs embed them cleanly.
+  rsLoRA "(alpha/sqrt r)" set as math; Fig 1a method chips 0.02 taller (subscript fit).
+- Method diagrams (Figs 2, 6, 7): no greys; frozen blue, trained in full orange, low-rank adapter green, tokens in
+  shades of the frozen blue, black text (secondary labels italic), square corners. Fig 1a keeps its family colours
+  (its panels b-e use blue/vermillion/green for the backbones).
+- Figure 2: (a) no token strip (patches go straight into ViT-B; only the W CLS tokens are drawn), no "z" outputs
+  (caption: "one logit per label"); (b) one route per tap (blocks 3, 6, 9, 12) to its own 1x1x1 conv, none crossing.
+- draw.io versions (figures/drawio/, drawio_export.py) take the same colours from diagrams.py.
+- Figs 6c and 7b: no asterisks on the parameter counts; the captions already state the excluded never-run Pillar-0
+  blocks and SPECTRE combiner.
+- Removed 13 unused PDFs from paper/figures (fig_convergence, fig_methods_cls(_rank), fig_methods_seg(_rank),
+  fig_modes, fig_perlabel_cls, fig_perstructure_seg, fig_pipeline_cls/_seg, fig_revision, fig_seeds, fig_voco): none is
+  included by the paper, several showed VoCo, and their scripts (results_figures.py, method_figures.py) no longer run
+  without the quarantined VoCo data. Number tables unchanged; 533/533 figure number checks equal; main text 10.59 pp.
