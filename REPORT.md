@@ -443,3 +443,7 @@ number macros used in the paper and every table the paper inputs unchanged. Chan
 Pillar-0 classification trajectory macros of figure_numbers.tex and the Pillar-0 rows of convergence.csv /
 tab_convergence*.tex (they had included the breast runs; fig_fullft_spectre plots TAP-CT and SPECTRE only), numRunsAllN
 1916 -> 1883 (unused), 88 breast rows of metrics_cls.csv. metrics/out and paper/tables refreshed from that rebuild.
+2026-11-11: cited the CVPR 2026 challenge paper of Veenboer et al. (veenboer2026patches; read in full from the
+OpenReview PDF) in the introduction, next to the frozen-evaluation sentence: the challenge's linear-probing track scored
+frozen features, and that solution combined frozen TAP-CT and SPECTRE features through distilled heads and pooling.
+Main text 10.59 -> 10.72 pages.
