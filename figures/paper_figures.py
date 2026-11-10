@@ -25,6 +25,7 @@ the ranks and the summary panels.
 """
 from __future__ import annotations
 
+import os
 import json
 import re
 import shutil
@@ -52,7 +53,7 @@ PAPER_FIG = style.PAPER_DIR / "figures"                  # ../paper/figures
 TABLES = style.PAPER_DIR / "tables"
 NO_VOCO = style.NO_VOCO                                  # True unless WITH_VOCO=1: every figure without the VoCo backbone
 VOCO = [] if NO_VOCO else ["voco"]
-RESULTS = HERE.parents[1] / "midl_paper" / "results"   # root of the run paths in runs.csv (training logs only)
+RESULTS = Path(os.environ.get("BFE_RESULTS") or "/projects/cvpr2026_challenge_fomo4ct/beyond_frozen_encoders")   # root of the run paths in runs.csv (training logs only); BFE_RESULTS overrides
 
 W = TEXTWIDTH_IN                                         # every figure is drawn at the printed width (6.0 in)
 FONT_FLOOR = 7.0                                         # no text below 7 pt at print size

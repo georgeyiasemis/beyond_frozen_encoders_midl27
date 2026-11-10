@@ -12,6 +12,7 @@ bootstrap with seed 42 only (as the main intervals, joint models only) is report
 """
 from __future__ import annotations
 
+import os
 import sys
 from itertools import product
 from pathlib import Path
@@ -23,7 +24,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import recompute as rc  # noqa: E402
 
-RES = HERE.parent.parent / "midl_paper" / "results"
+RES = Path(os.environ.get("BFE_RESULTS") or "/projects/cvpr2026_challenge_fomo4ct/beyond_frozen_encoders")  # structured results folder (tools/organize_results.py); BFE_RESULTS overrides
 SEEDS = (42, 43, 44)
 COMPARISONS = {"loralin": ("lora", "lin"), "attnftlora": ("attnft", "lora")}
 

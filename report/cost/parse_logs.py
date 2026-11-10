@@ -1,10 +1,11 @@
 """Per run of metrics/out/runs.csv (no breast MRI cohort): GPU model and median seconds per training step (between
 consecutive logged iterations, validation excluded) from the run logs. python parse_logs.py <runs.csv> <steps.csv>"""
+import os
 import re, sys, glob
 from datetime import datetime
 from multiprocessing import Pool
 import numpy as np, pandas as pd
-RES = "/home/g.yiasemis/projects/cvpr_ct_challenge/midl_paper/results/"
+RES = (os.environ.get("BFE_RESULTS") or "/projects/cvpr2026_challenge_fomo4ct/beyond_frozen_encoders") + "/"  # structured results folder (tools/organize_results.py); BFE_RESULTS overrides
 TS = re.compile(r"^\[(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d,\d{3})\]")
 IT = re.compile(r"LoggingHook.*- iteration: (\d+),")
 def parse(path):

@@ -11,6 +11,7 @@ paper's three-stage bootstrap (recompute.clustered_ci with recompute.label_boot_
 """
 from __future__ import annotations
 
+import os
 import re
 import sys
 from pathlib import Path
@@ -22,7 +23,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
 import recompute as rc  # noqa: E402
 
-RES = HERE.parent.parent / "midl_paper" / "results"
+RES = Path(os.environ.get("BFE_RESULTS") or "/projects/cvpr2026_challenge_fomo4ct/beyond_frozen_encoders")  # structured results folder (tools/organize_results.py); BFE_RESULTS overrides
 OUT = HERE / "out"
 FAMILY = {"lin": ["lin", "lin_lr1e2", "lin_lr1e4"], "attn": ["attn", "attn_lr3e5", "attn_lr3e4", "attn_lr1e3"]}
 LR = {"lin": 1e-3, "lin_lr1e2": 1e-2, "lin_lr1e4": 1e-4, "attn": 1e-4, "attn_lr3e5": 3e-5, "attn_lr3e4": 3e-4, "attn_lr1e3": 1e-3}
@@ -38,7 +39,7 @@ def run_table() -> pd.DataFrame:
             for r in d.itertuples() if (r.backbone, r.cohort) in PAIRS]
     for bb, ds in PAIRS:
         for m in [x for f in FAMILY.values() for x in f if x not in ("lin", "attn")]:
-            path = f"raw/snellius/{ds}/{bb}/joint/{m}/config"
+            path = f"runs/classification/{ds}/{bb}/joint/{m}/config"
             best = RES / path / "checkpoints" / "best" / "best_val_metric_val_auroc.txt"
             if not best.is_file():
                 continue

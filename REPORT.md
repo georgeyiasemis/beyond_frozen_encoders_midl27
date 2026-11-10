@@ -425,3 +425,21 @@ The "possibly" rows of tab:overlap came from two aggregate datasets in SPECTRE's
 - draw.io files rebuilt natively (figures/drawio_build.py replaces drawio_export.py): labels inside their shapes,
   arrows attached to the shapes they connect (heads, tap routes, LoRA branch, output dots), one image per slice stack,
   whole-pixel geometry, LM Roman 12, colours and every number from diagrams.py. 700 px wide (12 px = 7.4 pt at 6 in).
+
+## 2026-11-10 Results folder
+All inputs of the paper's numbers and figures were copied (originals untouched) into
+`/projects/cvpr2026_challenge_fomo4ct/beyond_frozen_encoders` by `tools/organize_results.py` (layout: that folder's
+README.md; 1966 runs, 5.5 GB, no checkpoints, no VoCo). The scripts now read it (`BFE_RESULTS` overrides):
+recompute.py (inventory, run folders, run YAMLs), e1_probe_lr.py, f1_seed_ci.py, design_numbers.py, cost_table.py,
+parse_logs.py, paper_figures.py, select_cases.py, select_seg_examples.py, case_figures.py (images under data/),
+diagrams.py. Check: full rebuild from the folder with no route to the old tree (strace: no file opened under
+midl_paper/results, aifofomo configs or the dataset roots) reproduced all 136 number macros used in the paper and all 66
+paper/tables files byte for byte; runs.csv, e1_probe_lr_runs.csv, steps.csv and case_selection.json are identical up to
+the run paths; params.csv names another run's log for 2 backbone-method pairs (same counts). Not covered:
+report/scripts/build_run_inventory.py still audits the old mirror midl_paper/results/raw; E2 runs not yet added.
+2026-11-11: breast MRI cohort (breastdivider, 33 Pillar-0 runs) removed from the results folder (now 1933 runs = 1516 main
++ 417 repeats and controls) and dropped by recompute.py when it reads the inventory. Rebuild from the folder: all 136
+number macros used in the paper and every table the paper inputs unchanged. Changed, none of them in the paper: the
+Pillar-0 classification trajectory macros of figure_numbers.tex and the Pillar-0 rows of convergence.csv /
+tab_convergence*.tex (they had included the breast runs; fig_fullft_spectre plots TAP-CT and SPECTRE only), numRunsAllN
+1916 -> 1883 (unused), 88 breast rows of metrics_cls.csv. metrics/out and paper/tables refreshed from that rebuild.

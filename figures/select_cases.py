@@ -19,6 +19,7 @@ Classification (per-task runs): per source, the label with the most held-out pos
 """
 from __future__ import annotations
 
+import os
 import argparse
 import json
 import sys
@@ -31,7 +32,7 @@ import pandas as pd
 HERE = Path(__file__).resolve().parent
 V2 = HERE.parent
 METRICS = V2 / "metrics" / "out"
-RES = V2.parent / "midl_paper" / "results"          # per-case files and saved predictions (read-only)
+RES = Path(os.environ.get("BFE_RESULTS") or "/projects/cvpr2026_challenge_fomo4ct/beyond_frozen_encoders")   # per-case files and saved predictions (read-only); BFE_RESULTS overrides
 OUT_SEL = HERE / "out" / "selection"
 sys.path.insert(0, str(V2 / "metrics"))
 import recompute as rc  # noqa: E402  (label-name mapping only)

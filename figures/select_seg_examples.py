@@ -36,7 +36,7 @@ EXAMPLES = {
 }
 RULE = {"lits": "ends", "amos": "full", "lits_joint": "ends"}
 BACKBONES = ("tapct", "spectre")
-LITS_LABELS = Path("/mnt/kronos/data_public/MSD/Task03_Liver/labelsTr")   # LiTS = MSD Task03 (read-only)
+LITS_LABELS = RES / "data" / "public" / "MSD" / "Task03_Liver" / "labelsTr"   # LiTS = MSD Task03 (copies, read-only)
 
 
 def has_tumor(case: str) -> bool:

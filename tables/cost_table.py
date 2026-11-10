@@ -12,13 +12,14 @@ Memory and GPU time: report/cost/memory.csv (report/cost/measure_memory.py, one 
 median time of one forward-backward-update on the training input, without data loading.
 Writes ../paper/tables/tab_cost.tex, ../paper/tables/cost_numbers.tex and report/cost/gpu_factors.csv.
 """
+import os
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
 V2 = Path(__file__).resolve().parents[1]
-COST = V2 / "report" / "cost"
+COST = Path(os.environ.get("BFE_RESULTS") or "/projects/cvpr2026_challenge_fomo4ct/beyond_frozen_encoders") / "metrics" / "cost"  # structured results folder (tools/organize_results.py); BFE_RESULTS overrides
 OUT = V2 / "paper" / "tables"
 REF_GPU = "H100"
 CLS_METHODS = ["lin", "attn", "lora", "lorag", "babmil", "dora", "rslora", "lin_then_lorag", "attn_then_lorag", "attnft", "fullft"]

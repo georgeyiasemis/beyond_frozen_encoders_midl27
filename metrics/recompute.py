@@ -21,6 +21,7 @@ checks.txt (the verification printout). The statistical procedure is described i
 """
 from __future__ import annotations
 
+import os
 import argparse
 import hashlib
 import math
@@ -38,10 +39,11 @@ import pandas as pd
 from scipy.stats import norm, rankdata, spearmanr
 
 HERE = Path(__file__).resolve().parent
-DEFAULT_INVENTORY = HERE.parent / "report" / "run_inventory.csv"
-DEFAULT_RESULTS = HERE.parents[1] / "midl_paper" / "results"
+BFE = Path(os.environ.get("BFE_RESULTS") or "/projects/cvpr2026_challenge_fomo4ct/beyond_frozen_encoders")  # structured results folder (tools/organize_results.py); BFE_RESULTS overrides
+DEFAULT_INVENTORY = BFE / "metrics" / "run_inventory.csv"
+DEFAULT_RESULTS = BFE
 DEFAULT_DRAFT_NUMBERS = HERE.parents[1] / "midl_paper" / "paper" / "tables" / "numbers.tex"
-FM_ADAPT = Path("/home/g.yiasemis/projects/cvpr_ct_challenge/aifofomo/examples/fm_probes/fm_adapt")
+FM_ADAPT = BFE / "configs" / "classification"   # run YAMLs (copied from aifofomo/examples/fm_probes/fm_adapt)
 
 # ----------------------------------------------------------------------------- design constants
 CLS_METHODS = ["lin", "attn", "lora", "lorag", "babmil", "dora", "rslora", "lin_then_lorag", "attn_then_lorag", "attnft", "fullft"]
@@ -252,9 +254,12 @@ def report_mode(task: str, cohort: str, mode: str) -> tuple[str, int | None]:
 
 def load_inventory(path: Path) -> pd.DataFrame:
     inv = pd.read_csv(path)
-    use = inv[(inv.status == "finished") & (inv.in_design == "yes") & inv.excluded.isna() & inv.aux.isna()].copy()
+    use = inv[(inv.status == "finished") & (inv.in_design == "yes") & inv.excluded.isna() & inv.aux.isna()
+              & ~inv.cohort.isin(EXCLUDED_COHORTS)].copy()   # the breast MRI cohort is not part of the study
     use = use.sort_values(["task", "cohort", "backbone", "mode", "method", "label", "site"]).reset_index(drop=True)
-    use["rel"] = use.path.str.replace(r"^raw/[a-z]+/", "", regex=True)
+    # run key: <cohort>/... (classification) or seg/<dataset>/... (segmentation), from runs/<task>/... or the old raw/<site>/...
+    use["rel"] = (use.path.str.replace(r"^raw/[a-z]+/", "", regex=True).str.replace(r"^runs/classification/", "", regex=True)
+                  .str.replace(r"^runs/segmentation/", "seg/", regex=True))
     dup = use[use.rel.duplicated(keep=False)]
     if len(dup):
         log(f"WARNING: {dup.rel.nunique()} runs finished on both sites; keeping the first in site order (gaia, snellius)")

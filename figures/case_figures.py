@@ -43,8 +43,8 @@ SEG_BACKBONES = ["tapct", "spectre", "voco"]
 if style.NO_VOCO:
     BB_ORDER = [b for b in BB_ORDER if b != "voco"]
     SEG_BACKBONES = [b for b in SEG_BACKBONES if b != "voco"]
-CVPR = "/projects/cvpr2026_challenge_fomo4ct/CVPR26-3DCTFMCompetition"
-DP = "/mnt/kronos/data_public"
+CVPR = str(RES / "data" / "cvpr26")   # copies of the shown images (tools/organize_results.py)
+DP = str(RES / "data" / "public")
 SOURCES = {  # key: (title, cohort, view, window); cohort names as style.COHORT_TEX
     "amos": ("CVPR26: AMOS", "amos_covid_luna", "coronal", (-160, 240)),
     "covid": ("CVPR26: COVID-CTset", "amos_covid_luna", "axial", (-1350, 150)),
@@ -68,7 +68,7 @@ def image_path(src: str, case: str) -> Path:
     if src == "fdg":
         for r in csv.DictReader(open(f"{DP}/FDG-PET-CT-Lesions/cls_labels.csv")):
             if r["case_id"] == case:
-                return Path(r["ct_path"])
+                return Path(r["ct_path"].replace("/mnt/kronos/data_public", DP))   # table holds absolute paths
     if src == "rsna2022":
         return Path(f"{DP}/RSNA-2022-Cervical-Spine-Fracture-Detection/images/{case}.nii.gz")
     if src == "rsna2023":
@@ -76,7 +76,7 @@ def image_path(src: str, case: str) -> Path:
     if src == "ich":
         for r in csv.DictReader(open(f"{DP}/RSNA-2019-Intracranial-Hemorrhage-Detection/niftis/patient_table_stratified_5k.csv")):
             if r["case_id"] == case:
-                return Path(r["file_path"])
+                return Path(r["file_path"].replace("/mnt/kronos/data_public", DP))   # table holds absolute paths
     raise FileNotFoundError(f"{src} {case}")
 
 

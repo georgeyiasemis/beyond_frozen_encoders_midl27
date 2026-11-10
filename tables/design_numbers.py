@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 """Design counts quoted in the paper (methods, labels, runs, split sizes), computed from the run inventory and the
 per-case files; written to paper/tables/design_numbers.tex. Metric numbers come from metrics/recompute.py."""
+import os
 from pathlib import Path
 import pandas as pd
 
 V2 = Path(__file__).resolve().parents[1]
-RAW = V2.parent / "midl_paper" / "results"
-inv = pd.read_csv(V2 / "report" / "run_inventory.csv")
+RAW = Path(os.environ.get("BFE_RESULTS") or "/projects/cvpr2026_challenge_fomo4ct/beyond_frozen_encoders")  # structured results folder (tools/organize_results.py); BFE_RESULTS overrides
+inv = pd.read_csv(RAW / "metrics" / "run_inventory.csv")
 inv = inv[(inv.status == "finished") & (inv.in_design == "yes") & inv.excluded.isna() & inv.aux.isna()]
 inv = inv[inv.cohort != "breastdivider"]
 # one row per designed run (drop the second site copy)

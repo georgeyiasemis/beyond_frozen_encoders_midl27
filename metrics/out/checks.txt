@@ -1,12 +1,12 @@
 
 == Verification ==
 (a) cls: 5 random runs, recomputed selection-split macro metric vs logged best value:
-    rsna2019_ich/tapct/pertask/attn/subarachnoid/subarachnoid: iter 5000, logged 0.870024, recomputed 0.870024, |diff| 2.35e-08 OK
-    fdg/tapct/pertask/dora/NEGATIVE/NEGATIVE: iter 7000, logged 0.759808, recomputed 0.759808, |diff| 2.39e-08 OK
-    amos_covid_luna/tapct/pertask/babmil/atherosclerosis/atherosclerosis: iter 4000, logged 0.859477, recomputed 0.859477, |diff| 2.14e-08 OK
-    amos_covid_luna/tapct/pertask/fullft/liver_lesion/liver_lesion: iter 2000, logged 0.716435, recomputed 0.716435, |diff| 8.83e-09 OK
-    rsna2022/tapct/pertask/fullft/patient_overall/patient_overall: iter 2000, logged 0.698908, recomputed 0.698908, |diff| 2.69e-08 OK
-    all 1145 cls runs: max |diff| 2.98e-08; runs above 2e-3: 0; best-iteration file mismatch: 0
+    rsna2019_ich/tapct/pertask/attnft/subarachnoid/subarachnoid: iter 4000, logged 0.886781, recomputed 0.886781, |diff| 1.93e-08 OK
+    fdg/tapct/pertask/lora/NEGATIVE/NEGATIVE: iter 3000, logged 0.762504, recomputed 0.762504, |diff| 4.64e-10 OK
+    amos_covid_luna/tapct/pertask/attnft/liver_calcifications/liver_calcifications: iter 4000, logged 0.515480, recomputed 0.515480, |diff| 1.35e-08 OK
+    amos_covid_luna/tapct/pertask/fullft/atherosclerosis/atherosclerosis: iter 6000, logged 0.862745, recomputed 0.862745, |diff| 8.18e-09 OK
+    rsna2022/tapct/pertask/lin/C5/C5: iter 8000, logged 0.577791, recomputed 0.577791, |diff| 1.25e-08 OK
+    all 1112 cls runs: max |diff| 2.98e-08; runs above 2e-3: 0; best-iteration file mismatch: 0
 (a) seg: 5 random runs, recomputed selection-split macro metric vs logged best value:
     seg/totalseg/spectre/pertask_cm/fullft/lungs_airway/lungs_airway: iter 2800, logged 0.895778, recomputed 0.895778, |diff| 4.23e-08 OK
     seg/kits23/tapct/joint_s44/fullft/config: iter 4000, logged 0.512386, recomputed 0.512386, |diff| 3.71e-08 OK
@@ -21,13 +21,12 @@
     pillar0: 6 classification labels {'rsna2019_ich': 6}; 0 segmentation structures
     voco: 0 classification labels {}; 0 segmentation structures
     pooled main backbones: 39 distinct cohort-label pairs; label-level n per backbone: {'all': 78, 'tapct': 39, 'spectre': 33, 'pillar0': 6}
-(d) task_index -> label mapping of joint classification runs: 2202 labels compared with the logged per-label validation AUROC, 0 mismatches > 2e-3, 0 runs without metrics.json
-changes_vs_draft: 3406 shared macros, 123 changed, 483 only in the draft, 1225 new
+(d) task_index -> label mapping of joint classification runs: 2180 labels compared with the logged per-label validation AUROC, 0 mismatches > 2e-3, 0 runs without metrics.json
 
 == Summary ==
 runs used per task/backbone (all finished design runs incl. seeds, revision, compute-matched):
 task  backbone
-cls   pillar0     123
+cls   pillar0      90
       spectre     462
       tapct       560
 seg   spectre     383
@@ -43,41 +42,25 @@ rows per output file:
     changes_vs_draft.csv: 3406
     cohort_means.csv: 603
     convergence.csv: 154
+    e1_probe_lr_labels.csv: 312
+    e1_probe_lr_runs.csv: 80
+    e1_probe_lr_selection.csv: 20
+    e1_probe_lr_summary.csv: 16
+    f1_seed_ci.csv: 8
     label_ci.csv: 3636
     label_level.csv: 114
     label_level_values.csv: 2278
-    metrics_cls.csv: 6164
+    metrics_cls.csv: 6076
     metrics_seg.csv: 4054
     paired_cls.csv: 6240
     paired_seg.csv: 2394
     params.csv: 33
     ranks.csv: 65
     revision.csv: 1214
-    runs.csv: 1916
+    runs.csv: 1883
     seeds.csv: 202
     seeds_summary.csv: 44
-    selection_check.csv: 1916
+    selection_check.csv: 1883
     spread.csv: 33
     numbers.tex: 4632 macros
 notes (skipped labels / pairs): 0 -> notes.txt
-20 largest changes vs the draft:
-    numVocoRunsSegDoneN: 263.0 -> 0.0 (|d| = 263)
-    numVocoRunsSegN: 263.0 -> 0.0 (|d| = 263)
-    numVocoRunsClsDoneN: 209.0 -> 0.0 (|d| = 209)
-    numVocoRunsClsN: 209.0 -> 0.0 (|d| = 209)
-    numVocosegrankSlotsN: 59.0 -> 0.0 (|d| = 59)
-    numVocorankSlotsN: 32.0 -> 0.0 (|d| = 32)
-    numSegpairedSpectreDecDoraSigbetter: 58.0 -> 54.0 (|d| = 4)
-    numSegpairedSpectreDecLoraSigbetter: 61.0 -> 57.0 (|d| = 4)
-    numPairedSpectreFullftDoraSigbetter: 42.0 -> 44.0 (|d| = 2)
-    numPairedTapctFullftDoraSigbetter: 15.0 -> 17.0 (|d| = 2)
-    numPairedTapctLinFullftSigworse: 6.0 -> 8.0 (|d| = 2)
-    numSegpairedSpectreDecDecThenLoraSigbetter: 22.0 -> 20.0 (|d| = 2)
-    numSegpairedSpectreDecDoraSigworse: 14.0 -> 12.0 (|d| = 2)
-    numSegpairedSpectreDecLoragSigbetter: 44.0 -> 46.0 (|d| = 2)
-    numSegpairedTapctLinDecSigbetter: 95.0 -> 93.0 (|d| = 2)
-    numSegpairedTapctLinDoraSigbetter: 88.0 -> 90.0 (|d| = 2)
-    numCohortFdgPatientsTest: 99.0 -> 98.0 (|d| = 1)
-    numCohortFdgTest: 122.0 -> 121.0 (|d| = 1)
-    numCohortRsnaBZBBVal: 202.0 -> 201.0 (|d| = 1)
-    numPairedTapctFullftAttnSigworse: 17.0 -> 18.0 (|d| = 1)

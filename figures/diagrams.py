@@ -20,6 +20,7 @@ and from the code (aifofomo/), cited next to each constant.
 """
 from __future__ import annotations
 
+import os
 import argparse
 import json
 import math
@@ -43,7 +44,7 @@ import style  # noqa: E402
 from style import BACKBONE_TEX, TEXTWIDTH_IN  # noqa: E402
 
 ROOT = HERE.parents[1]                                     # .../cvpr_ct_challenge
-OLD_RESULTS = ROOT / "midl_paper" / "results"              # read only
+OLD_RESULTS = Path(os.environ.get("BFE_RESULTS") or "/projects/cvpr2026_challenge_fomo4ct/beyond_frozen_encoders")   # read only; BFE_RESULTS overrides
 DATA = HERE / "data"
 OUT = style.FIG_OUT                                       # figures/out
 PAPER_FIG = style.PAPER_DIR / "figures"
@@ -95,8 +96,8 @@ def _harvest_seg_logs() -> pd.DataFrame:
     for bb in ("tapct", "spectre", "voco"):
         for m in ("lin", "dec", "lora", "lorag", "dora", "fullft", "dec_then_lora"):
             hit = None
-            for site_dir in sorted((OLD_RESULTS / "raw").iterdir()):
-                for run in sorted(site_dir.glob(f"seg/amos22/{bb}/joint/{m}")):
+            for site_dir in [OLD_RESULTS / "runs" / "segmentation"]:
+                for run in sorted(site_dir.glob(f"amos22/{bb}/joint/{m}")):
                     for log in sorted(run.rglob("log_0_0.txt")):
                         for line in log.read_text(errors="ignore").splitlines():
                             g = pat.search(line)
@@ -169,7 +170,7 @@ def _pillar0_no_grad() -> dict[str, int]:
 def refresh_data() -> None:
     """Copy / harvest every number the diagrams draw into data/ (run once; reads the previous draft's results read-only)."""
     DATA.mkdir(exist_ok=True)
-    shutil.copyfile(OLD_RESULTS / "trainable_params.csv", DATA / "trainable_params_cls.csv")
+    shutil.copyfile(OLD_RESULTS / "metrics" / "trainable_params.csv", DATA / "trainable_params_cls.csv")
     seg = _harvest_seg_logs()
     # SPECTRE segmentation: `module` is the whole SpectreImageFeatureExtractor (backbones.py l.147-149), so all-block
     # LoRA/DoRA also wrap the combiner's q/kv and Full FT unfreezes it, but features() calls only the ViT
