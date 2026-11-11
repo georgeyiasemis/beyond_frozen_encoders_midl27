@@ -33,6 +33,10 @@ FM = PROJ / "aifofomo" / "examples" / "fm_probes"
 CVPR = Path("/projects/cvpr2026_challenge_fomo4ct/CVPR26-3DCTFMCompetition")
 PUBLIC = Path("/mnt/kronos/data_public")
 E1 = {"lin_lr1e2", "lin_lr1e4", "attn_lr3e5", "attn_lr3e4", "attn_lr1e3"}
+E2_ROOT = Path("/projects/direct/temp/fm_probe/v2")   # Gaia save root of the E2 LoRA learning-rate runs
+E2_PAIRS = [("tapct", "amos_covid_luna"), ("tapct", "fdg"), ("tapct", "rsna2023"), ("tapct", "rsna2022"), ("tapct", "rsna2019_ich"),
+            ("spectre", "amos_covid_luna"), ("spectre", "fdg"), ("spectre", "rsna2023"), ("spectre", "rsna2022"), ("pillar0", "rsna2019_ich")]
+NO_COPY = shutil.ignore_patterns("*.pt", "*.ptbest", "*.pth", "tensorboard")
 
 
 def rel_of(path: str) -> str:
@@ -67,7 +71,7 @@ def copy(src: Path, dst: Path, dry: bool) -> int:
         return sum(f.stat().st_size for f in src.rglob("*") if f.is_file()) if src.is_dir() else src.stat().st_size
     dst.parent.mkdir(parents=True, exist_ok=True)
     if src.is_dir():
-        shutil.copytree(src, dst, dirs_exist_ok=True, copy_function=_cp)
+        shutil.copytree(src, dst, dirs_exist_ok=True, copy_function=_cp, ignore=NO_COPY)   # results only, no model weights
         return sum(f.stat().st_size for f in dst.rglob("*") if f.is_file())
     _cp(str(src), str(dst))
     return dst.stat().st_size
@@ -103,6 +107,20 @@ def main() -> None:
                          design_class=dc.iloc[0] if len(dc) else "", path=new_path(rel), config=ydst,
                          eval_config=str(Path(ydst).parent / "eval" / Path(ydst).name) if ev.is_file() else "",
                          source_path=f"midl_paper/results/{src}", source_config=str(ysrc.relative_to(PROJ))))
+    # E2 (LoRA learning rate 3e-4 / 3e-5, joint classification): finished runs of the Gaia save root, without checkpoints
+    for bb, ds in E2_PAIRS:
+        for m in ("lora_lr3e5", "lora_lr3e4"):
+            src_dir = E2_ROOT / ds / bb / "joint" / m / "config"
+            best = src_dir / "checkpoints" / "best" / "best_val_metric_val_auroc.txt"
+            iters = sorted(int(p.name[5:]) for p in (src_dir / "val_case_metrics").glob("iter_*")) if src_dir.is_dir() else []
+            if not best.is_file() or not iters or iters[-1] < 8000:
+                continue
+            rel = f"{ds}/{bb}/joint/{m}/config"
+            ysrc, ydst = config_of(rel)
+            it = int(re.search(r"iteration:\s*(\d+)", best.read_text()).group(1))
+            rows.append(dict(task="cls", cohort=ds, backbone=bb, mode="joint", method=m, label="joint", seed=42, best_iter=it,
+                             final_iter=iters[-1], part="e2_lora_lr", design_class="", path=new_path(rel), config=ydst, eval_config="",
+                             source_path=str(src_dir), source_config=str(ysrc.relative_to(PROJ))))
     index = pd.DataFrame(rows)
     assert index.path.is_unique, "two runs map to one folder"
     n = 0

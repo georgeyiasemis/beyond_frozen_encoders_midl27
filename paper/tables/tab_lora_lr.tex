@@ -1,0 +1,25 @@
+\begin{tabular}{lrrrrrr}
+\toprule
+ & & & \multicolumn{3}{c}{LoRA learning rate} & \\
+\cmidrule(lr){4-6}
+Cohort & Lin & Attn & $3\times10^{-5}$ & $10^{-4}$ & $3\times10^{-4}$ & Attn-only FT \\
+\midrule
+\multicolumn{7}{@{}l}{\textit{TAP-CT}} \\
+CVPR26 & 0.707 & 0.720 & 0.714 & 0.733 & 0.617 & 0.739 \\
+FDG-PET/CT & 0.858 & 0.860 & 0.865 & 0.866 & \textcolor{gray}{0.536} & 0.870 \\
+RSNA23 trauma & 0.739 & 0.738 & 0.735 & 0.757 & 0.633 & 0.833 \\
+RSNA22 C-spine & 0.626 & 0.624 & 0.607 & 0.714 & \textcolor{gray}{0.614} & 0.712 \\
+RSNA19 ICH & 0.871 & 0.877 & 0.890 & 0.906 & 0.863 & 0.915 \\
+\multicolumn{7}{@{}l}{\textit{SPECTRE}} \\
+CVPR26 & 0.702 & 0.738 & 0.740 & 0.716 & 0.649 & 0.740 \\
+FDG-PET/CT & 0.884 & 0.880 & 0.898 & 0.901 & 0.807 & 0.906 \\
+RSNA23 trauma & 0.789 & 0.788 & 0.843 & 0.846 & 0.842 & 0.803 \\
+RSNA22 C-spine & 0.629 & 0.601 & 0.642 & 0.706 & 0.593 & 0.718 \\
+\multicolumn{7}{@{}l}{\textit{Pillar-0}} \\
+RSNA19 ICH & 0.888 & 0.888 & 0.914 & 0.912 & 0.920 & 0.912 \\
+\midrule
+All (78 labels) & 0.739 & 0.747 & 0.755 & 0.774 & 0.681 & 0.785 \\
+LoRA $-$ Attn-only FT & & & $-0.030$ & $-0.011$ & $-0.103$ & \\
+ & & & \scriptsize [$-0.063$, $-0.003$] & \scriptsize [$-0.027$, $+0.005$] & \scriptsize [$-0.154$, $-0.058$] & \\
+\bottomrule
+\end{tabular}

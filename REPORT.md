@@ -447,3 +447,25 @@ tab_convergence*.tex (they had included the breast runs; fig_fullft_spectre plot
 OpenReview PDF) in the introduction, next to the frozen-evaluation sentence: the challenge's linear-probing track scored
 frozen features, and that solution combined frozen TAP-CT and SPECTRE features through distilled heads and pooling.
 Main text 10.59 -> 10.72 pages.
+2026-11-11: backbones and parameter counts checked against the weights (TAP-CT-B-3D fomofo/tap-ct-b-3d: 12 blocks,
+4x8x8 patches, CLS + 4 registers, 87.08 M; SPECTRE-Large cclaess/SPECTRE-Large: 24-block backbone, 16x16x8 patches,
+4-block combiner, 396.9 M; Pillar-0 head CT: conv stem + stages of 2/2/8 blocks, 11 channels, 1152-d, 94.1 M) and
+against the logged configs and counts of all 1883 logged runs. One fix: the decoder grows by 17C on both backbones
+(final 1x1x1 convolution from 16 channels), not 33C on SPECTRE. Not committed.
+
+## LoRA learning-rate ablation (E2), 2026-11-11
+
+- 20 joint LoRA runs at 3e-5 and 3e-4 (default 1e-4), seed 42, the 10 cohort–backbone pairs of E1; all finished 8000 steps.
+- Reported as an ablation (no learning rate picked per pair): `metrics/e2_lora_lr.py` writes `paper/tables/tab_lora_lr.tex`
+  (App. D, Tab. `tab:loralr`) and `paper/tables/lora_lr_numbers.tex`. Held-out AUROC over the 78 labels: 0.755 (3e-5),
+  0.774 (1e-4), 0.681 (3e-4); Attn-only FT 0.785. LoRA − Attn-only FT: −0.030 [−0.063, −0.003], −0.011 [−0.027, +0.005],
+  −0.103 [−0.154, −0.058]. Two 3e-4 runs (TAP-CT FDG, RSNA22) collapse (prediction spread < 0.01, grey).
+- Run count of repeats and controls 417 → 437 (`e1_probe_lr.py` counts the E2 runs); stats.tex sentence updated.
+- Main text unchanged (10.72 pp).
+- Appendix prose (2026-11-11): every appendix float not cited in the main text now has a paragraph in its own appendix
+  (purpose, runs and mode, table, result, numbers from macros): App. C (methods ranks, paired tests, encoder adaptation
+  on the decoder + seg budget figure, between backbones, prediction spread), App. D (seed repeats, LoRA learning rate),
+  App. E (per-cohort tables), App. F (cohort tables, pretraining overlap).
+- Training mode stated everywhere: captions (Fig. 1, cls/gain figures, optim tables, cost, seg/key/method figures,
+  ranks, convergence groups, backbone gap, spread, full-FT trajectories, case figures) and the results sentences that
+  pool modes. Main text 10.72 -> 10.79 pp.

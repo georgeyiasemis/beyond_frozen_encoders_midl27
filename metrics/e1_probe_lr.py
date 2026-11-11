@@ -135,9 +135,11 @@ def write_paper(sel: pd.DataFrame, summ: pd.DataFrame, n_runs_e1: int) -> None:
     change_bb = max(abs(piv.loc[(p, "selected", bb)]["mean"] - piv.loc[(p, "default", bb)]["mean"])
                     for p in FAMILY for bb in ("tapct", "spectre", "pillar0"))
     n_e1 = int(n_runs_e1)
+    n_e2 = sum((RES / f"runs/classification/{ds}/{bb}/joint/{m}/config/checkpoints/best/best_val_metric_val_auroc.txt").is_file()
+               for bb, ds in PAIRS for m in ("lora_lr3e5", "lora_lr3e4"))   # LoRA learning-rate runs (e2_lora_lr.py)
     src = "".join(f.read_text() for f in sorted(tex.glob("*.tex")) if f.name != "probe_lr_numbers.tex")
     rev = int(re.search(r"numRunsRevisionN\}\{(\d+)\}", src).group(1))
-    macros = {"numProbelrRunsN": str(n_e1), "numRunsRevisionAllN": str(rev + n_e1), "numProbelrMaxchange": f"{change:.3f}", "numProbelrMaxchangeBb": f"{change_bb:.3f}", "numProbelrPairsN": str(n_pairs),
+    macros = {"numProbelrRunsN": str(n_e1), "numRunsRevisionAllN": str(rev + n_e1 + n_e2), "numProbelrMaxchange": f"{change:.3f}", "numProbelrMaxchangeBb": f"{change_bb:.3f}", "numProbelrPairsN": str(n_pairs),
               "numProbelrLinKeptN": str(lin_kept), "numProbelrAttnLowN": str(attn_low)}
     for kind, tg in (("default", "Def"), ("selected", "Sel")):   # Pillar-0 LoRA - Lin (third review, A6)
         r = piv.loc[("lin", kind, "pillar0")]
