@@ -1,4 +1,4 @@
-paper_figures.py number check: 646 comparisons, 533 equal, 0 different, 0 without a reference
+paper_figures.py number check: 647 comparisons, 534 equal, 0 different, 0 without a reference
 OK      fig_overview         (b) pooled AUROC pillar0 attn                           figure=    0.886  \pooledpillarZattn=0.886
 OK      fig_overview         (b) pooled AUROC pillar0 attn_then_lorag                figure=    0.900  \pooledpillarZattnthenlorag=0.900
 OK      fig_overview         (b) pooled AUROC pillar0 attnft                         figure=    0.922  \pooledpillarZattnft=0.922
@@ -39,6 +39,7 @@ OK      fig_overview         (a) classification methods vs design_numbers.tex   
 OK      fig_overview         (a) segmentation methods vs design_numbers.tex          figure=        7  metrics/out=7
 OK      fig_overview         (a) classification cohorts                              figure=        5  metrics/out=5
 OK      fig_overview         (a) segmentation datasets                               figure=        5  metrics/out=5
+OK      fig_overview         (a) Pillar-0 logged total = checkpoint - BatchNorm buffers <= checkpoint figure=     True  metrics/out=True
 OK      fig_overview         (a) classification methods listed                       figure=       11  metrics/out=11
 OK      fig_overview         (a) segmentation methods listed                         figure=        7  metrics/out=7
 INFO    fig_overview         (b) encoder parameters updated, frozen: 0 M (TAP-CT, SPECTRE, Pillar-0; caption)

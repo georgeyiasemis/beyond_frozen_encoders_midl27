@@ -469,3 +469,10 @@ against the logged configs and counts of all 1883 logged runs. One fix: the deco
 - Training mode stated everywhere: captions (Fig. 1, cls/gain figures, optim tables, cost, seg/key/method figures,
   ranks, convergence groups, backbone gap, spread, full-FT trajectories, case figures) and the results sentences that
   pool modes. Main text 10.72 -> 10.79 pp.
+- Pillar-0 check (2026-11-11): checkpoint 94,147,402 = Atlas vision encoder with stem 80,373,440 (incl. 3,209 BatchNorm
+  buffers) + CLIP text projection 13,770,753 (never runs); 44,843,456 parameters run on head CT (= gradient check);
+  35,529,984 in per-scale sub-blocks that never run. Fig. 1(a) now gives the vision encoder, 80 M (was 94 M, which
+  included the text projection; TAP-CT and SPECTRE count the vision model only), from figures/data/pillar0_parts.csv
+  (diagrams.write_pillar0_parts, safetensors header). Architecture named Atlas in Fig. 1(a), intro, methods and Fig. 6.
+- Draw.io Figure 1: panel (a) native cells; panels (b)-(e) and the legend are matplotlib renders of the paper figure,
+  embedded as SVG (text as outlines), so the plotted values cannot drift from the PDF.

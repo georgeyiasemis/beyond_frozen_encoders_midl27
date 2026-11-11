@@ -9,10 +9,10 @@ paper figures); the font is LM Roman 12 (fonts/lmroman12-*.otf; install it to se
 
 Canvas 700 px wide (placed at the 6.0 in text width: 12 px = 7.4 pt printed).
 
-fig_overview is converted from the matplotlib figure that paper_figures.fig_overview() draws (same data, same layout):
-every patch, text, line and marker of that figure becomes a draw.io cell at its printed position (the figure's tight
-bounding box mapped onto the 700 px canvas), method names sit inside their boxes, the card arrows are attached to the
-cards, and panels (b)-(e) are drawn as native axes, gridlines, ticks, lines and markers. No value is typed in here.
+fig_overview: panel (a), the design schematic, is converted from the matplotlib figure that paper_figures.fig_overview()
+draws into native cells (cards, method boxes with their names inside, attached arrows). Panels (b)-(e) and the legend
+are the data plots: they are rendered by matplotlib from that same figure and embedded as SVG images at their printed
+positions, so their values cannot drift from the PDF. No value is typed in here.
 
     python drawio_build.py   -> ../paper/figures/drawio/<name>.drawio and <name>_preview.png (a redraw of the cells, for checking)
 """
@@ -100,6 +100,13 @@ class Doc:
         b64 = base64.b64encode(png).decode()
         return self.vertex(x, y, round(w, 1), round(h, 1),
                            f"shape=image;html=1;imageAspect=0;aspect=fixed;image=data:image/png,{b64};", "",
+                           ("image", x, y, w, h, np.asarray(im.convert("RGBA"))))
+
+    def svg_image(self, x, y, w, h, svg: bytes, png: bytes) -> str:
+        """An SVG image cell of size w x h; the PNG render of the same image is used by the preview only."""
+        b64 = base64.b64encode(svg).decode()
+        im = Image.open(io.BytesIO(png))
+        return self.vertex(x, y, w, h, f"shape=image;html=1;imageAspect=0;aspect=fixed;image=data:image/svg+xml,{b64};", "",
                            ("image", x, y, w, h, np.asarray(im.convert("RGBA"))))
 
     # ---- connectors
@@ -714,16 +721,6 @@ def fig_overview() -> Doc:
             w, h = sz * ext.width, sz * ext.height
             doc.marker(cx, cy, w, h, kind, fc, ec if ea > 0 else "none", round(lw * pxpt, 1) if ec != "none" else 0, opacity=round(fa * 100))
 
-    def put_line(l):
-        xy = l.get_transform().transform(l.get_xydata())
-        pts = [tuple(round(v, 1) for v in P(*p)) for p in xy]
-        col, a = _hex(l.get_color())
-        ls = l.get_linestyle()
-        dash = {":": "1 2", "--": "4 3", "-.": "4 2 1 2"}.get(ls)
-        if ls in ("None", "", " ") or len(pts) < 2:
-            return
-        doc.polyline(pts, col, round(l.get_linewidth() * pxpt, 1), dash, round(a * 100))
-
     axes = fig.axes
     # ---------------------------------------------------------------- (a) design: cards, method boxes, markers, arrows
     ax = axes[0]
@@ -762,79 +759,28 @@ def fig_overview() -> Doc:
         doc.edge(a_, b_, (0.5, 1), (0.5, 0), color=arrow_col, lw=round(arrow_lw * pxpt, 1))
     put_text(ax._left_title)
 
-    # ---------------------------------------------------------------- (b)-(e) data panels
-    for ax in axes[1:]:
-        bx, by, bw, bh = box_of(ax)
-        (xl0, xl1), (yl0, yl1) = ax.get_xlim(), ax.get_ylim()
-        for p in ax.patches:                                    # shaded band (axvspan)
-            x, y, w, h = box_of(p)
-            x0, x1 = max(x, bx), min(x + w, bx + bw); y0, y1 = max(y, by), min(y + h, by + bh)
-            fc, _ = _hex(p.get_facecolor())
-            doc.vertex(round(x0), round(y0), round(x1 - x0), round(y1 - y0), f"rounded=0;html=1;fillColor={fc};strokeColor=none;", "",
-                       ("rect", round(x0), round(y0), round(x1 - x0), round(y1 - y0), fc, "none", 0, "", FS, False, False, "center", "middle", BLACK))
-        for axis, lo, hi in ((ax.xaxis, xl0, xl1), (ax.yaxis, yl0, yl1)):   # gridlines at the visible major ticks
-            gl = axis.get_gridlines()
-            if not any(g.get_visible() for g in gl):
-                continue
-            col, _ = _hex(gl[0].get_color()); lw = round(gl[0].get_linewidth() * pxpt, 1)
-            for v in axis.get_majorticklocs():
-                if min(lo, hi) - 1e-9 <= v <= max(lo, hi) + 1e-9:
-                    if axis is ax.yaxis:
-                        _, yy = P(*ax.transData.transform((xl0, v)))
-                        doc.polyline([(round(bx, 1), round(yy, 1)), (round(bx + bw, 1), round(yy, 1))], col, lw)
-                    else:
-                        xx, _ = P(*ax.transData.transform((v, yl0)))
-                        doc.polyline([(round(xx, 1), round(by, 1)), (round(xx, 1), round(by + bh, 1))], col, lw)
-        for name, sp in ax.spines.items():                      # axes lines
-            if not sp.get_visible():
-                continue
-            col, _ = _hex(sp.get_edgecolor()); lw = round(sp.get_linewidth() * pxpt, 1)
-            seg = {"left": [(bx, by), (bx, by + bh)], "bottom": [(bx, by + bh), (bx + bw, by + bh)],
-                   "right": [(bx + bw, by), (bx + bw, by + bh)], "top": [(bx, by), (bx + bw, by)]}[name]
-            doc.polyline([(round(a_, 1), round(b_, 1)) for a_, b_ in seg], col, lw)
-        for axis, lo, hi in ((ax.xaxis, xl0, xl1), (ax.yaxis, yl0, yl1)):   # tick marks (outward)
-            ticks = [t for t in axis.get_major_ticks() if t.tick1line.get_visible()]
-            if not ticks:
-                continue
-            tl = ticks[0].tick1line
-            ln = tl.get_markersize() * pxpt; col, _ = _hex(tl.get_color()); lw = round(tl.get_markeredgewidth() * pxpt, 1)
-            for v in axis.get_majorticklocs():
-                if min(lo, hi) - 1e-9 <= v <= max(lo, hi) + 1e-9:
-                    if axis is ax.xaxis:
-                        xx, _ = P(*ax.transData.transform((v, yl0)))
-                        doc.polyline([(round(xx, 1), round(by + bh, 1)), (round(xx, 1), round(by + bh + ln, 1))], col, lw)
-                    else:
-                        _, yy = P(*ax.transData.transform((xl0, v)))
-                        doc.polyline([(round(bx - ln, 1), round(yy, 1)), (round(bx, 1), round(yy, 1))], col, lw)
-        arts = sorted([*ax.lines, *ax.collections], key=lambda a_: a_.get_zorder())
-        for a_ in arts:
-            put_line(a_) if isinstance(a_, matplotlib.lines.Line2D) else put_collection(a_, ax) if isinstance(a_, PathCollection) else None
-        inview = lambda v, lo, hi: min(lo, hi) - 1e-9 <= v <= max(lo, hi) + 1e-9
-        ticklabels = ([t for t in ax.get_xticklabels() if inview(t.get_position()[0], xl0, xl1)]
-                      + [t for t in ax.get_yticklabels() if inview(t.get_position()[1], yl0, yl1)])   # as drawn: inside the limits
-        for t in [*ticklabels, *ax.texts, ax.xaxis.label, ax.yaxis.label, ax._left_title]:
-            if t.get_visible() and t.get_text().strip():
-                put_text(t)
-
-    # ---------------------------------------------------------------- legend above (b)-(e)
+    # ---------------------------------------------------------------- (b)-(e) and the legend: matplotlib renders
+    # Each data panel (with its title, tick and axis labels) and the legend is rendered by matplotlib from the paper's
+    # figure, with every other panel hidden, cropped to its own extent and embedded as an SVG image at its printed
+    # position. The plotted values are therefore exactly those of fig_overview.pdf; edit the data in paper_figures.py.
+    from matplotlib.transforms import Bbox
     leg = fig.legends[0]
-    fsz = leg.prop.get_size_in_points()
-    for t, hd in zip(leg.get_texts(), leg.legend_handles):
-        put_text(t)
-        x, y, w, h = box_of(t)
-        x1 = x - leg.handletextpad * fsz * pxpt
-        x0 = x1 - leg.handlelength * fsz * pxpt
-        cy = y + h / 2
-        col, _ = _hex(hd.get_color())
-        if hd.get_linestyle() not in ("None", "", " "):
-            dash = {":": "1 2", "--": "4 3"}.get(hd.get_linestyle())
-            doc.polyline([(round(x0, 1), round(cy, 1)), (round(x1, 1), round(cy, 1))], col, round(hd.get_linewidth() * pxpt, 1), dash)
-        mk = hd.get_marker()
-        ms = hd.get_markersize() * pxpt
-        if mk == "|":
-            doc.marker((x0 + x1) / 2, cy, max(2, hd.get_markeredgewidth() * pxpt), ms, "|", col)
-        else:
-            doc.marker((x0 + x1) / 2, cy, ms, ms, mk, col)
+    parts = [(ax, ax.get_tightbbox(r)) for ax in axes[1:]] + [(leg, leg.get_window_extent(r))]
+    for art, bb in parts:
+        for a_ in axes:
+            a_.set_visible(a_ is art)
+        leg.set_visible(leg is art)
+        bb = bb.padded(1.5 * dpi / 72)                          # 1.5 pt margin (display px)
+        inch = Bbox.from_extents(bb.x0 / dpi, bb.y0 / dpi, bb.x1 / dpi, bb.y1 / dpi)
+        svg, png = io.BytesIO(), io.BytesIO()
+        with plt.rc_context({"svg.fonttype": "path"}):          # text as outlines: no font needed in draw.io
+            fig.savefig(svg, format="svg", bbox_inches=inch, pad_inches=0, transparent=True)
+        fig.savefig(png, format="png", dpi=300, bbox_inches=inch, pad_inches=0, transparent=True)
+        (x0, y1), (x1, y0) = P(bb.x0, bb.y0), P(bb.x1, bb.y1)
+        doc.svg_image(round(x0, 1), round(y0, 1), round(x1 - x0, 1), round(y1 - y0, 1), svg.getvalue(), png.getvalue())
+    for a_ in axes:
+        a_.set_visible(True)
+    leg.set_visible(True)
     plt.close(fig)
     return doc
 

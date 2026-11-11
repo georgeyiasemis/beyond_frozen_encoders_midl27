@@ -6,7 +6,7 @@
 \begin{figure}[H]
 \centering
 \includegraphics[width=\textwidth,height=0.71\textheight,keepaspectratio]{figures/fig_arms.pdf}
-\caption{Classification with SPECTRE and Pillar-0; TAP-CT is shown in Fig.~\ref{fig:pipeline}. (a, b) How each backbone turns a volume into the tokens that the heads read. SPECTRE encodes crops separately and summarizes them with its pretrained feature combiner, whereas Pillar-0 encodes the whole head CT with a convolutional stem and a three-stage multi-scale transformer. (c) The encoder components that each of the eleven methods trains, its head, its number of steps and the number of encoder parameters that receive a gradient. For Pillar-0, this count excludes per-scale blocks that never run; ratios in the text use unrounded counts. The CVPR26 joint models were also trained for 26\,000 steps (13\,000 + 13\,000).}
+\caption{Classification with SPECTRE and Pillar-0; TAP-CT is shown in Fig.~\ref{fig:pipeline}. (a, b) How each backbone turns a volume into the tokens that the heads read. SPECTRE encodes crops separately and summarizes them with its pretrained feature combiner, whereas Pillar-0 encodes the whole head CT with a convolutional stem and a three-stage multi-scale Atlas transformer. (c) The encoder components that each of the eleven methods trains, its head, its number of steps and the number of encoder parameters that receive a gradient. For Pillar-0, this count excludes per-scale blocks that never run; ratios in the text use unrounded counts. The CVPR26 joint models were also trained for 26\,000 steps (13\,000 + 13\,000).}
 \label{fig:arms}
 \end{figure}
 

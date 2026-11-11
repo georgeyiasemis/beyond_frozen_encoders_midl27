@@ -167,6 +167,22 @@ def _pillar0_no_grad() -> dict[str, int]:
             "lin_then_lorag": lora_late, "attn_then_lorag": lora_late, "attnft": attn_all, "fullft": full}
 
 
+def _pillar0_parts() -> dict[str, int]:
+    """Parameters of the Pillar-0 head-CT checkpoint by part, from the safetensors header shapes: the CLIP text
+    projection (`model.text.*`, `logit_scale`), which the classification model loads but never runs, and the rest
+    (the Atlas vision encoder with its convolutional stem, BatchNorm buffers included)."""
+    with open(PILLAR0_DIR / "model.safetensors", "rb") as fh:
+        n = struct.unpack("<Q", fh.read(8))[0]
+        hdr = json.loads(fh.read(n))
+    hdr.pop("__metadata__", None)
+    text = sum(math.prod(v["shape"]) for k, v in hdr.items() if k.startswith("model.text.") or k == "model.logit_scale")
+    return {"text_projection": text, "checkpoint_total": sum(math.prod(v["shape"]) for v in hdr.values())}
+
+
+def write_pillar0_parts() -> None:
+    pd.DataFrame([dict(part=k, numel=v) for k, v in _pillar0_parts().items()]).to_csv(DATA / "pillar0_parts.csv", index=False)
+
+
 def refresh_data() -> None:
     """Copy / harvest every number the diagrams draw into data/ (run once; reads the previous draft's results read-only)."""
     DATA.mkdir(exist_ok=True)
@@ -185,6 +201,7 @@ def refresh_data() -> None:
     seg.to_csv(DATA / "trainable_params_seg.csv", index=False)
     pd.DataFrame([dict(backbone="pillar0", method=m, no_grad_backbone=v) for m, v in _pillar0_no_grad().items()]
                  ).to_csv(DATA / "no_grad_cls.csv", index=False)
+    write_pillar0_parts()
     # example slices (AMOS22 case drawn on the TAP-CT grid, and a head CT slice for Pillar-0)
     ex = OLD_RESULTS / "examples" / "seg" / "amos22_long" / "amos_0284" / "tapct-lora.npz"
     dd = np.load(ex)

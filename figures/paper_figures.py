@@ -348,6 +348,11 @@ def fig_overview() -> None:
     tot, cls_name = {}, {}
     for bb in MAIN + VOCO:
         _, tot[bb], cls_name[bb] = logged_params("cls", bb, "lin")
+    # Pillar-0: the logged encoder total includes the CLIP text projection, which never runs; (a) gives the vision
+    # encoder (Atlas with its stem), as for TAP-CT and SPECTRE (figures/data/pillar0_parts.csv, from diagrams.py)
+    p0 = pd.read_csv(DIAG_DATA / "pillar0_parts.csv").set_index("part").numel
+    check("fig_overview", "(a) Pillar-0 logged total = checkpoint - BatchNorm buffers <= checkpoint", str(tot["pillar0"] <= p0["checkpoint_total"]), ref="True")
+    tot["pillar0"] -= int(p0["text_projection"])
     print("  logged encoder sizes:", {b: f"{v:,} ({cls_name[b]})" for b, v in tot.items()})
 
     fig = plt.figure(figsize=(W, 4.2))
@@ -374,7 +379,7 @@ def fig_overview() -> None:
     y1 = 9.95 - h1; y2 = y1 - GAP - h2; y3 = y2 - GAP - h3
     cardbox(y1, h1, "3D CT backbones")
     ax.text(9.55, y1 + h1 - 0.41, "parameters", ha="right", va="center", fontsize=6.2, color=INK2)
-    arch = {"tapct": "ViT-B", "spectre": "ViT-L", "pillar0": "multi-scale", "voco": "Swin"}
+    arch = {"tapct": "ViT-B", "spectre": "ViT-L", "pillar0": "Atlas", "voco": "Swin"}
     for k, bb in enumerate(["tapct", "spectre", "pillar0"] + VOCO):
         yy = y1 + h1 - 0.88 - k * row1
         ax.scatter([0.6], [yy], s=13, color=BACKBONE_COL[bb], marker=BACKBONE_MARK[bb], linewidths=0)
