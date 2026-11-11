@@ -937,6 +937,13 @@ def write_param_macros(cls: pd.DataFrame) -> None:
             lines.append(f"\\providecommand{{\\numParamsbb{tag}{mt}}}{{{fmt_m(n, sep=chr(92) + ',')}}}")
         # encoder parameters of Attn-only FT per encoder parameter of LoRA, rounded to an integer
         lines.append(f"\\providecommand{{\\numParamsratio{tag}AttnftLora}}{{{round(ns['attnft'] / ns['lora'])}}}")
+    # Pillar-0: size of the Atlas vision encoder (logged encoder total without the CLIP text projection, as in Fig. 1a)
+    # and the encoder parameters that run on a head CT (= those Full FT updates: logged total - never-run parameters)
+    bt = int(cls.loc[("pillar0", "lin"), "backbone_total"])
+    text = int(pd.read_csv(DATA / "pillar0_parts.csv").set_index("part").numel["text_projection"])
+    run = bt - int(pd.read_csv(DATA / "no_grad_cls.csv").set_index(["backbone", "method"]).no_grad_backbone[("pillar0", "fullft")])
+    lines.append(f"\\providecommand{{\\numParamsPillarZEncoder}}{{{fmt_m(bt - text, sep=chr(92) + ',')}}}")
+    lines.append(f"\\providecommand{{\\numParamsPillarZRun}}{{{fmt_m(run, sep=chr(92) + ',')}}}")
     PAPER_TAB.mkdir(parents=True, exist_ok=True)
     (PAPER_TAB / "param_numbers.tex").write_text("\n".join(lines) + "\n")
 
