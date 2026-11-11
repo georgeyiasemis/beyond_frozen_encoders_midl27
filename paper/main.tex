@@ -42,12 +42,15 @@
 
 \title[Beyond frozen encoders]{Beyond Frozen Encoders: Adapting 3D CT Foundation Models to Multi-Label Classification and Segmentation}
 
-\author[Yiasemis et al.]{\Name{George Yiasemis} \Email{g.yiasemis@nki.nl}\\
-\Name{Razvan-Andrei Matisan} \Email{r.matisan@nki.nl}\\
-\Name{???} \Email{???@nki.nl}\\
-\Name{Jonas Teuwen} \Email{j.teuwen@nki.nl}\\
-\addr AI for Oncology, Netherlands Cancer Institute, Amsterdam, The Netherlands 
-% \todo{co-authors and affiliations}
+% all author names on one row: names in \small (jmlr.cls sets \@name to \normalsize\upshape\bfseries)
+\makeatletter\def\@name{\small\upshape\bfseries}\makeatother
+\author[Yiasemis et al.]{%
+\Name{George Yiasemis\midljointauthortext{Equal contribution.}\nametag{$^{1}$}},
+\Name{Razvan-Andrei Matisan\midlotherjointauthor\nametag{$^{1}$}},
+\Name{Cees Snoek\nametag{$^{2}$}},
+\Name{Jonas Teuwen\nametag{$^{1}$}}\\
+\Email{g.yiasemis@nki.nl}\\
+\addr $^{1}$Netherlands Cancer Institute, Amsterdam\qquad $^{2}$University of Amsterdam, Amsterdam
 }
 
 \setlength{\emergencystretch}{2em}
