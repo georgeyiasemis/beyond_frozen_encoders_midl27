@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""Native draw.io versions of the method diagrams: Figures 2, 6 and 7 (fig_pipeline, fig_arms, fig_arms_seg).
+"""Native draw.io versions of the method diagrams, Figures 2, 6 and 7 (fig_pipeline, fig_arms, fig_arms_seg), and of the
+overview, Figure 1 (fig_overview).
 
 Built cell by cell, not converted from the matplotlib drawing, so that they are easy to edit in draw.io: every label
 sits inside its shape, arrows are attached to the shapes they connect, each slice stack is a single image, and all
@@ -7,6 +8,11 @@ positions are whole pixels. Colours, method tables and every number come from di
 paper figures); the font is LM Roman 12 (fonts/lmroman12-*.otf; install it to see it in draw.io).
 
 Canvas 700 px wide (placed at the 6.0 in text width: 12 px = 7.4 pt printed).
+
+fig_overview is converted from the matplotlib figure that paper_figures.fig_overview() draws (same data, same layout):
+every patch, text, line and marker of that figure becomes a draw.io cell at its printed position (the figure's tight
+bounding box mapped onto the 700 px canvas), method names sit inside their boxes, the card arrows are attached to the
+cards, and panels (b)-(e) are drawn as native axes, gridlines, ticks, lines and markers. No value is typed in here.
 
     python drawio_build.py   -> ../paper/figures/drawio/<name>.drawio and <name>_preview.png (a redraw of the cells, for checking)
 """
@@ -126,6 +132,41 @@ class Doc:
 
     def arrow(self, x0, y, x1, lw=1.2) -> str:
         return self.line([(x0, y), (x1, y)], arrow=True, lw=lw)
+
+    # ---- chart primitives (fig_overview)
+    def rbox(self, x, y, w, h, fill, stroke, r, label="", fs=FS, lw=1.0, align="center", color=BLACK, opacity=100) -> str:
+        """Rounded box with corner radius r (px); the label sits inside it."""
+        st = (f"rounded=1;absoluteArcSize=1;arcSize={2 * r:g};whiteSpace=nowrap;html=1;fillColor={fill};strokeColor={stroke};"
+              f"strokeWidth={lw:g};opacity={opacity:g};fontFamily={FONT};fontSize={fs:g};fontColor={color};align={align};"
+              f"verticalAlign=middle;spacing=0;spacingLeft={4 if align == 'left' else 0};")
+        return self.vertex(x, y, w, h, st, label, ("rbox", x, y, w, h, fill, stroke, lw, r, label, fs, align, color, opacity))
+
+    def marker(self, cx, cy, w, h, kind, fill, stroke="none", lw=0.0, opacity=100) -> str:
+        """Data marker centred at (cx, cy): kind o (circle), s (square), ^ (triangle) or | (bar)."""
+        shape = {"o": "ellipse;", "s": "rounded=0;", "^": "triangle;direction=north;", "|": "rounded=0;"}[kind]
+        st = f"{shape}html=1;fillColor={fill};strokeColor={stroke};strokeWidth={lw:g};opacity={opacity:g};"
+        x, y = round(cx - w / 2), round(cy - h / 2)
+        return self.vertex(x, y, round(w), round(h), st, "", ("marker", kind, x, y, round(w), round(h), fill, stroke, lw, opacity))
+
+    def rtext(self, cx, cy, w, h, label, fs, rot, color=BLACK, align="center") -> str:
+        """Text rotated by rot degrees (draw.io: clockwise), centred at (cx, cy)."""
+        st = (f"text;html=1;whiteSpace=nowrap;fillColor=none;strokeColor=none;fontFamily={FONT};fontSize={fs:g};"
+              f"fontColor={color};align={align};verticalAlign=middle;spacing=0;rotation={rot:g};")
+        x, y = round(cx - w / 2), round(cy - h / 2)
+        return self.vertex(x, y, round(w), round(h), st, label, ("rtext", cx, cy, w, h, label, fs, rot, color))
+
+    def polyline(self, pts, color=BLACK, lw=1.0, dash=None, opacity=100) -> str:
+        """Free polyline (axes, gridlines, data lines); dash is a draw.io dashPattern such as '1 2'."""
+        i = self._id()
+        (x0, y0), (x1, y1) = pts[0], pts[-1]
+        mid = "".join(f'<mxPoint x="{px:g}" y="{py:g}"/>' for px, py in pts[1:-1])
+        st = (f"edgeStyle=none;html=1;rounded=0;endArrow=none;strokeColor={color};strokeWidth={lw:g};opacity={opacity:g};"
+              + (f"dashed=1;dashPattern={dash};" if dash else ""))
+        self.cells.append(f'<mxCell id="{i}" style={quoteattr(st)} edge="1" parent="1"><mxGeometry relative="1" as="geometry">'
+                          f'<mxPoint x="{x0:g}" y="{y0:g}" as="sourcePoint"/><mxPoint x="{x1:g}" y="{y1:g}" as="targetPoint"/>'
+                          + (f'<Array as="points">{mid}</Array>' if mid else "") + '</mxGeometry></mxCell>')
+        self.prev.append(("pline", list(pts), color, lw, dash, opacity))
+        return i
 
     # ---- output
     def xml(self) -> str:
@@ -577,6 +618,227 @@ def fig_arms_seg(seg) -> Doc:
     return doc
 
 
+# ================================================================== Figure 1: overview (from the matplotlib figure)
+def _overview_figure():
+    """The matplotlib figure of paper_figures.fig_overview(), drawn as for the paper (style.setup, the 7 pt font floor)
+    but not saved."""
+    import matplotlib.figure
+    savefig = matplotlib.figure.Figure.savefig
+    import paper_figures as pf                                  # replaces Figure.savefig (font floor): restored below
+    matplotlib.figure.Figure.savefig = savefig
+    pf.style.setup()
+    plt.rcParams.update({"axes.labelcolor": pf.INK, "xtick.color": pf.INK2, "ytick.color": pf.INK2})
+    box = {}
+    save, pf.save = pf.save, (lambda fig, name: box.setdefault(name, fig))
+    try:
+        pf.fig_overview()
+    finally:
+        pf.save = save
+    fig = box["fig_overview"]
+    for t in fig.findobj(matplotlib.text.Text):
+        if t.get_text() and t.get_fontsize() < pf.FONT_FLOOR:
+            t.set_fontsize(pf.FONT_FLOOR)
+    fig.canvas.draw()
+    return fig, pf
+
+
+def _hex(c) -> tuple[str, float]:
+    import matplotlib.colors as mc
+    r = mc.to_rgba(c)
+    return mc.to_hex(r[:3]), r[3]
+
+
+def _html(s: str) -> str:
+    """matplotlib text (mathtext subscripts, newlines) -> draw.io HTML label."""
+    parts = re.split(r"(\$_\\mathrm\{[^}]*\}\$)", s)
+    out = "".join(f"<sub>{html.escape(p[10:-2])}</sub>" if p.startswith("$_\\mathrm{") else html.escape(p.replace("$", "")) for p in parts)
+    return out.replace("\n", "<br>")
+
+
+def fig_overview() -> Doc:
+    import matplotlib.text
+    from matplotlib.collections import PathCollection
+    from matplotlib.patches import FancyBboxPatch
+    from matplotlib.text import Annotation
+    fig, pf = _overview_figure()
+    r = fig.canvas.get_renderer()
+    tb = fig.get_tightbbox(r).padded(0.02)                     # inches, as savefig(bbox="tight", pad_inches=0.02)
+    s_in = W / tb.width                                         # canvas px per inch
+    pxpt = s_in / 72                                            # canvas px per printed pt
+    H = int(round(tb.height * s_in))
+    doc = Doc("fig_overview", H)
+    dpi = fig.dpi
+
+    def P(dx, dy):                                              # display px -> canvas px
+        return (dx / dpi - tb.x0) * s_in, (tb.y1 - dy / dpi) * s_in
+
+    def box_of(artist):
+        e = artist.get_window_extent(r)
+        (x0, y1), (x1, y0) = P(e.x0, e.y0), P(e.x1, e.y1)
+        return x0, y0, x1 - x0, y1 - y0
+
+    def put_text(t, rot_ok=True):
+        if not t.get_visible() or not t.get_text().strip() or isinstance(t, Annotation):
+            return
+        fs = round(t.get_fontsize() * pxpt)
+        col, _ = _hex(t.get_color())
+        lab = _html(t.get_text())
+        bold = t.get_fontweight() in ("bold", 700)
+        x, y, w, h = box_of(t)
+        rot = t.get_rotation() % 360
+        if rot:
+            t0 = t.get_rotation(); t.set_rotation(0); _, _, w0, h0 = box_of(t); t.set_rotation(t0)
+            doc.rtext(x + w / 2, y + h / 2, w0 + 2, h0, lab, fs, -t0, color=col)
+            return
+        al = {"left": "left", "right": "right"}.get(t.get_horizontalalignment(), "center")
+        xx = {"left": x - 1, "right": x - 1}.get(al, x - 1)
+        doc.text(round(xx), round(y), round(w + 2), round(h), lab, fs=fs, align=al, valign="middle", bold=bold, color=col)
+
+    def put_collection(c, ax):
+        offs = c.get_offset_transform().transform(c.get_offsets())
+        fcs = c.get_facecolors(); ecs = c.get_edgecolors(); lws = c.get_linewidths(); sizes = c.get_sizes()
+        path = c.get_paths()[0]
+        ext = path.get_extents()
+        bar = len(path.vertices) == 2
+        for k, (dx, dy) in enumerate(offs):
+            cx, cy = P(dx, dy)
+            sz = np.sqrt(sizes[k % len(sizes)]) * pxpt           # marker size: sqrt(s) pt
+            fc, fa = _hex(fcs[k % len(fcs)]) if len(fcs) else _hex(ecs[k % len(ecs)])
+            lw = float(lws[k % len(lws)]) if len(lws) else 0.0
+            if bar:
+                ec, _ = _hex(ecs[k % len(ecs)])
+                doc.marker(cx, cy, max(2, lw * pxpt), sz * ext.height, "|", ec, opacity=100)
+                continue
+            kind = next((pf.BACKBONE_MARK[b] for b, col in pf.BACKBONE_COL.items() if _hex(col)[0] == fc), "o")
+            ec, ea = _hex(ecs[k % len(ecs)]) if len(ecs) and lw > 0 else ("none", 1)
+            w, h = sz * ext.width, sz * ext.height
+            doc.marker(cx, cy, w, h, kind, fc, ec if ea > 0 else "none", round(lw * pxpt, 1) if ec != "none" else 0, opacity=round(fa * 100))
+
+    def put_line(l):
+        xy = l.get_transform().transform(l.get_xydata())
+        pts = [tuple(round(v, 1) for v in P(*p)) for p in xy]
+        col, a = _hex(l.get_color())
+        ls = l.get_linestyle()
+        dash = {":": "1 2", "--": "4 3", "-.": "4 2 1 2"}.get(ls)
+        if ls in ("None", "", " ") or len(pts) < 2:
+            return
+        doc.polyline(pts, col, round(l.get_linewidth() * pxpt, 1), dash, round(a * 100))
+
+    axes = fig.axes
+    # ---------------------------------------------------------------- (a) design: cards, method boxes, markers, arrows
+    ax = axes[0]
+    texts = [t for t in ax.texts if t.get_text().strip()]
+    used, cards = set(), []
+    for p in ax.patches:
+        x, y, w, h = box_of(p)
+        fc, fa = _hex(p.get_facecolor()); ec, ea = _hex(p.get_edgecolor())
+        if fa < 1:                                              # the card shadow: black at low alpha on white
+            fc = _hex(tuple(fa * c + (1 - fa) for c in matplotlib.colors.to_rgb(fc)))[0]
+        stroke = ec if (ea > 0 and p.get_linewidth() > 0) else "none"
+        if isinstance(p, FancyBboxPatch):
+            rr = p.get_boxstyle().rounding_size * (box_of(ax)[2] / (ax.get_xlim()[1] - ax.get_xlim()[0]))
+            inside = [t for t in texts if id(t) not in used and h < 20 and x <= P(*ax.transData.transform(t.get_position()))[0] <= x + w
+                      and y <= P(*ax.transData.transform(t.get_position()))[1] <= y + h]
+            lab, fs, col = "", FS, BLACK
+            if inside:                                          # a method box: its name becomes the label
+                t = inside[0]; used.add(id(t))
+                lab, fs, col = _html(t.get_text()), round(t.get_fontsize() * pxpt), _hex(t.get_color())[0]
+            cid = doc.rbox(round(x), round(y), round(w), round(h), fc, stroke, round(rr, 1), lab, fs=fs,
+                           lw=round(p.get_linewidth() * pxpt, 1), align="left", color=col)
+            if stroke != "none" and h > 40:
+                cards.append((y, cid))
+        else:
+            doc.vertex(round(x), round(y), max(1, round(w)), round(h), f"rounded=0;html=1;fillColor={fc};strokeColor={stroke};", "",
+                       ("rect", round(x), round(y), max(1, round(w)), round(h), fc, stroke, 0, "", FS, False, False, "center", "middle", BLACK))
+    for t in texts:
+        if id(t) not in used:
+            put_text(t)
+    for c in ax.collections:
+        put_collection(c, ax)
+    cards = [cid for _, cid in sorted(cards)]
+    arrow_col = next((_hex(t.arrow_patch.get_edgecolor())[0] for t in ax.texts if isinstance(t, Annotation) and t.arrow_patch), BLACK)
+    arrow_lw = next((t.arrow_patch.get_linewidth() for t in ax.texts if isinstance(t, Annotation) and t.arrow_patch), 1.0)
+    for a_, b_ in zip(cards, cards[1:]):
+        doc.edge(a_, b_, (0.5, 1), (0.5, 0), color=arrow_col, lw=round(arrow_lw * pxpt, 1))
+    put_text(ax._left_title)
+
+    # ---------------------------------------------------------------- (b)-(e) data panels
+    for ax in axes[1:]:
+        bx, by, bw, bh = box_of(ax)
+        (xl0, xl1), (yl0, yl1) = ax.get_xlim(), ax.get_ylim()
+        for p in ax.patches:                                    # shaded band (axvspan)
+            x, y, w, h = box_of(p)
+            x0, x1 = max(x, bx), min(x + w, bx + bw); y0, y1 = max(y, by), min(y + h, by + bh)
+            fc, _ = _hex(p.get_facecolor())
+            doc.vertex(round(x0), round(y0), round(x1 - x0), round(y1 - y0), f"rounded=0;html=1;fillColor={fc};strokeColor=none;", "",
+                       ("rect", round(x0), round(y0), round(x1 - x0), round(y1 - y0), fc, "none", 0, "", FS, False, False, "center", "middle", BLACK))
+        for axis, lo, hi in ((ax.xaxis, xl0, xl1), (ax.yaxis, yl0, yl1)):   # gridlines at the visible major ticks
+            gl = axis.get_gridlines()
+            if not any(g.get_visible() for g in gl):
+                continue
+            col, _ = _hex(gl[0].get_color()); lw = round(gl[0].get_linewidth() * pxpt, 1)
+            for v in axis.get_majorticklocs():
+                if min(lo, hi) - 1e-9 <= v <= max(lo, hi) + 1e-9:
+                    if axis is ax.yaxis:
+                        _, yy = P(*ax.transData.transform((xl0, v)))
+                        doc.polyline([(round(bx, 1), round(yy, 1)), (round(bx + bw, 1), round(yy, 1))], col, lw)
+                    else:
+                        xx, _ = P(*ax.transData.transform((v, yl0)))
+                        doc.polyline([(round(xx, 1), round(by, 1)), (round(xx, 1), round(by + bh, 1))], col, lw)
+        for name, sp in ax.spines.items():                      # axes lines
+            if not sp.get_visible():
+                continue
+            col, _ = _hex(sp.get_edgecolor()); lw = round(sp.get_linewidth() * pxpt, 1)
+            seg = {"left": [(bx, by), (bx, by + bh)], "bottom": [(bx, by + bh), (bx + bw, by + bh)],
+                   "right": [(bx + bw, by), (bx + bw, by + bh)], "top": [(bx, by), (bx + bw, by)]}[name]
+            doc.polyline([(round(a_, 1), round(b_, 1)) for a_, b_ in seg], col, lw)
+        for axis, lo, hi in ((ax.xaxis, xl0, xl1), (ax.yaxis, yl0, yl1)):   # tick marks (outward)
+            ticks = [t for t in axis.get_major_ticks() if t.tick1line.get_visible()]
+            if not ticks:
+                continue
+            tl = ticks[0].tick1line
+            ln = tl.get_markersize() * pxpt; col, _ = _hex(tl.get_color()); lw = round(tl.get_markeredgewidth() * pxpt, 1)
+            for v in axis.get_majorticklocs():
+                if min(lo, hi) - 1e-9 <= v <= max(lo, hi) + 1e-9:
+                    if axis is ax.xaxis:
+                        xx, _ = P(*ax.transData.transform((v, yl0)))
+                        doc.polyline([(round(xx, 1), round(by + bh, 1)), (round(xx, 1), round(by + bh + ln, 1))], col, lw)
+                    else:
+                        _, yy = P(*ax.transData.transform((xl0, v)))
+                        doc.polyline([(round(bx - ln, 1), round(yy, 1)), (round(bx, 1), round(yy, 1))], col, lw)
+        arts = sorted([*ax.lines, *ax.collections], key=lambda a_: a_.get_zorder())
+        for a_ in arts:
+            put_line(a_) if isinstance(a_, matplotlib.lines.Line2D) else put_collection(a_, ax) if isinstance(a_, PathCollection) else None
+        inview = lambda v, lo, hi: min(lo, hi) - 1e-9 <= v <= max(lo, hi) + 1e-9
+        ticklabels = ([t for t in ax.get_xticklabels() if inview(t.get_position()[0], xl0, xl1)]
+                      + [t for t in ax.get_yticklabels() if inview(t.get_position()[1], yl0, yl1)])   # as drawn: inside the limits
+        for t in [*ticklabels, *ax.texts, ax.xaxis.label, ax.yaxis.label, ax._left_title]:
+            if t.get_visible() and t.get_text().strip():
+                put_text(t)
+
+    # ---------------------------------------------------------------- legend above (b)-(e)
+    leg = fig.legends[0]
+    fsz = leg.prop.get_size_in_points()
+    for t, hd in zip(leg.get_texts(), leg.legend_handles):
+        put_text(t)
+        x, y, w, h = box_of(t)
+        x1 = x - leg.handletextpad * fsz * pxpt
+        x0 = x1 - leg.handlelength * fsz * pxpt
+        cy = y + h / 2
+        col, _ = _hex(hd.get_color())
+        if hd.get_linestyle() not in ("None", "", " "):
+            dash = {":": "1 2", "--": "4 3"}.get(hd.get_linestyle())
+            doc.polyline([(round(x0, 1), round(cy, 1)), (round(x1, 1), round(cy, 1))], col, round(hd.get_linewidth() * pxpt, 1), dash)
+        mk = hd.get_marker()
+        ms = hd.get_markersize() * pxpt
+        if mk == "|":
+            doc.marker((x0 + x1) / 2, cy, max(2, hd.get_markeredgewidth() * pxpt), ms, "|", col)
+        else:
+            doc.marker((x0 + x1) / 2, cy, ms, ms, mk, col)
+    plt.close(fig)
+    return doc
+
+
 # ================================================================== preview (redraw of the cells) + overflow check
 def _mt(s: str) -> str:
     """HTML label -> matplotlib text (mathtext for sub/superscripts) for the preview."""
@@ -618,6 +880,33 @@ def preview(doc: Doc, path: Path) -> list[str]:
         elif k == "image":
             _, x, y, w, h, arr = p
             ax.imshow(arr, extent=(x, x + w, y + h, y), zorder=5, interpolation="bilinear")
+        elif k == "rbox":
+            from matplotlib.patches import FancyBboxPatch
+            _, x, y, w, h, fc, ec, lw, rr, label, fs, al, color, op = p
+            ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle=f"round,pad=0,rounding_size={min(rr, w / 2, h / 2)}", fc=fc,
+                                        ec=ec, lw=lw * pt, alpha=op / 100, zorder=2))
+            if label:
+                t = ax.text(x + 4 if al == "left" else x + w / 2, y + h / 2, _mt(label), fontsize=fs * pt, ha=al, va="center", color=color, zorder=6)
+                texts.append((t, (x, y, w, h), ec != "none", label))
+        elif k == "marker":
+            _, kind, x, y, w, h, fc, ec, lw, op = p
+            shape = {"o": "o", "s": "s", "^": "^", "|": "s"}[kind]
+            if kind == "o":
+                from matplotlib.patches import Ellipse
+                patch = Ellipse((x + w / 2, y + h / 2), w, h)
+            elif kind == "^":
+                patch = Polygon([(x, y + h), (x + w / 2, y), (x + w, y + h)])
+            else:
+                patch = Rectangle((x, y), w, h)
+            patch.set(fc=fc, ec=ec, lw=lw * pt, alpha=op / 100, zorder=5)
+            ax.add_patch(patch)
+        elif k == "rtext":
+            _, cx, cy, w, h, label, fs, rot, color = p
+            ax.text(cx, cy, _mt(label), fontsize=fs * pt, ha="center", va="center", rotation=-rot, rotation_mode="anchor", color=color, zorder=6)
+        elif k == "pline":
+            _, pts, c, lw, dash, op = p
+            xs, ys = zip(*pts)
+            ax.plot(xs, ys, color=c, lw=lw * pt, alpha=op / 100, ls=":" if dash == "1 2" else "--" if dash else "-", zorder=4)
         elif k == "line":
             _, pts, c, lw, arrow = p
             xs, ys = zip(*pts)
@@ -652,6 +941,12 @@ def main() -> None:
         for msg in preview(doc, OUT / f"{doc.name}_preview.png"):
             print("CHECK", msg)
         print(f"{doc.name}: {len(doc.cells)} cells, {W}x{doc.h} px -> {OUT / (doc.name + '.drawio')}")
+    with plt.rc_context():                         # last: paper_figures sets its own rcParams
+        doc = fig_overview()
+    (OUT / f"{doc.name}.drawio").write_text(doc.xml())
+    for msg in preview(doc, OUT / f"{doc.name}_preview.png"):
+        print("CHECK", msg)
+    print(f"{doc.name}: {len(doc.cells)} cells, {W}x{doc.h} px -> {OUT / (doc.name + '.drawio')}")
 
 
 if __name__ == "__main__":
