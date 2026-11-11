@@ -20,8 +20,10 @@
 \def\stripsign#1#2\relax{\ifx+#1#2\else\ifx-#1#2\else#1#2\fi\fi}
 \newcommand{\magn}[1]{\expandafter\stripsign#1\relax}
 \newcommand{\mci}[3]{\begin{tabular}[c]{@{}c@{}}#1\\[-1.5pt]{\scriptsize[#2, #3]}\end{tabular}}
-% Greek capital Delta from the text font, so that the PDF text reads U+0394 (CM math maps it to U+2206)
-\renewcommand{\Delta}{\text{\symbol{"0394}}}
+% Greek capital Delta from the text font, so that the PDF text reads U+0394 (CM math maps it to U+2206);
+% XeLaTeX/LuaLaTeX only: pdfLaTeX fonts have no character 916, so there \Delta stays the CM math symbol
+\usepackage{iftex}
+\ifPDFTeX\else\renewcommand{\Delta}{\text{\symbol{"0394}}}\fi
 \input{tables/numbers.tex}
 \input{tables/design_numbers.tex}
 \input{tables/param_numbers.tex}

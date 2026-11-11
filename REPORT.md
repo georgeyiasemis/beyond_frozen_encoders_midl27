@@ -476,3 +476,14 @@ against the logged configs and counts of all 1883 logged runs. One fix: the deco
   (diagrams.write_pillar0_parts, safetensors header). Architecture named Atlas in Fig. 1(a), intro, methods and Fig. 6.
 - Draw.io Figure 1: panel (a) native cells; panels (b)-(e) and the legend are matplotlib renders of the paper figure,
   embedded as SVG (text as outlines), so the plotted values cannot drift from the PDF.
+- Parameter check (2026-11-11, job 18795, A6000): every classification and segmentation model of the paper built from a
+  paper run YAML with the release code (62 models), then one train-mode forward/backward (48 models) to count the
+  parameters that receive a gradient. All reported counts match: Tab. 6 (trainable incl. head; Pillar-0 with gradient),
+  Fig. 6c and Fig. 7b (encoder parameters with gradient), the LoRA / Attn-only FT ratios 48, 54, 19, the heads
+  (769/1081/1153; 14.2/28.0/31.9 M), the decoder (2,453,984 / 2,620,672 + 17C; 2.45 / 2.62 M at C = 15), the counts
+  with never-run parts (Pillar-0 1.1 / 0.74 / 21 / 94 M; SPECTRE seg combiner 2.4 / 2.5 / 2.4 / 397 M) and Fig. 1a
+  (87 / 397 / 80 M). Pillar-0 never-run counts reproduce exactly (e.g. Full FT 44,843,456 with gradient). Only other
+  parameter without gradient: TAP-CT's 768-d mask token under Full FT (87,082,752 updated; still 87 M). Scripts and
+  outputs: beyond_frozen_encoders/metrics/param_check/.
+- pdfLaTeX (Overleaf) compatibility: \Delta redefined to U+0394 only under XeTeX/LuaTeX (iftex), since pdfLaTeX
+  fonts have no character 916 ("Bad character code (916)" in Tabs. headline, methods, paired).
